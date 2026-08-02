@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter, IBM_Plex_Mono, Caveat } from "next/font/google";
 import { MotionConfig } from "motion/react";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -30,6 +31,19 @@ export const metadata: Metadata = {
   title: "ŞÜPHELİ — Dijital Dedektif Oyunu",
   description:
     "Herkes bir şey saklıyor. Kanıtları incele, şüphelileri sorgula, katili bul. Ücretsiz, çok vakalı dijital dedektiflik oyunu.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ŞÜPHELİ",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
@@ -50,6 +64,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} ${plexMono.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <ServiceWorkerRegister />
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
       </body>
     </html>

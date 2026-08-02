@@ -6,7 +6,7 @@ export const vaka02: CaseData = {
   title: "Son Round",
   difficulty: "orta",
   tagline: "Büyük yatırım turunun imzalanacağı gece, genç bir CEO kendi ofisinde öldürüldü.",
-  available: false,
+  available: true,
   synopsis:
     "İstanbul'un finans merkezindeki cam kule, gece yarısına yaklaşırken hâlâ ışıklarla doluydu. Nova Teknoloji'nin 28. katındaki toplantı odasında, şirketin değerini kat kat artıracak dev bir yatırım turunun son imzaları atılmak üzereydi — bu, kurucu ortak ve CEO Deniz Aral'ın yıllardır peşinde koştuğu andı.\n\nToplantı bitip herkes dağıldığında, Deniz kendi ofisine çekildi. Asistanı Yağmur, saat 23:30'da onu imza törenine çağırmaya geldiğinde kapı aralıktı. İçeri girdiğinde bulduğu manzara onu dondurdu: Deniz, masasının önünde, kafasına aldığı sert bir darbeyle cansız yatıyordu. Suç aleti, az önce kazandığı 'Yılın Girişimcisi' ödülünün kristal heykelciğiydi — kırılmış parçaları etrafa saçılmıştı.\n\n28. kata sadece kartlı geçişle giriliyor, her hareket saniyesi saniyesine loglanıyordu. Ama güvenlik ekibi logu incelediğinde beklenen şeyi bulamadı — kimsenin orada olmadığını değil, bir kaydın sistemden eksik olduğunu gördüler. Bu kazayla olmuş bir şey değildi; biri, o gece binada bulunan sekiz kişiden biri, izlerini bilerek silmişti. Birkaç ay önce ülke gündemini sarsan Yıldız Ekspresi cinayetinin ardından, kamuoyu bir kez daha benzer bir gizemle çalkalanıyordu — bu sefer failin peşinde teknoloji vardı, ama gerçeği ortaya çıkaracak olan yine sabır ve dikkatti.",
   victim: {
