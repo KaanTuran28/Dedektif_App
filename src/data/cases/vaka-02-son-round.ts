@@ -8,7 +8,7 @@ export const vaka02: CaseData = {
   tagline: "Büyük yatırım turunun imzalanacağı gece, genç bir CEO kendi ofisinde öldürüldü.",
   available: false,
   synopsis:
-    "Nova Teknoloji, İstanbul'da hızla büyüyen bir yapay zeka girişimi. Bu gece, şirketin değerini kat kat artıracak büyük bir yatırım turu imzalanacaktı. Saat 23:30'da, 28. kattaki CEO ofisinde kurucu ortak ve CEO Deniz Aral, kafasına aldığı sert bir darbeyle ölü bulundu. Suç aleti, kendi masasındaki kristal 'Yılın Girişimcisi' ödülü. Kata sadece kartlı geçişle giriliyor, her hareket loglanıyor — ama log, beklenenin aksine kimsenin orada olmadığını değil, bir kaydın eksik olduğunu gösteriyor. Katil hâlâ o gece binada olan beş kişiden biri. Birkaç ay önce ülke gündemini sarsan Yıldız Ekspresi cinayetinin ardından, kamuoyu bir kez daha benzer bir gizemle çalkalanıyor.",
+    "İstanbul'un finans merkezindeki cam kule, gece yarısına yaklaşırken hâlâ ışıklarla doluydu. Nova Teknoloji'nin 28. katındaki toplantı odasında, şirketin değerini kat kat artıracak dev bir yatırım turunun son imzaları atılmak üzereydi — bu, kurucu ortak ve CEO Deniz Aral'ın yıllardır peşinde koştuğu andı.\n\nToplantı bitip herkes dağıldığında, Deniz kendi ofisine çekildi. Asistanı Yağmur, saat 23:30'da onu imza törenine çağırmaya geldiğinde kapı aralıktı. İçeri girdiğinde bulduğu manzara onu dondurdu: Deniz, masasının önünde, kafasına aldığı sert bir darbeyle cansız yatıyordu. Suç aleti, az önce kazandığı 'Yılın Girişimcisi' ödülünün kristal heykelciğiydi — kırılmış parçaları etrafa saçılmıştı.\n\n28. kata sadece kartlı geçişle giriliyor, her hareket saniyesi saniyesine loglanıyordu. Ama güvenlik ekibi logu incelediğinde beklenen şeyi bulamadı — kimsenin orada olmadığını değil, bir kaydın sistemden eksik olduğunu gördüler. Bu kazayla olmuş bir şey değildi; biri, o gece binada bulunan sekiz kişiden biri, izlerini bilerek silmişti. Birkaç ay önce ülke gündemini sarsan Yıldız Ekspresi cinayetinin ardından, kamuoyu bir kez daha benzer bir gizemle çalkalanıyordu — bu sefer failin peşinde teknoloji vardı, ama gerçeği ortaya çıkaracak olan yine sabır ve dikkatti.",
   victim: {
     name: "Deniz Aral",
     age: 34,
@@ -98,6 +98,57 @@ export const vaka02: CaseData = {
         { question: "İlişkinizin bitmesi sizi ne kadar etkiledi?", answer: "Çok. Ama onu öldürmek... hayır, asla düşünmedim bile." },
         { question: "23:30'a kadar nerede olduğunuzu doğrulayabilecek biri var mı?", answer: "Evet, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım, ikisi de yanımdaydı." },
         { question: "Ofise sık girip çıktığınız doğru mu?", answer: "Evet, işim gereği, kimse hareketimi sorgulamaz. Ama o gece 22:25'ten sonra hiç girmedim, ta ki onu bulana kadar." },
+      ],
+    },
+    {
+      id: "cem",
+      name: "Cem Baydar",
+      age: 47,
+      role: "Hukuk Müşaviri",
+      motive:
+        "Deniz, Cem'in yatırımcı fonlardan birinde gizlice hissesi olduğunu öğrenmişti — bariz bir çıkar çatışması. O gece yönetim kuruluna resmi olarak bildireceğini söylemişti, bu Cem'in kariyerinin ve barosundaki itibarının sonu olabilirdi.",
+      opportunity:
+        "Sözleşme maddelerini son kez gözden geçirmek için o akşam 28. kattaydı, geç saate kadar çalıştı.",
+      statementIntro:
+        "\"Nova'nın hukuk müşavirliğini beş yıldır yapıyorum, bu yatırım turunun sözleşmesini ben hazırladım. O akşam son değişiklikleri gözden geçirmek için ofisteydim, evet. Deniz'in bana kızgın olduğunu biliyordum, bir çıkar çatışması iddiası vardı, kabul ediyorum hata yaptım ama bunu düzeltecektim. Toplantı odasında çalışıp saat 22:30 gibi çıktım, evime gittim.\"",
+      statementQA: [
+        { question: "Çıkar çatışması iddiasını açıklar mısınız?", answer: "Yatırımcı fonlardan birinde küçük bir payım var, açıklamam gerekirdi, unuttum ya da göz ardı ettim, kasıtlı değildi." },
+        { question: "Deniz sizi yönetim kuruluna şikayet edecek miydi?", answer: "Öyle söylemişti, evet. Kariyerimi riske atan bir durumdu ama bu beni cinayete sürüklemez." },
+        { question: "22:30'da çıktığınızı kim doğrulayabilir?", answer: "Güvenlik kamerası lobi çıkışını göstermeli. Kartımla çıkış yaptım." },
+      ],
+    },
+    {
+      id: "zehra",
+      name: "Zehra Akman",
+      age: 38,
+      role: "Rakip Şirket CEO'su",
+      motive:
+        "Kendi girişimi Nova'nın en değerli mühendislerini transfer etmeye çalışıyordu; Deniz bunu öğrenip yatırımcılara Zehra'nın şirketini kötüleyen bir rapor gönderme tehdidinde bulunmuştu, bu Zehra'nın kendi yatırım turunu tehlikeye atabilirdi.",
+      opportunity:
+        "O akşam binada, alt katta farklı bir toplantı için bulunuyordu, güvenlik kartı 21:40 giriş kaydı gösteriyor.",
+      statementIntro:
+        "\"Deniz'le rekabetimiz herkesçe biliniyor, gizlemeyeceğim. O akşam binada başka bir toplantı için bulunuyordum, 22. katta bir ortak görüşmemiz vardı, Deniz'in ofisine hiç çıkmadım. Aramızdaki gerginlik iş dünyasında sık rastlanan bir şey, cinayetle bir ilgisi yok.\"",
+      statementQA: [
+        { question: "Deniz'in sizi tehdit ettiği doğru mu?", answer: "Evet, yatırımcılara kötü bir rapor göndereceğini söylemişti. Sinir bozucuydu ama alışığım bu tür şeylere." },
+        { question: "22. kattaki toplantınızın saatini doğrulayabilir misiniz?", answer: "Tabii, üç kişiyle birlikteydim, 21:40'tan 23:00'a kadar sürdü." },
+        { question: "28. kata hiç çıkmadınız mı?", answer: "Hayır, asansöre bile binmedim, neden çıkayım ki?" },
+      ],
+    },
+    {
+      id: "kerem",
+      name: "Kerem Arslan",
+      age: 39,
+      role: "Sessiz Ortak / Kurucu",
+      motive:
+        "Nova'yı Deniz ve Ozan'la birlikte kurmuştu ama yıllar içinde kararlardan dışlanmış, hisseleri sembolik bir düzeye indirilmişti; bu yatırım turunun kendisini tamamen tasfiye edeceğini öğrenmişti.",
+      opportunity:
+        "Artık şirkette aktif çalışmıyor olsa da eski kartı hâlâ aktifti, kimse bunu fark etmemişti.",
+      statementIntro:
+        "\"Nova'yı üçümüz kurduk, ben, Deniz ve Ozan. Zamanla şirketin günlük işlerinden uzaklaştırıldım, 'stratejik' dediler buna. Bu turun beni tamamen tasfiye edeceğini öğrendiğimde çok kırıldım, yıllarımın karşılığı bu muydu diye sordum kendime. O akşam binadaydım, evet, kartımın hâlâ çalıştığını bilmiyordum bile, eski alışkanlıkla denedim, açıldı. Ama Deniz'in ofisine gitmedim, sadece eski çalışma odamı özlemiştim, oturdum biraz.\"",
+      statementQA: [
+        { question: "Kartınızın hâlâ aktif olduğunu bilmiyor muydunuz?", answer: "Hayır, şaşırdım açıkçası. Kimse iptal etmeyi düşünmemiş olmalı." },
+        { question: "Binada ne kadar kaldınız?", answer: "Yarım saat kadar, eski odamda oturdum, biraz düşündüm, sonra çıktım." },
+        { question: "Deniz'le en son ne zaman konuştunuz?", answer: "İki hafta önce, kısa bir telefon görüşmesi. O gece hiç konuşmadık." },
       ],
     },
   ],
@@ -225,16 +276,56 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       },
       body: `Yapay zeka alanında hızla büyüyen Nova Teknoloji'nin, şirket değerini kat kat artıracak yeni bir yatırım turuna hazırlandığı öğrenildi. Sektör kaynakları, imza töreninin bu hafta içinde gerçekleşeceğini belirtirken, şirket içi kaynaklar bazı ortaklık paylarının yeniden yapılandırılacağına dair "gerilimli" görüşmelerin sürdüğünü aktardı. Nova Teknoloji'den konuya ilişkin resmi bir açıklama gelmedi.`,
     },
+    {
+      id: "board-eposta",
+      type: "eposta",
+      title: "Yönetim Kuruluna Taslak E-posta",
+      meta: "Deniz Aral'ın taslaklar klasöründe bulundu, gönderilmemiş",
+      emailHeader: {
+        from: "Deniz Aral",
+        to: "Yönetim Kurulu",
+        subject: "Acil — Hukuk Müşavirliği Çıkar Çatışması",
+        date: "Olay günü, 20:12",
+      },
+      body: `Değerli kurul üyeleri, yatırım turu görüşmeleri sırasında hukuk müşavirimiz Cem Baydar'ın, yatırımcı fonlarımızdan birinde önceden beyan edilmemiş bir hissesi olduğunu öğrendim. Bu açık bir çıkar çatışması ve sözleşme sürecinin bütünlüğünü riske atıyor. Toplantıdan hemen sonra bu konuyu resmi olarak gündeme getireceğim.
+
+(Not: E-posta gönderilmemiş, taslak olarak kalmış.)`,
+    },
+    {
+      id: "muhendis-transfer-mesaj",
+      type: "whatsapp",
+      title: "Mühendis Transferi Yazışması",
+      meta: "Şirket dizüstü bilgisayarında bulundu, kurbanın kıdemli mühendisine ait",
+      messages: [
+        { sender: "İşe Alım Uzmanı (Zehra'nın şirketi)", time: "19:02", text: "Teklifimizi tekrar düşündün mü? Paket çok daha iyi, biliyorsun." },
+        { sender: "Kıdemli Mühendis", time: "19:10", text: "Düşünüyorum ama Deniz bu hafta bir şeyler sezdi galiba, çok gergin." },
+        { sender: "İşe Alım Uzmanı", time: "19:12", text: "Zehra Hanım aceleye getirmemizi istiyor, yatırım turu kapanmadan karar verelim diyor." },
+        { sender: "Kıdemli Mühendis", time: "19:15", text: "Tamam, toplantıdan sonra konuşalım, şu an ofisteyim.", self: true },
+      ],
+    },
+    {
+      id: "eski-ortaklik-ozeti",
+      type: "resmi_rapor",
+      title: "Eski Ortaklık Sözleşmesi Özeti",
+      meta: "Ticaret Sicili kayıtları · Nova Teknoloji kuruluş belgeleri",
+      body: `Nova Teknoloji, sekiz yıl önce Deniz Aral, Ozan Kırca ve Kerem Arslan tarafından eşit ortaklıkla (%33,3) kurulmuştur. İzleyen yıllarda yapılan art arda hisse ihraçları ve yeniden yapılandırmalarla Kerem Arslan'ın payı kademeli olarak %2,1'e kadar düşürülmüştür. İncelenen taslak yatırım turu sözleşmesinde, Kerem Arslan'a ait payın "seyreltme koruması" maddesinden hariç tutulduğu, bu turun tamamlanmasıyla payının sembolik bir düzeyin de altına ineceği görülmektedir.`,
+    },
   ],
   timeline: [
     { time: "19:30", description: "Selin ön görüşme için ofise gelir, misafir kartı alır, ardından havalimanına gider." },
     { time: "20:15", description: "Selin'in uçağı İstanbul'dan kalkar." },
+    { time: "21:40", description: "Zehra Akman, 22. kattaki farklı bir toplantı için binaya girer." },
     { time: "21:48–21:52", description: "Deniz, Ozan ve Aylin gece toplantısı için 28. kata girer." },
     { time: "21:52", description: "Kart sisteminde Selin adına bir giriş kaydı görünüyor — kendisi 'o saatte İzmir'deydim' diyor.", contradicts: "selin" },
+    { time: "22:00", description: "Kerem Arslan, hâlâ aktif olan eski kartıyla binaya girer, eski çalışma odasına gider." },
+    { time: "22:10", description: "Cem Baydar, toplantı odasında sözleşme maddelerini son kez gözden geçirir." },
     { time: "22:14–22:19", description: "Barış lobiye girer, eşyalarını alıp 5 dakikada çıkar (28. kata çıkmaz)." },
+    { time: "22:30", description: "Kerem eski odasından ayrılıp binadan çıkar." },
+    { time: "22:30", description: "Cem Baydar binadan çıkar." },
     { time: "22:40", description: "Aylin kendi ofisine kartla girer." },
     { time: "22:45", description: "Ozan'ın gerçek girişi (yalnızca gölge log'da var) — kendisi 'evdeydim, o gece binaya hiç gitmedim' diyor.", contradicts: "ozan" },
     { time: "22:50–23:10", description: "Cinayet gerçekleşir." },
+    { time: "23:00", description: "Zehra'nın toplantısı sona erer, o da binadan çıkar." },
     { time: "23:15", description: "Ozan çıkar (yalnızca gölge log'da var)." },
     { time: "23:20", description: "Aylin çıkar." },
     { time: "23:30", description: "Yağmur, Deniz'i toplantıya çağırmaya gelip cesedi bulur." },
@@ -264,6 +355,6 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
   solution: {
     killerId: "ozan",
     explanation:
-      "Katil, ortak kurucu ve CTO Ozan Kırca. Yatırım turu imza gecesi, herkesin dikkati toplantıdayken Deniz'in ofisine girdi, hisse sulandırma ve patent tartışmasını büyüttü, öfkeyle masadaki kristal ödülle Deniz'e vurdu. CTO olarak erişebildiği bina güvenlik sisteminden kendi giriş kaydını sildi — ana logda kimsenin görünmemesi ilk bakışta onu temize çıkarır gibiydi, ama bu ayrıcalığa sadece CTO'nun sahip olması aslında onu işaret ediyordu. IT güvenlik ekibinin yedek 'gölge log' sunucusunda gerçek girişi (22:45–23:15) ortaya çıktı. E-posta yazışması, hem finansal hem duygusal (ihanet) boyutuyla en güçlü motivi doğruluyordu. Diğer şüphelilerin çelişkileri gerçekti ama masum açıklamalara bağlanıyordu: Aylin kariyer kaygısıyla belge saklamıştı, Barış hiç 28. kata çıkmamıştı, Selin o saatte İzmir'deydi, Yağmur'un iki tanıklı alibisi vardı.",
+      "Katil, ortak kurucu ve CTO Ozan Kırca. Yatırım turu imza gecesi, herkesin dikkati toplantıdayken Deniz'in ofisine girdi, hisse sulandırma ve patent tartışmasını büyüttü, öfkeyle masadaki kristal ödülle Deniz'e vurdu. CTO olarak erişebildiği bina güvenlik sisteminden kendi giriş kaydını sildi — ana logda kimsenin görünmemesi ilk bakışta onu temize çıkarır gibiydi, ama bu ayrıcalığa sadece CTO'nun sahip olması aslında onu işaret ediyordu. IT güvenlik ekibinin yedek 'gölge log' sunucusunda gerçek girişi (22:45–23:15) ortaya çıktı. E-posta yazışması, hem finansal hem duygusal (ihanet) boyutuyla en güçlü motivi doğruluyordu. Diğer yedi şüphelinin hepsinin gerçek bir motivi ve fırsatı vardı ama hiçbiri cinayete karışmamıştı: Aylin kariyer kaygısıyla belge saklamıştı, Barış hiç 28. kata çıkmamıştı, Selin o saatte İzmir'deydi, Yağmur'un iki tanıklı alibisi vardı, Cem sadece sözleşmeyi düzeltip erken çıkmıştı, Zehra hiç 28. kata uğramamıştı, Kerem ise eski odasında oturup dışarı çıkmıştı — hiçbirinin bina güvenlik sisteminin admin yetkisine erişimi yoktu, oysa bu, olayı çözen en kritik ayrıntıydı.",
   },
 };

@@ -8,7 +8,7 @@ export const vaka03: CaseData = {
   tagline: "80. doğum günü kutlamasında, aile patriği kendi kadehinden içtiği zehirle can verdi.",
   available: false,
   synopsis:
-    "Boğaz kıyısındaki tarihi Zümrüt Yalı'da, Erendil Holding'in kurucusu Necdet Erendil'in 80. doğum günü kutlanıyor. Üç kuşak aile üyesi ve yakın çevresi toplanmış. Kutlama kadehi kaldırılırken Necdet aniden fenalaşıp hayatını kaybediyor — özel viski kadehine zehir katılmış. Herkesin bir motivi var: miras, borç, ifşa olacak bir sır. Ama zehire gerçekten erişimi olan tek kişiyi bulmak gerekiyor. Bu, Yıldız Ekspresi ve Son Round'dan sonra ülke gündemini üçüncü kez sarsan bir cinayet vakası.",
+    "Boğaz'ın en eski yalılarından biri olan Zümrüt Yalı, bu akşam ışıl ışıldı. Erendil Holding'in efsanevi kurucusu Necdet Erendil'in 80. doğum günü kutlanıyordu; bahçedeki fenerler suya yansıyor, üç kuşak aile üyesi ve holdingin yakın çevresi geniş salonda toplanmıştı. Necdet, yıllardır olduğu gibi bu gece de odanın merkezindeydi — sert bakışları, keskin dili ve herkesi aynı anda hem büyüleyen hem korkutan o eski gücüyle.\n\nPasta kesilip kadehler kaldırılacağı sırada, Sadi'nin özenle hazırladığı özel viski Necdet'e sunuldu. Necdet kısa bir konuşma yaptı, kadehi kaldırdı, içti — ve birkaç dakika içinde aniden fenalaşıp yere yığıldı. Aile doktoru hemen müdahale etti ama çok geçti. Kadehte iz miktarda beyaz bir kristal madde bulundu: digoksin, dar terapötik aralıklı, sıkı kontrollü bir kalp ilacı.\n\nNecdet Erendil'in hayatı miras kavgalarıyla, borçlarla, eski ihanetlerle ve yıllarca özenle saklanmış sırlarla örülüydü — ve bu gece, o sırların hepsi aynı salonda, aynı masanın etrafında oturuyordu. Zehire gerçekten erişimi olan tek kişiyi bulman gerekiyor. Bu, Yıldız Ekspresi ve Son Round'dan sonra ülke gündemini üçüncü kez sarsan bir cinayet vakası.",
   victim: {
     name: "Necdet Erendil",
     age: 80,
@@ -114,6 +114,40 @@ export const vaka03: CaseData = {
         { question: "Kadehi hazırlarken yalnız mıydınız?", answer: "Evet, mutfakta yalnızdım. Her zaman öyle olur, kimse karışmaz benim işime." },
       ],
     },
+    {
+      id: "melis",
+      name: "Melis Erendil",
+      age: 46,
+      role: "Gelini (Aslan'ın Eşi)",
+      motive:
+        "Necdet, geçen ay Melis'in şirket kredi kartıyla yaptığı büyük kişisel harcamaları fark etmiş, bunu ailenin önünde açıklamakla tehdit etmişti — hem evliliği hem itibarı için yıkıcı olurdu.",
+      opportunity:
+        "Kutlama boyunca 'yardım ediyorum' bahanesiyle mutfağa ve servis alanına sık sık girip çıkıyordu.",
+      statementIntro:
+        "\"Necdet Bey'in harcamalarımı fark ettiğini biliyordum, birkaç hafta önce beni kenara çekip çok sert konuştu. Utanç vericiydi ama bu ailenin her bireyinin başına gelebilecek bir şey, kimse mükemmel değil. O gece mutfağa birkaç kez girdim, servise yardım ediyordum, Sadi Bey'e de yardım ettim aslında birkaç tepsi taşırken. Kadehle hiç ilgilenmedim, onun neyle ilgili olduğunu bile bilmiyordum.\"",
+      statementQA: [
+        { question: "Necdet Bey'in sizi ifşa etmekle tehdit etmesi ne zaman oldu?", answer: "İki hafta önce, aile yemeğinde. Herkesin içinde değil ama sonrasında ailenin öğreneceğinden korktum." },
+        { question: "Mutfağa kaç kez girdiniz?", answer: "Üç, dört kez belki. Sadi Bey'e yardım ediyordum, o kadar kalabalıkta tek başına yetişemez." },
+        { question: "Kadehin hazırlandığı anı gördünüz mü?", answer: "Hayır, o sırada salonda misafirlerle ilgileniyordum sanırım." },
+      ],
+    },
+    {
+      id: "emin",
+      name: "Emin Doğaner",
+      age: 55,
+      role: "Aile Avukatı / İş Ortağı",
+      motive:
+        "Necdet'in bazı şirket hisselerini kendi üzerine geçiren belgede usulsüzlük vardı; Necdet bunu son anda fark edip belgeyi iptal ettirmek ve konuyu savcılığa taşımakla tehdit etmişti.",
+      opportunity:
+        "Kutlamaya 'yeni vasiyet taslağını görüşmek' bahanesiyle davetliydi, kutlamadan önce Necdet'le baş başa uzun bir görüşme yapmıştı.",
+      statementIntro:
+        "\"Necdet Bey'in avukatlığını yirmi yıldır yapıyorum, ona her şeyi borçluyum aslında. O belge meselesi bir yanlış anlaşılmaydı, açıklamaya çalıştım ama beni dinlemedi, savcılığa gideceğini söyledi. Kutlamadan önce özel olarak görüştük, sert bir tartışma oldu, kabul ediyorum. Ama sonra salona döndüm, kutlamanın geri kalanında misafirlerle birlikteydim, kimseyle yalnız kalmadım.\"",
+      statementQA: [
+        { question: "Necdet Bey'le tartışmanız ne zaman, ne kadar sürdü?", answer: "Kutlama başlamadan önce, yaklaşık yirmi dakika. Kütüphanede konuştuk." },
+        { question: "Savcılığa gitme tehdidi ciddi miydi?", answer: "Maalesef evet. Kariyerimin ve baromdaki itibarımın sonu olurdu." },
+        { question: "Kadehin servis edildiği sırada neredeydiniz?", answer: "Salondaydım, diğer misafirlerle birlikte. Kadehe yaklaşmadım, buna gerek de yoktu." },
+      ],
+    },
   ],
   documents: [
     {
@@ -214,9 +248,26 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
 
 Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat haberi camiada üzüntüyle karşılandı. Erendil, "Eski ortağımın kaybından derin üzüntü duyuyorum" açıklamasını yaptı.`,
     },
+    {
+      id: "kredi-karti-notu",
+      type: "resmi_rapor",
+      title: "Şirket Kredi Kartı İnceleme Notu",
+      meta: "Erendil Holding İç Denetim · Gizli",
+      body: `İç denetim ekibi tarafından yapılan rutin inceleme sırasında, Melis Erendil'e (Aslan Erendil'in eşi) tahsis edilen şirket kredi kartıyla son altı ayda yapılan harcamaların büyük kısmının kişisel nitelikte olduğu tespit edilmiştir. Necdet Erendil, bulguları görür görmez konuyu bizzat takip etmek istediğini belirtmiş, "ailevi bir mesele olarak" ele alınmasını istemiştir.`,
+    },
+    {
+      id: "hisse-devri-inceleme",
+      type: "resmi_rapor",
+      title: "Hisse Devri Belgesi İncelemesi",
+      meta: "Erendil Holding Hukuk Servisi · Acil İnceleme Talebi",
+      body: `Necdet Erendil'in talimatıyla incelenen 2019 tarihli hisse devri belgesinde, holding avukatı Emin Doğaner adına devredilen %4'lük payın imza sürecinde usulsüzlük şüphesi bulunmaktadır. Necdet Erendil, belgeyi "yakın zamanda fark ettiğini" ve "derhal iptal sürecini başlatacağını" belirten yazılı bir talimat vermiştir. Belgenin savcılığa intikal ettirilip ettirilmeyeceği netlik kazanmamıştır.`,
+    },
   ],
   timeline: [
+    { time: "19:35", description: "Emin Doğaner, kutlama başlamadan önce Necdet'le kütüphanede özel bir görüşme yapar, sert bir tartışma yaşanır." },
     { time: "20:00", description: "Doğum günü kutlaması başlar, misafirler salona geçer." },
+    { time: "20:15", description: "Melis, servise yardım etmek için mutfağa girer." },
+    { time: "20:35", description: "Melis tekrar mutfağa girip çıkar." },
     { time: "20:45", description: "Necdet özel viskisini ister, Sadi mutfaktan hazırlar." },
     { time: "20:50", description: "Sadi kadehi salona getirip yan masaya bırakır, herkesi pasta için çağırır — kadehe dokunan son kişi oydu, kendisi 'hiçbir sebebim yok' diyor.", contradicts: "sadi" },
     { time: "20:55", description: "Sadi kadehi Necdet'e sunar." },
@@ -250,6 +301,6 @@ Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat 
   solution: {
     killerId: "sadi",
     explanation:
-      "Katil, kırk yıllık kahya Sadi Yalman. Kardeşi Yusuf'un, gençliğinde Necdet tarafından hileli bir ortaklık anlaşmasıyla dolandırılıp her şeyini kaybettiğini ve bu yüzden intihar ettiğini, yakın zamanda kardeşinin eski bir mektubundan öğrendi. Kırk yıldır ailenin en güvenilir hizmetkarı olarak hem mutfağa hem Dr. Umay'ın ilaç dolabına serbestçe erişebiliyordu — dolaptan aldığı digoksini, her zaman kendisinin hazırladığı özel viski kadehine kattı. Diğer beş şüphelinin motivleri gerçek ve gürültülüydü (miras, kumar borcu, aldatma tehdidi, malpraktis ifşası) ama hiçbirinin zehire gerçek bir erişimi yoktu: Aslan ve Kaan'ın fırsat penceresi vardı ama zehri nereden bulacaklardı; Defne yeni vasiyeti bilmiyordu; Yıldız'ın erişimi yoktu; Dr. Umay'ın erişimi vardı ama kadehi o hazırlamadı, hazırlayan hep Sadi'ydi. İlaç dolabı erişim kaydı ve hizmetçi ifadesi, ipucu zincirini doğrudan Sadi'ye bağlıyordu.",
+      "Katil, kırk yıllık kahya Sadi Yalman. Kardeşi Yusuf'un, gençliğinde Necdet tarafından hileli bir ortaklık anlaşmasıyla dolandırılıp her şeyini kaybettiğini ve bu yüzden intihar ettiğini, yakın zamanda kardeşinin eski bir mektubundan öğrendi. Kırk yıldır ailenin en güvenilir hizmetkarı olarak hem mutfağa hem Dr. Umay'ın ilaç dolabına serbestçe erişebiliyordu — dolaptan aldığı digoksini, her zaman kendisinin hazırladığı özel viski kadehine kattı. Diğer yedi şüphelinin motivleri gerçek ve gürültülüydü (miras, kumar borcu, aldatma tehdidi, malpraktis ifşası, harcama skandalı, hisse usulsüzlüğü) ama hiçbirinin zehire gerçek bir erişimi yoktu: Aslan ve Kaan'ın fırsat penceresi vardı ama zehri nereden bulacaklardı; Defne yeni vasiyeti bilmiyordu; Yıldız'ın erişimi yoktu; Dr. Umay'ın erişimi vardı ama kadehi o hazırlamadı, hazırlayan hep Sadi'ydi; Melis ve Emin'in kutlama öncesi/sırasındaki hareketleri gerçekti ama ikisinin de ilaç dolabına erişimi yoktu. İlaç dolabı erişim kaydı ve hizmetçi ifadesi, ipucu zincirini doğrudan Sadi'ye bağlıyordu.",
   },
 };

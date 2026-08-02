@@ -234,7 +234,7 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                     playTick();
                   }}
                   aria-pressed={isArmed}
-                  className={`select-none rounded-sm border px-2.5 py-1.5 text-xs flex items-center gap-1.5 transition-colors ${
+                  className={`select-none rounded-sm border px-2.5 py-1.5 text-xs flex items-center gap-1.5 transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 ${
                     isArmed
                       ? "border-accent-gold ring-2 ring-accent-gold bg-accent-gold/10"
                       : "border-white/15 bg-background hover:border-white/30"
@@ -308,6 +308,7 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                     style={{ x: pair.x, y: pair.y, left: 0, top: 0, borderColor: selected ? "var(--accent-gold)" : `${n.color}99` }}
                     onDragEnd={() => handleDragEnd(n.id)}
                     onTap={() => handleTap(n.id)}
+                    whileHover={editing ? undefined : { scale: 1.04, zIndex: 20 }}
                     whileDrag={{ scale: 1.06, zIndex: 30 }}
                     role="button"
                     tabIndex={0}

@@ -102,14 +102,17 @@ export default function HomePage() {
                   >
                     <div className="pin" />
                     {playedStamp && (
-                      <span
+                      <motion.span
                         aria-hidden
-                        className={`stamp absolute -top-2 -right-2 sm:top-1 sm:right-1 text-[10px] sm:text-xs rotate-[10deg] pointer-events-none ${
+                        initial={{ scale: 2.4, opacity: 0, rotate: -25 }}
+                        animate={{ scale: 1, opacity: 1, rotate: 10 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 15, delay: 0.3 + i * 0.08 }}
+                        className={`stamp absolute -top-2 -right-2 sm:top-1 sm:right-1 text-[10px] sm:text-xs pointer-events-none ${
                           playedStamp === "Çözüldü" ? "text-accent-gold" : "text-accent-red-bright"
                         }`}
                       >
                         {playedStamp}
-                      </span>
+                      </motion.span>
                     )}
                     <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
                       Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
