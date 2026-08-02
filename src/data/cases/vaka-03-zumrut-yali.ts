@@ -6,7 +6,7 @@ export const vaka03: CaseData = {
   title: "Zümrüt Yalı",
   difficulty: "zor",
   tagline: "80. doğum günü kutlamasında, aile patriği kendi kadehinden içtiği zehirle can verdi.",
-  available: false,
+  available: true,
   synopsis:
     "Boğaz'ın en eski yalılarından biri olan Zümrüt Yalı, bu akşam ışıl ışıldı. Erendil Holding'in efsanevi kurucusu Necdet Erendil'in 80. doğum günü kutlanıyordu; bahçedeki fenerler suya yansıyor, üç kuşak aile üyesi ve holdingin yakın çevresi geniş salonda toplanmıştı. Necdet, yıllardır olduğu gibi bu gece de odanın merkezindeydi — sert bakışları, keskin dili ve herkesi aynı anda hem büyüleyen hem korkutan o eski gücüyle.\n\nPasta kesilip kadehler kaldırılacağı sırada, Sadi'nin özenle hazırladığı özel viski Necdet'e sunuldu. Necdet kısa bir konuşma yaptı, kadehi kaldırdı, içti — ve birkaç dakika içinde aniden fenalaşıp yere yığıldı. Aile doktoru hemen müdahale etti ama çok geçti. Kadehte iz miktarda beyaz bir kristal madde bulundu: digoksin, dar terapötik aralıklı, sıkı kontrollü bir kalp ilacı.\n\nNecdet Erendil'in hayatı miras kavgalarıyla, borçlarla, eski ihanetlerle ve yıllarca özenle saklanmış sırlarla örülüydü — ve bu gece, o sırların hepsi aynı salonda, aynı masanın etrafında oturuyordu. Zehire gerçekten erişimi olan tek kişiyi bulman gerekiyor. Bu, Yıldız Ekspresi ve Son Round'dan sonra ülke gündemini üçüncü kez sarsan bir cinayet vakası.",
   victim: {

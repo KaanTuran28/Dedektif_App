@@ -1,0 +1,26 @@
+{
+  "name": "ŞÜPHELİ — Dijital Dedektif Oyunu",
+  "short_name": "ŞÜPHELİ",
+  "description": "Herkes bir şey saklıyor. Kanıtları incele, şüphelileri sorgula, katili bul.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#141212",
+  "theme_color": "#141212",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
