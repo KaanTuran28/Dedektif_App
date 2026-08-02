@@ -7,11 +7,13 @@ import { allCases } from "@/data/cases";
 import { tiltFor } from "@/lib/tilt";
 import { StatsPanel } from "@/components/StatsPanel";
 import { HowToPlayModal } from "@/components/HowToPlayModal";
+import { formatRemaining, getCaseProgress, getRemainingMs, type CaseProgress } from "@/lib/progress";
 
 const GUIDE_SEEN_KEY = "supheli:rehber-gorundu";
 
 export default function HomePage() {
   const [guideOpen, setGuideOpen] = useState(false);
+  const [progressMap, setProgressMap] = useState<Record<string, CaseProgress>>({});
 
   useEffect(() => {
     const seen = window.localStorage.getItem(GUIDE_SEEN_KEY);
@@ -19,6 +21,17 @@ export default function HomePage() {
       setGuideOpen(true);
       window.localStorage.setItem(GUIDE_SEEN_KEY, "1");
     }
+  }, []);
+
+  useEffect(() => {
+    function refresh() {
+      const map: Record<string, CaseProgress> = {};
+      for (const c of allCases) map[c.id] = getCaseProgress(c.id);
+      setProgressMap(map);
+    }
+    refresh();
+    const interval = setInterval(refresh, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -67,6 +80,10 @@ export default function HomePage() {
         <div className="relative w-full grid gap-6 sm:gap-8 sm:grid-cols-2">
           {allCases.map((c, i) => {
             const tilt = tiltFor(c.id);
+            const progress = progressMap[c.id];
+            const remaining = progress ? getRemainingMs(progress) : null;
+            const inProgress = !!progress?.inProgress && remaining !== null && remaining > 0;
+
             return (
               <motion.div
                 key={c.id}
@@ -91,10 +108,21 @@ export default function HomePage() {
                     <p className="text-paper-ink/70 mt-2 text-sm sm:text-base">
                       {c.tagline}
                     </p>
-                    <span className="mt-3 inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
-                      Dosyayı Aç
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
-                    </span>
+                    {inProgress ? (
+                      <div className="mt-3 flex items-center gap-3 flex-wrap">
+                        <span className="inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
+                          ▶ Kaldığın Yerden Devam Et
+                        </span>
+                        <span className="font-mono-doc text-xs text-paper-ink/60">
+                          ⏱ {formatRemaining(remaining!)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="mt-3 inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
+                        Dosyayı Aç
+                        <span className="transition-transform group-hover:translate-x-1">→</span>
+                      </span>
+                    )}
                   </Link>
                 ) : (
                   <div className="relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl opacity-60 grayscale-[40%] cursor-not-allowed select-none">

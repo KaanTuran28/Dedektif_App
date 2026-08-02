@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, type PanInfo } from "motion/react";
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import type { Suspect, TimelineEvent } from "@/types/case";
 import { getSolvedContradictions, markContradictionSolved } from "@/lib/timelinePuzzle";
 import { unlockContradictionHunter } from "@/lib/achievements";
-import { playMatch, playMismatch } from "@/lib/sound";
+import { playMatch, playMismatch, playTick } from "@/lib/sound";
 
 export function Timeline({
   events,
@@ -17,16 +17,14 @@ export function Timeline({
   caseId: string;
 }) {
   const [solved, setSolved] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
   const [shake, setShake] = useState<number | null>(null);
-  const zoneRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const puzzleEvents = events.filter((e) => e.contradicts);
   const totalPuzzles = puzzleEvents.length;
 
   useEffect(() => {
     setSolved(getSolvedContradictions(caseId));
-    setLoaded(true);
   }, [caseId]);
 
   const suspectById = (id: string) => suspects.find((s) => s.id === id);
@@ -34,32 +32,23 @@ export function Timeline({
     (s) => puzzleEvents.some((e) => e.contradicts === s.id) && !solved.includes(s.id)
   );
 
-  function handleDrop(suspectId: string, info: PanInfo) {
-    let matchedIndex: number | null = null;
-    for (const [idxStr, el] of Object.entries(zoneRefs.current)) {
-      if (!el) continue;
-      const rect = el.getBoundingClientRect();
-      if (
-        info.point.x >= rect.left &&
-        info.point.x <= rect.right &&
-        info.point.y >= rect.top &&
-        info.point.y <= rect.bottom
-      ) {
-        matchedIndex = Number(idxStr);
-        break;
-      }
-    }
-    if (matchedIndex === null) return;
+  function handleChipTap(suspectId: string) {
+    setSelected((prev) => (prev === suspectId ? null : suspectId));
+    playTick();
+  }
 
-    const zoneEvent = events[matchedIndex];
-    if (zoneEvent.contradicts === suspectId) {
-      const next = markContradictionSolved(caseId, suspectId);
+  function handleZoneTap(index: number) {
+    if (!selected) return;
+    const zoneEvent = events[index];
+    if (zoneEvent.contradicts === selected) {
+      const next = markContradictionSolved(caseId, selected);
       setSolved(next);
+      setSelected(null);
       playMatch();
       if (next.length === totalPuzzles) unlockContradictionHunter();
     } else {
       playMismatch();
-      setShake(matchedIndex);
+      setShake(index);
       setTimeout(() => setShake(null), 400);
     }
   }
@@ -70,8 +59,8 @@ export function Timeline({
         Vakada bilinen olayların kronolojik şeridi.
         {totalPuzzles > 0 && (
           <>
-            {" "}Bazı olaylar bir şüphelinin ifadesiyle çelişiyor — o şüpheliyi
-            aşağıdan sürükleyip ilgili olaya bırak.
+            {" "}Bazı olaylar bir şüphelinin ifadesiyle çelişiyor — önce bir
+            şüpheliye, sonra ilgili olaya dokun.
           </>
         )}
       </p>
@@ -81,6 +70,11 @@ export function Timeline({
           <div className="flex items-center justify-between mb-3">
             <p className="text-[11px] uppercase tracking-widest text-accent-gold font-mono-doc">
               Şüpheliler
+              {selected && (
+                <span className="text-text-dim normal-case tracking-normal font-sans">
+                  {" "}— şimdi olayı seç
+                </span>
+              )}
             </p>
             <p className="text-text-dim text-[11px] font-mono-doc">
               {solved.length}/{totalPuzzles} çelişki yakalandı
@@ -92,26 +86,29 @@ export function Timeline({
             </p>
           ) : (
             <div className="flex flex-wrap gap-3">
-              {trayChips.map((s) => (
-                <motion.div
-                  key={s.id}
-                  drag
-                  dragSnapToOrigin
-                  dragElastic={0.15}
-                  whileDrag={{ scale: 1.08, zIndex: 50 }}
-                  onDragEnd={(_e, info) => handleDrop(s.id, info)}
-                  className="cursor-grab active:cursor-grabbing select-none rounded-sm border border-white/15 bg-background px-3 py-2 flex items-center gap-2 shadow-lg"
-                  style={{ touchAction: "none" }}
-                >
-                  <div className="h-7 w-7 shrink-0 rounded-full bg-white/10 flex items-center justify-center">
-                    <svg viewBox="0 0 64 64" className="h-5 w-5 text-white/40" fill="currentColor" aria-hidden>
-                      <circle cx="32" cy="20" r="14" />
-                      <path d="M6 62c0-16 11.6-26 26-26s26 10 26 26" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-semibold whitespace-nowrap">{s.name}</span>
-                </motion.div>
-              ))}
+              {trayChips.map((s) => {
+                const isSelected = selected === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => handleChipTap(s.id)}
+                    aria-pressed={isSelected}
+                    className={`select-none rounded-sm border px-3 py-2 flex items-center gap-2 shadow-lg transition-colors ${
+                      isSelected
+                        ? "border-accent-gold bg-accent-gold/10 ring-2 ring-accent-gold"
+                        : "border-white/15 bg-background hover:border-white/30"
+                    }`}
+                  >
+                    <div className="h-7 w-7 shrink-0 rounded-full bg-white/10 flex items-center justify-center">
+                      <svg viewBox="0 0 64 64" className="h-5 w-5 text-white/40" fill="currentColor" aria-hidden>
+                        <circle cx="32" cy="20" r="14" />
+                        <path d="M6 62c0-16 11.6-26 26-26s26 10 26 26" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-semibold whitespace-nowrap">{s.name}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -124,6 +121,7 @@ export function Timeline({
             const isZone = !!e.contradicts;
             const isSolved = isZone && solved.includes(e.contradicts!);
             const matchedSuspect = isSolved ? suspectById(e.contradicts!) : null;
+            const clickable = isZone && !isSolved && !!selected;
             return (
               <motion.div
                 key={i}
@@ -141,16 +139,19 @@ export function Timeline({
                   }`}
                 />
                 <p className="font-mono-doc text-accent-gold text-sm font-semibold">{e.time}</p>
-                <div
-                  ref={isZone ? (el) => { zoneRefs.current[i] = el; } : undefined}
+                <button
+                  onClick={isZone && !isSolved ? () => handleZoneTap(i) : undefined}
+                  disabled={!isZone || isSolved}
                   className={
                     isZone
-                      ? `mt-1 rounded-sm border-2 border-dashed px-3 py-2 transition-colors ${
+                      ? `mt-1 w-full text-left rounded-sm border-2 border-dashed px-3 py-2 transition-colors ${
                           isSolved
-                            ? "border-accent-gold/70 bg-accent-gold/10"
-                            : "border-accent-red-bright/50 bg-accent-red-bright/5"
+                            ? "border-accent-gold/70 bg-accent-gold/10 cursor-default"
+                            : clickable
+                              ? "border-accent-gold bg-accent-gold/5 cursor-pointer animate-pulse"
+                              : "border-accent-red-bright/50 bg-accent-red-bright/5 cursor-default"
                         }`
-                      : undefined
+                      : "mt-1 w-full text-left cursor-default"
                   }
                 >
                   <p className="text-text leading-relaxed">{e.description}</p>
@@ -159,7 +160,7 @@ export function Timeline({
                       ✓ {matchedSuspect.name} ile eşleşti
                     </p>
                   )}
-                </div>
+                </button>
               </motion.div>
             );
           })}
