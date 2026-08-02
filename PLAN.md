@@ -203,3 +203,29 @@ oyuncuyu ödüllendiren küçük referanslar olacak.
 
 **Uygulandı:** Vaka 02 ("Son Round") synopsis'ine, Vaka 01'e ("Yıldız
 Ekspresi") tek cümlelik geriye dönük bir gönderme eklendi.
+
+## 10. İyileştirme Backlog'u (2026-08-02'de önerildi, kullanıcı seçecek)
+
+**İçerik & Tekrar Oynanabilirlik**
+- Yeni vaka(lar) — villa/influencer/küçük kasaba (orta efor)
+- Zorluk çeşitliliği — bir "kolay" öğretici vaka + bir "zor" çok-şüpheli vaka (küçük efor)
+- İpucu sistemi — sınırlı ipucu hakkı, rütbeyi düşürür ama vazgeçmeyi önler (orta efor)
+- Rozetler/başarımlar — localStorage'da biriken küçük ödüller (küçük efor)
+
+**Oynanış Derinliği**
+- Panoya not iğneleme — delil panosu kartlarına kişisel not (küçük efor)
+- Suçlamada motiv/yöntem sorusu — sadece "kim" değil "neden/nasıl", rütbe buna göre (orta efor)
+- Zaman çizelgesi aracı — alibi saatlerini sürükleyerek çelişki yakalama (büyük efor)
+
+**His / Atmosfer**
+- Sonuç ekranı paylaşım kartı — rütbeyi gösteren, sosyal medyada paylaşılabilir görsel (orta efor,
+  "ücretsiz yayınlama" hedefine organik büyüme açısından değerli)
+- Vaka kapanış animasyonu — dosyanın fiziksel kapanma sekansı (küçük efor)
+- Mini istatistik ekranı — kaç vaka çözüldü, ortalama rütbe (küçük efor)
+
+**Sağlamlık**
+- Gerçek mobil cihazda test — özellikle iOS Safari dokunmatik/ses davranışı hiç denenmedi
+- Erişilebilirlik taraması — tam klavye navigasyonu, ekran okuyucu uyumluluğu (orta efor)
+
+Kullanıcı bunlardan hangilerini önceliklendireceğine karar verecek, seçilenler
+buradan işaretlenip `DURUM.md`'ye taşınacak.
