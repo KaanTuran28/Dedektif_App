@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { allCases } from "@/data/cases";
 import { tiltFor } from "@/lib/tilt";
+import { StatsPanel } from "@/components/StatsPanel";
 
 export default function HomePage() {
   return (
@@ -77,7 +78,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      <p className="text-text-dim text-xs mt-10 font-mono-doc">
+      <StatsPanel cases={allCases} />
+
+      <p className="text-text-dim text-xs mt-6 font-mono-doc">
         Yakında yeni vakalar eklenecek.
       </p>
     </main>
