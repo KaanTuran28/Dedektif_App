@@ -77,6 +77,43 @@ export function playTick() {
   osc.stop(c.currentTime + 0.05);
 }
 
+/** yükselen iki nota: doğru eşleştirme onayı */
+export function playMatch() {
+  if (muted || !isSoundEnabled()) return;
+  const c = getCtx();
+  if (!c) return;
+  [523, 784].forEach((freq, i) => {
+    const osc = c.createOscillator();
+    osc.type = "sine";
+    const start = c.currentTime + i * 0.09;
+    osc.frequency.setValueAtTime(freq, start);
+    const gain = c.createGain();
+    gain.gain.setValueAtTime(0.001, start);
+    gain.gain.exponentialRampToValueAtTime(0.12, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+    osc.connect(gain).connect(c.destination);
+    osc.start(start);
+    osc.stop(start + 0.22);
+  });
+}
+
+/** alçalan kısa nota: yanlış eşleştirme */
+export function playMismatch() {
+  if (muted || !isSoundEnabled()) return;
+  const c = getCtx();
+  if (!c) return;
+  const osc = c.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(220, c.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(140, c.currentTime + 0.15);
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.1, c.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.18);
+  osc.connect(gain).connect(c.destination);
+  osc.start();
+  osc.stop(c.currentTime + 0.18);
+}
+
 /** kauçuk damga: alçak "gümm" + kısa gürültü darbesi */
 export function playStamp() {
   if (muted || !isSoundEnabled()) return;

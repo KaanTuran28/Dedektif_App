@@ -185,7 +185,7 @@ Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat 
   timeline: [
     { time: "20:00", description: "Doğum günü kutlaması başlar, misafirler salona geçer." },
     { time: "20:45", description: "Necdet özel viskisini ister, Sadi mutfaktan hazırlar." },
-    { time: "20:50", description: "Sadi kadehi salona getirip yan masaya bırakır, herkesi pasta için çağırır — kadeh birkaç dakika gözden kaçar." },
+    { time: "20:50", description: "Sadi kadehi salona getirip yan masaya bırakır, herkesi pasta için çağırır — kadehe dokunan son kişi oydu, kendisi 'hiçbir sebebim yok' diyor.", contradicts: "sadi" },
     { time: "20:55", description: "Sadi kadehi Necdet'e sunar." },
     { time: "21:00", description: "Necdet kadeh kaldırıp içer, kısa bir konuşma yapar." },
     { time: "21:05", description: "Necdet aniden fenalaşır." },

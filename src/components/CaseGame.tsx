@@ -282,7 +282,9 @@ export function CaseGame({ data }: { data: CaseData }) {
               </div>
             )}
 
-            {step === "zaman" && <Timeline events={data.timeline} />}
+            {step === "zaman" && (
+              <Timeline events={data.timeline} suspects={data.suspects} caseId={data.id} />
+            )}
 
             {step === "pano" && <EvidenceBoard data={data} />}
 
