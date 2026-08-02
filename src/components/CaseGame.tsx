@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -27,6 +27,7 @@ import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
 import { suspectColorFor } from "@/lib/suspectColor";
+import { groupDocumentsByCategory } from "@/lib/docCategories";
 import { allCases } from "@/data/cases";
 import { generateShareCard } from "@/lib/shareCard";
 
@@ -170,6 +171,8 @@ export function CaseGame({ data }: { data: CaseData }) {
     (viewedDocs.size / Math.max(data.documents.length, 1) +
       viewedSuspects.size / Math.max(data.suspects.length, 1)) /
     2;
+
+  const docGroups = useMemo(() => groupDocumentsByCategory(data.documents), [data.documents]);
 
   const inInvestigation = TABS.some((t) => t.id === step);
 
@@ -341,7 +344,7 @@ export function CaseGame({ data }: { data: CaseData }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.1 }}
-                  className="text-text-dim leading-relaxed text-base sm:text-lg"
+                  className="text-text-dim leading-relaxed text-base sm:text-lg whitespace-pre-line"
                 >
                   {data.synopsis}
                 </motion.p>
@@ -366,16 +369,31 @@ export function CaseGame({ data }: { data: CaseData }) {
             )}
 
             {step === "kanitlar" && (
-              <div className="space-y-5">
-                {data.documents.map((doc) => (
-                  <DocumentCard
-                    key={doc.id}
-                    doc={doc}
-                    onOpen={(id) => {
-                      setViewedDocs((prev) => new Set(prev).add(id));
-                      markDocViewed(data.id, id);
-                    }}
-                  />
+              <div className="space-y-8">
+                {docGroups.map((group) => (
+                  <div key={group.label} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <p className="shrink-0 text-[11px] uppercase tracking-widest text-accent-gold font-mono-doc">
+                        {group.label}
+                      </p>
+                      <div className="h-px flex-1 bg-white/10" />
+                      <p className="shrink-0 text-text-dim text-[11px] font-mono-doc">
+                        {group.documents.length}
+                      </p>
+                    </div>
+                    <div className="space-y-5">
+                      {group.documents.map((doc) => (
+                        <DocumentCard
+                          key={doc.id}
+                          doc={doc}
+                          onOpen={(id) => {
+                            setViewedDocs((prev) => new Set(prev).add(id));
+                            markDocViewed(data.id, id);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

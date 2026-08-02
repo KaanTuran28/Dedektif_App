@@ -105,12 +105,37 @@ export function SuspectCard({
               </span>
               {suspect.opportunity}
             </p>
-            <p className="italic text-text-dim">
-              <span className="text-accent-gold text-xs uppercase tracking-widest not-italic block mb-1 font-mono-doc">
+            <div>
+              <span className="text-accent-gold text-xs uppercase tracking-widest block mb-1 font-mono-doc">
                 İfade
               </span>
-              {suspect.statement}
-            </p>
+              <p className="italic text-text-dim leading-relaxed whitespace-pre-wrap">
+                {suspect.statementIntro}
+              </p>
+            </div>
+            {suspect.statementQA.length > 0 && (
+              <div>
+                <span className="text-accent-gold text-xs uppercase tracking-widest block mb-2 font-mono-doc">
+                  Sorgu Tutanağı
+                </span>
+                <div className="space-y-3 rounded-sm border border-white/10 bg-background/40 px-3 py-3">
+                  {suspect.statementQA.map((qa, i) => (
+                    <div key={i} className="text-sm leading-relaxed font-mono-doc">
+                      <p>
+                        <span className="font-semibold text-accent-red">Polis:</span>{" "}
+                        {qa.question}
+                      </p>
+                      <p className="mt-1">
+                        <span className="font-semibold text-accent-gold">
+                          {suspect.name.split(" ")[0]}:
+                        </span>{" "}
+                        {qa.answer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

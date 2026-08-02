@@ -25,8 +25,14 @@ export const vaka02: CaseData = {
         "Deniz, yeni yatırım turunda Ozan'ın hisselerini ciddi şekilde sulandıran bir madde eklemiş, üstelik Ozan'ın geliştirdiği çekirdek teknolojiyi kendi adına patentletmeye çalıştığını gösteren bir yazışma ortaya çıkmıştı.",
       opportunity:
         "CTO olarak bina güvenlik/kartlı geçiş sisteminin admin erişimine sahip — kendi giriş kaydını sistemden silebilir.",
-      statement:
-        "\"Evdeydim, o gece binaya hiç gitmedim. Log kaydıma bakın, orada değilim.\"",
+      statementIntro:
+        "\"Deniz'le sekiz yıl önce bu şirketi kurduk, yıllarımı bu şirkete verdim. Son yatırım turunda hisselerimin ciddi şekilde sulandırılacağını öğrendiğimde şok oldum, üstelik yıllarımı verdiğim çekirdek teknolojiyi kendi adına patentletmek istiyordu. O gece evdeydim, bu yorucu tartışmadan sonra sakinleşmem gerekiyordu. Log kayıtlarına bakarsanız zaten binada görünmüyorum.\"",
+      statementQA: [
+        { question: "Deniz'le e-posta yazışmanızda çok sinirli görünüyorsunuz, doğru mu?", answer: "Evet, çok kızgındım. Ama kızgınlık cinayet demek değil." },
+        { question: "O gece gerçekten evde miydiniz, doğrulayabilecek biri var mı?", answer: "Yalnız yaşıyorum, kimse doğrulayamaz. Ama neden yalan söyleyeyim ki?" },
+        { question: "Bina güvenlik sisteminin admin yetkisine kimin erişimi var?", answer: "Benim, CTO olarak. Ama bunu asla kötüye kullanmadım." },
+        { question: "Sistemde bir kayıt silindiyse bunu kimin yapabileceğini düşünürsünüz?", answer: "(uzun bir duraksama) Bilmiyorum. Belki bir teknik sorun olmuştur." },
+      ],
     },
     {
       id: "aylin",
@@ -36,8 +42,14 @@ export const vaka02: CaseData = {
       motive:
         "Şirketin finansallarında bir usulsüzlük şüphesi vardı, yatırım turunun due diligence sürecinde ortaya çıkacaktı; Deniz bunu biliyordu.",
       opportunity: "O gece geç saate kadar ofisteydi, 28. kata erişimi var.",
-      statement:
-        "\"Bazı belgeleri sildim, evet — ama bu cinayetle ilgili değil, kariyerimle ilgiliydi.\"",
+      statementIntro:
+        "\"Nova'da altı yıldır CFO'yum, sayılarla yaşarım. O gece geç saate kadar ofisteydim, evet, bazı finansal kayıtları kişisel yedeğime aktarıp sildim ama bunun cinayetle hiçbir ilgisi yok. Deniz'in kendi talimatıyla yaptığımız, sınırda ama yasal bir vergi yapılandırmasıydı, due diligence'ta yanlış anlaşılıp hem şirketi hem beni zor durumda bırakmasından korktum. Saat 23:20 gibi çıktım, Deniz'i yaşarken son görenlerden değildim bile.\"",
+      statementQA: [
+        { question: "Neden finansal kayıtları sildiniz?", answer: "Panikledim. Yatırım turunun gözden geçirmesi başlayacaktı, o kayıtlar yanlış yorumlanabilirdi." },
+        { question: "Bu, Deniz'in bilgisi dahilinde miydi?", answer: "Evet, talimat ondan gelmişti aslında. Ama o artık burada değil, ben tek başıma savunmasız kaldım." },
+        { question: "23:05'te tam olarak neredeydiniz?", answer: "Kendi ofisimdeydim, sunucudaki dosyalarla uğraşıyordum." },
+        { question: "Deniz'in ofisine hiç girdiniz mi o gece?", answer: "Hayır, bir kez bile. Onunla konuşacak halim de yoktu açıkçası, bu iş beni fazlasıyla germişti." },
+      ],
     },
     {
       id: "baris",
@@ -47,8 +59,13 @@ export const vaka02: CaseData = {
       motive:
         "İki ay önce haksız yere kovulduğunu düşünüyor, işe iade davası açmış; Deniz'in yeni işverenlere kötü referans verdiğini öğrenmiş.",
       opportunity: "Eski kartı iptal edilmemiş, o gece lobiden içeri girmiş.",
-      statement:
-        "\"Sadece eşyalarımı almaya gelmiştim. Beş dakika kaldım, asansöre bile binmedim.\"",
+      statementIntro:
+        "\"İki ay önce haksız yere kovuldum, buna hâlâ inanıyorum. Deniz'in yeni işverenlere kötü referans verdiğini öğrendiğimde çok kırıldım, bir de üstüne işe iade davası açtım. O gece sadece eşyalarımı almak için geldim, güvenlik beni eski kartımla içeri aldı, resepsiyonda birkaç dakika bekledim, kutumu alıp çıktım. Asansöre bile binmedim, 28. kata hiç çıkmadım.\"",
+      statementQA: [
+        { question: "Neden o saatte, gece geldiniz eşyalarınızı almaya?", answer: "Gündüz kimseyle karşılaşmak istemedim, utanç vericiydi benim için." },
+        { question: "Deniz'i görmeyi bekliyor muydunuz?", answer: "Hayır, ondan uzak durmak istiyordum aslında. Görsem ne söyleyeceğimi bile bilmiyordum." },
+        { question: "Lobiden sonra nereye gittiniz?", answer: "Direkt arabama, eve gittim. Kamera kayıtları da bunu gösteriyor zaten, beş dakika kaldım sadece." },
+      ],
     },
     {
       id: "selin",
@@ -59,8 +76,13 @@ export const vaka02: CaseData = {
         "Deniz, imza gecesi son anda anlaşma şartlarını kendi lehine değiştirmeye çalışmış; Selin'in fonu için büyük bir kayıp anlamına geliyordu. Ayrıca Deniz, Selin'in geçmişte örtbas ettiği bir skandalı biliyordu.",
       opportunity:
         "Akşamüstü ön görüşme için binadaydı, gece toplantısına da katılması bekleniyordu.",
-      statement:
-        "\"Görüşmeden hemen sonra havalimanına gittim. O saatte İzmir'deydim, kontrol edin.\"",
+      statementIntro:
+        "\"Fonumuz Nova'ya iki yıl önce yatırım yaptı, bu gece imzalanacak yeni tur benim için de kritikti. Akşamüstü ön görüşme için ofisteydim, sonra havalimanına gidip İzmir'e uçtum, orada başka bir toplantım vardı. Deniz'in son anda şartları kendi lehine değiştirmeye çalıştığını biliyordum, bu fonumuz için ciddi bir kayıp anlamına geliyordu, kızgındım ama İstanbul'da bile değildim o saatte.\"",
+      statementQA: [
+        { question: "Bina girişinde misafir kartınızla bir kayıt var, bunu açıklar mısınız?", answer: "O kart akşamüstü toplantısı içindi, iade etmeyi unutmuş olabilirim ama ben 20:15 uçağıyla İstanbul'dan ayrıldım." },
+        { question: "Deniz'in sizinle ilgili bildiği bir sır olduğu doğru mu?", answer: "Geçmişte örtbas ettiğim bir olay vardı, evet, bunu biliyordu. Ama bunu kullanmadı, en azından henüz." },
+        { question: "İzmir'deki otel kaydınızı doğrulatabilir miyiz?", answer: "Tabii, check-in saatim 22:02, resepsiyon hatırlar beni." },
+      ],
     },
     {
       id: "yagmur",
@@ -70,8 +92,13 @@ export const vaka02: CaseData = {
       motive:
         "Deniz ile gizli bir ilişkisi vardı; Deniz ilişkiyi bitirip Selin'in ekibinden biriyle görüşmeye başlamıştı, Yağmur bunu yeni öğrenmişti.",
       opportunity: "Ofise sürekli girip çıkan tek kişi, kimse hareketini sorgulamaz.",
-      statement:
-        "\"Onu son gördüğümde gergindi. Ben resepsiyonda bekledim, yalnız değildim.\"",
+      statementIntro:
+        "\"Deniz'in kişisel asistanıyım, iki yıldır. Aramızda gizli bir ilişki vardı, bunu şimdi saklamanın anlamı yok. Son zamanlarda ilişkimizi bitirdi, Selin'in ekibinden biriyle görüşmeye başladığını öğrendim, çok kırıldım ama bu beni cinayete sürükleyecek bir şey değil. O gece resepsiyonda bekledim, gece nöbetçisi ve temizlikçiyle birlikteydim, 23:30'da toplantıyı hatırlatmaya gittiğimde onu o halde buldum.\"",
+      statementQA: [
+        { question: "İlişkinizin bitmesi sizi ne kadar etkiledi?", answer: "Çok. Ama onu öldürmek... hayır, asla düşünmedim bile." },
+        { question: "23:30'a kadar nerede olduğunuzu doğrulayabilecek biri var mı?", answer: "Evet, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım, ikisi de yanımdaydı." },
+        { question: "Ofise sık girip çıktığınız doğru mu?", answer: "Evet, işim gereği, kimse hareketimi sorgulamaz. Ama o gece 22:25'ten sonra hiç girmedim, ta ki onu bulana kadar." },
+      ],
     },
   ],
   documents: [
@@ -185,6 +212,18 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       title: "Yağmur Diker İfadesi",
       meta: "Kişisel Asistan, 26 · Kurbanın son gördüğü kişilerden",
       body: `"Deniz'i son kez 22:25'te gördüm, ofisine çekiliyordu, biraz gergindi. Ben resepsiyonda kaldım, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım'la birlikteydim, ikisi de doğrular. 23:30'da toplantı bitti, herkes onu bekliyordu, ben çağırmaya gittim... O halde buldum."`,
+    },
+    {
+      id: "nova-haber",
+      type: "haber_kupuru",
+      title: "Yatırım Turu Öncesi Merak",
+      newsHeader: {
+        publication: "Meridyen Gazetesi",
+        headline: "Nova Teknoloji Dev Yatırım Turuna Hazırlanıyor",
+        byline: "Ekonomi Servisi",
+        date: "Olaydan 2 gün önce",
+      },
+      body: `Yapay zeka alanında hızla büyüyen Nova Teknoloji'nin, şirket değerini kat kat artıracak yeni bir yatırım turuna hazırlandığı öğrenildi. Sektör kaynakları, imza töreninin bu hafta içinde gerçekleşeceğini belirtirken, şirket içi kaynaklar bazı ortaklık paylarının yeniden yapılandırılacağına dair "gerilimli" görüşmelerin sürdüğünü aktardı. Nova Teknoloji'den konuya ilişkin resmi bir açıklama gelmedi.`,
     },
   ],
   timeline: [

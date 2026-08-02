@@ -24,8 +24,14 @@ export const vaka03: CaseData = {
       motive:
         "Necdet, holding CEO'luğunu Aslan'a değil kız kardeşi Defne'ye devretmeyi planlıyordu; bu Aslan'ın otuz yıllık kariyer beklentisini yok ediyordu.",
       opportunity: "Kutlamanın büyük kısmında bahçede tek başına iş telefonu görüşmesi yaptığını söylüyor, tanığı yok.",
-      statement:
-        "\"Babamla CEO'luk konusunda tartıştık, evet. Ama onu öldürecek kadar mı? Hayır. Telefondaydım, biri doğrulayabilir sanmıştım ama kimse görmemiş.\"",
+      statementIntro:
+        "\"Otuz yılımı bu şirkete verdim, CEO'luğu babamdan sonra devralacağımı hep varsaydım. Yeni vasiyet taslağından geç haberim oldu, kız kardeşim Defne'ye devredileceğini öğrenince babamla sert bir tartışma yaşadık, evet. Ama kutlamanın çoğunda bahçede tek başıma iş telefonuyla uğraşıyordum, önemli bir görüşmeydi, kimsenin dikkatini çekmemiş olabilirim ama oradaydım.\"",
+      statementQA: [
+        { question: "Babanızla tartışmanız kutlamadan hemen önce miydi?", answer: "İki gün önceydi. O gece bir daha konuşmadık bile, mesafeliydik." },
+        { question: "Telefon görüşmenizi doğrulayabilecek biri var mı?", answer: "Görüşme kaydı operatörde olmalı ama karşı taraftaki kişi yurt dışında, ulaşmak zaman alabilir." },
+        { question: "Kadehin hazırlandığı sırada neredeydiniz?", answer: "Hâlâ bahçedeydim sanıyorum, saatleri tam takip etmedim açıkçası." },
+        { question: "Yeni CEO'luk kararını kabul ettiniz mi?", answer: "Hayır, kesinlikle etmedim. Ama bu, babamı öldürmemi gerektirmez." },
+      ],
     },
     {
       id: "defne",
@@ -35,8 +41,13 @@ export const vaka03: CaseData = {
       motive:
         "Babasıyla yıllar süren küslüğü barıştırma girişimi reddedilmişti; yeni vasiyetle CEO'luğun ona geçeceğini öğrenmemiş görünüyor — ya da öyle iddia ediyor.",
       opportunity: "Kutlama sırasında salonun köşesinde ailenin eski tablolarına bakarken tek başınaydı.",
-      statement:
-        "\"Yeni vasiyeti bilmiyordum, yemin ederim. Babamla barışmaya çalışıyordum, onu öldürüp bunu mu kaybedecektim?\"",
+      statementIntro:
+        "\"Babamla yıllardır küskündük, bu kutlamaya barışma umuduyla geldim aslında. Yeni vasiyetten haberim yoktu, yemin ederim — CEO'luğun bana geçeceğini öğrendiğimde şaşırdım, hatta biraz korktum, çünkü kardeşimin bunu nasıl karşılayacağını biliyordum. Kutlama sırasında salonun köşesinde ailenin eski tablolarına bakıyordum, yalnızdım, kimseyle konuşmuyordum.\"",
+      statementQA: [
+        { question: "Yeni vasiyeti gerçekten bilmiyor muydunuz?", answer: "Hayır. Babam böyle şeyleri asla önceden söylemezdi, sürpriz yapmayı severdi — kötü bir sürpriz oldu." },
+        { question: "Kardeşinizle aranız nasıldı o gece?", answer: "Gergindi ama her zamanki gibiydi. Konuşmadık pek." },
+        { question: "Tabloların yanında ne kadar süre kaldınız?", answer: "On, on beş dakika belki. Kadehle ilgili hiçbir şey görmedim, salonun diğer ucundaydım." },
+      ],
     },
     {
       id: "yildiz",
@@ -46,8 +57,13 @@ export const vaka03: CaseData = {
       motive:
         "Necdet boşanmayı düşünüyordu; bir aldatma iddiası nedeniyle mirastan büyük ölçüde mahrum bırakılma tehdidi vardı.",
       opportunity: "Kutlama boyunca misafirlerle sosyalleşiyordu, ama kadehin bekletildiği birkaç dakika onun da yakınındaydı.",
-      statement:
-        "\"Evet, boşanmayı konuşuyorduk. Ama ben ondan bir şey saklamıyorum, o beni suçluyordu. Mirası kaybetmek istemezdim tabii ki, ama bu cinayet işlemek için bir sebep değil.\"",
+      statementIntro:
+        "\"Necdet'le boşanmayı konuşuyorduk, evet, bunu saklamayacağım. Bir aldatma iddiası öne sürmüştü, doğru değil ama beni buna ikna edemedim. Mirastan mahrum kalma tehdidi ağırdı üstümde. Kutlama boyunca misafirlerle sosyalleştim, herkesle konuştum, ev sahipliği yapmaya çalıştım — kadehin bekletildiği birkaç dakika da yakınlarda olabilirim ama ona dokunmadım.\"",
+      statementQA: [
+        { question: "Aldatma iddiasını nasıl öğrendiniz?", answer: "Bir özel dedektif tuttuğunu öğrendim, çok küçük düşürücüydü. Ama iddia asılsız." },
+        { question: "Kadehin masada beklediği sırada nerede olduğunuzu hatırlıyor musunuz?", answer: "Salonun ortasındaydım, misafirlerle konuşuyordum. Kadehe yaklaşmadım." },
+        { question: "Boşanma gerçekleşseydi ne kaybederdiniz?", answer: "Neredeyse her şeyi. Ama bu bir cinayet sebebi değil, ben zaten avukatımla konuşmaya başlamıştım." },
+      ],
     },
     {
       id: "kaan",
@@ -57,8 +73,13 @@ export const vaka03: CaseData = {
       motive:
         "Kumar borcu nedeniyle dedesinden gizlice büyük bir para istemiş, reddedilmişti; Necdet bunu ailesine anlatmakla tehdit ediyordu.",
       opportunity: "Kutlamanın çoğunda arkadaşlarıyla mesajlaşarak bahçenin dış tarafında oturuyordu.",
-      statement:
-        "\"Dedem parayı vermedi, kızgındım evet. Ama ailenin önünde rezil olmaktan korkuyordum, onu öldürmekten değil.\"",
+      statementIntro:
+        "\"Dedem parayı vermedi, kızgındım evet. Kumar borcum var, bunu ailemin öğrenmesinden çok korkuyordum, dedem de bunu biliyordu, tehdit ediyordu neredeyse. Kutlamanın çoğunda bahçenin dış tarafında oturup arkadaşlarımla mesajlaşıyordum, kimseyle pek konuşmadım, kutlamaya da isteksiz katıldım açıkçası.\"",
+      statementQA: [
+        { question: "Borcunuzun tutarı nedir?", answer: "Söylemek istemiyorum ama... büyük. Dedemin bana yardım etmesi gerekiyordu." },
+        { question: "Dedeniz sizi ailenize ifşa etmekle mi tehdit ediyordu?", answer: "Doğrudan değil ama ima ediyordu. 'Bu son uyarın' demişti." },
+        { question: "Salona ne zaman girdiniz?", answer: "Pasta kesilmeden hemen önce, herkesle birlikte. Ondan önce bahçedeydim." },
+      ],
     },
     {
       id: "umay",
@@ -68,8 +89,13 @@ export const vaka03: CaseData = {
       motive:
         "Geçmişte bir tıbbi ihmal / yanlış tedavi iddiasını Necdet biliyor ve bunu ifşa etmekle tehdit ediyordu — malpraktis davası riski kariyerini bitirebilirdi.",
       opportunity: "İlaç dolabına erişimi var, kutlamada da hazır bulunuyordu.",
-      statement:
-        "\"O dava yıllar önce kapandı, kimse hatırlamıyor sanıyordum. Necdet'in bunu bilmesi rahatsız ediciydi ama ilaç dolabımdan bir şey kaybolduğunu fark etmedim.\"",
+      statementIntro:
+        "\"Necdet Bey'in ailesine on beş yıldır doktorluk yapıyorum. Yıllar önce bir malpraktis şikayeti almıştım, kapandı, unutulduğunu sanıyordum. Necdet Bey'in bunu bildiğini ve arada bir hatırlattığını itiraf edeyim, rahatsız ediciydi ama bu beni cinayete sürükleyecek bir şey değil. Kutlamada hazır bulundum, ilaç dolabıma erişimim var elbette, ama bir eksiklik fark etmedim son kontrolüme kadar.\"",
+      statementQA: [
+        { question: "İlaç dolabınızın şifresini kimler biliyor?", answer: "Sadece ben, ve yıllar önce düzenleme için Sadi'ye de yetki vermiştim, unutmuşum bile." },
+        { question: "Digoksin kutusunun eksikliğini ne zaman fark ettiniz?", answer: "Olaydan sonra, envanteri kontrol ederken. Çok şaşırdım." },
+        { question: "Necdet Bey'e müdahale ederken neler gözlemlediniz?", answer: "Klasik bir digoksin zehirlenmesi belirtileri vardı ama iş işten geçmişti, çok hızlı ilerledi." },
+      ],
     },
     {
       id: "sadi",
@@ -79,8 +105,14 @@ export const vaka03: CaseData = {
       motive:
         "Necdet, gençliğinde Sadi'nin kardeşi Yusuf'u bir iş anlaşmazlığında dolandırıp intihara sürüklemişti. Sadi bunu yakın zamanda kardeşinin eski günlüğünden öğrendi.",
       opportunity: "Kırk yıldır evde çalışan güvenilir kahya; mutfağa, servis kadehlerine ve doktorun ilaç dolabına serbestçe erişebiliyor.",
-      statement:
-        "\"Kırk yıldır bu aileye hizmet ettim. Necdet Bey'e bir şey yapmamın hiçbir sebebi yok — o bana hep iyi davrandı.\"",
+      statementIntro:
+        "\"Kırk yıldır bu aileye hizmet ettim, Necdet Bey'e bir şey yapmamın hiçbir sebebi yok — bana hep iyi davrandı, en azından öyle sanıyordum. Kadehi her zaman ben hazırlarım, o gece de öyle yaptım, mutfaktan getirip salona bıraktım, sonra herkesi pasta için çağırdım. O birkaç dakika kadehin yanında değildim, mutfağa dönmüştüm.\"",
+      statementQA: [
+        { question: "Kardeşiniz Yusuf hakkında yakın zamanda bir şey öğrendiniz mi?", answer: "(uzun bir sessizlik) ...Eski bir mektup buldum eşyalarını düzenlerken. Ama bu eski bir hikaye, otuz yıl önce oldu." },
+        { question: "Necdet Bey'in kardeşinizin ölümüyle bir ilgisi olduğunu düşünüyor musunuz?", answer: "Mektupta öyle yazıyordu ama... ben bunu yeni öğrendim, ne yapacağımı bile bilmiyordum." },
+        { question: "İlaç dolabına en son ne zaman girdiniz?", answer: "Üç gün önce, temizlik için. Bu rutin bir şey, yıllardır böyle yaparım." },
+        { question: "Kadehi hazırlarken yalnız mıydınız?", answer: "Evet, mutfakta yalnızdım. Her zaman öyle olur, kimse karışmaz benim işime." },
+      ],
     },
   ],
   documents: [
