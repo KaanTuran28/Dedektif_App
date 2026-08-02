@@ -3,29 +3,52 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import type { CaseData } from "@/types/case";
+import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SuspectCard } from "@/components/SuspectCard";
 import { Notebook } from "@/components/Notebook";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
-import { recordAccusation } from "@/lib/progress";
-import { rankFor } from "@/lib/rank";
+import { Timeline } from "@/components/Timeline";
+import { HintPanel } from "@/components/HintPanel";
+import { getCaseProgress, getHintsUsed, recordAccusation } from "@/lib/progress";
+import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
+import { checkAchievements } from "@/lib/achievements";
+import { allCases } from "@/data/cases";
 
-type Step = "giris" | "kanitlar" | "supheliler" | "pano" | "notlar" | "suclama" | "sonuc";
+type Step =
+  | "giris"
+  | "kanitlar"
+  | "supheliler"
+  | "pano"
+  | "zaman"
+  | "notlar"
+  | "suclama"
+  | "motiv-sorusu"
+  | "yontem-sorusu"
+  | "sonuc";
 
 const TABS: { id: Step; label: string }[] = [
   { id: "giris", label: "Vaka" },
   { id: "kanitlar", label: "Kanıtlar" },
   { id: "supheliler", label: "Şüpheliler" },
+  { id: "zaman", label: "Zaman" },
   { id: "pano", label: "Pano" },
   { id: "notlar", label: "Notlar" },
 ];
 
+interface FinalResult {
+  correct: boolean;
+  motiveCorrect: boolean;
+  methodCorrect: boolean;
+  rank: DetectiveRank;
+}
+
 export function CaseGame({ data }: { data: CaseData }) {
   const [step, setStep] = useState<Step>("giris");
   const [accusedId, setAccusedId] = useState<string | null>(null);
-  const [result, setResult] = useState<boolean | null>(null);
+  const [motiveCorrect, setMotiveCorrect] = useState(false);
+  const [final, setFinal] = useState<FinalResult | null>(null);
   const [introDone, setIntroDone] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
@@ -51,18 +74,49 @@ export function CaseGame({ data }: { data: CaseData }) {
     setStep(next);
   }
 
-  function handleAccuse() {
-    if (!accusedId) return;
-    const correct = accusedId === data.solution.killerId;
-    recordAccusation(data.id, accusedId, correct);
-    setResult(correct);
-    setStep("sonuc");
-  }
-
   const coverage =
     (viewedDocs.size / Math.max(data.documents.length, 1) +
       viewedSuspects.size / Math.max(data.suspects.length, 1)) /
     2;
+
+  const inInvestigation = TABS.some((t) => t.id === step);
+
+  function handleAccuse() {
+    if (!accusedId) return;
+    const correct = accusedId === data.solution.killerId;
+    if (!correct) {
+      finalize(correct, false, false);
+      return;
+    }
+    setStep("motiv-sorusu");
+  }
+
+  function handleMotiveAnswer(_optionId: string, correct: boolean) {
+    setMotiveCorrect(correct);
+    setStep("yontem-sorusu");
+  }
+
+  function handleMethodAnswer(_optionId: string, correct: boolean) {
+    finalize(true, motiveCorrect, correct);
+  }
+
+  function finalize(correct: boolean, motiveWasCorrect: boolean, methodCorrect: boolean) {
+    const hintsUsed = getHintsUsed(data.id);
+    const rank = rankFor({ correctSuspect: correct, motiveCorrect: motiveWasCorrect, methodCorrect, coverage, hintsUsed });
+    recordAccusation(data.id, accusedId ?? "", correct, rank.points, rank.label);
+    const solvedCasesCount = allCases.filter((c) => getCaseProgress(c.id).solved).length;
+    checkAchievements({
+      caseId: data.id,
+      correct,
+      coverage,
+      hintsUsed,
+      motiveCorrect: motiveWasCorrect,
+      methodCorrect,
+      solvedCasesCount,
+    });
+    setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank });
+    setStep("sonuc");
+  }
 
   if (!introDone) {
     return (
@@ -88,7 +142,7 @@ export function CaseGame({ data }: { data: CaseData }) {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {step !== "sonuc" && (
+            {inInvestigation && (
               <p
                 title="İncelenen kanıt + şüpheli oranı — dedektif rütbeni etkiler"
                 className="hidden sm:block text-text-dim text-[11px] font-mono-doc border border-white/10 rounded-sm px-2 py-1.5"
@@ -96,6 +150,7 @@ export function CaseGame({ data }: { data: CaseData }) {
                 🔍 %{Math.round(coverage * 100)} incelendi
               </p>
             )}
+            {inInvestigation && <HintPanel caseId={data.id} hints={data.hints} />}
             <button
               onClick={toggleSound}
               aria-label={soundOn ? "Sesi kapat" : "Sesi aç"}
@@ -103,7 +158,7 @@ export function CaseGame({ data }: { data: CaseData }) {
             >
               {soundOn ? "🔊" : "🔇"}
             </button>
-            {step !== "sonuc" && (
+            {inInvestigation && (
               <button
                 onClick={() => goStep("suclama")}
                 className="rounded-sm bg-accent-red-bright px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
@@ -114,7 +169,7 @@ export function CaseGame({ data }: { data: CaseData }) {
           </div>
         </div>
 
-        {step !== "sonuc" && (
+        {inInvestigation && (
           <nav className="max-w-3xl mx-auto px-4 sm:px-6 flex gap-1 overflow-x-auto">
             {TABS.map((t) => {
               const active = step === t.id;
@@ -201,6 +256,8 @@ export function CaseGame({ data }: { data: CaseData }) {
               </div>
             )}
 
+            {step === "zaman" && <Timeline events={data.timeline} />}
+
             {step === "pano" && <EvidenceBoard data={data} />}
 
             {step === "notlar" && <Notebook caseId={data.id} />}
@@ -214,8 +271,24 @@ export function CaseGame({ data }: { data: CaseData }) {
               />
             )}
 
-            {step === "sonuc" && result !== null && (
-              <ResultReveal data={data} result={result} coverage={coverage} />
+            {step === "motiv-sorusu" && (
+              <FollowUpQuestionScreen
+                title="Motiv"
+                question={data.motiveQuestion}
+                onAnswer={handleMotiveAnswer}
+              />
+            )}
+
+            {step === "yontem-sorusu" && (
+              <FollowUpQuestionScreen
+                title="Yöntem"
+                question={data.methodQuestion}
+                onAnswer={handleMethodAnswer}
+              />
+            )}
+
+            {step === "sonuc" && final && (
+              <ResultReveal data={data} final={final} coverage={coverage} />
             )}
           </motion.div>
         </AnimatePresence>
@@ -404,16 +477,46 @@ function AccusationLineup({
   );
 }
 
+function FollowUpQuestionScreen({
+  title,
+  question,
+  onAnswer,
+}: {
+  title: string;
+  question: FollowUpQuestion;
+  onAnswer: (optionId: string, correct: boolean) => void;
+}) {
+  return (
+    <div className="space-y-5">
+      <p className="text-xs uppercase tracking-widest text-accent-gold font-mono-doc">
+        Son Soru · {title}
+      </p>
+      <p className="font-display text-xl sm:text-2xl font-bold">{question.prompt}</p>
+      <div className="grid gap-3">
+        {question.options.map((o) => (
+          <button
+            key={o.id}
+            onClick={() => onAnswer(o.id, o.correct)}
+            className="text-left rounded-sm border border-white/10 bg-panel px-4 py-3 hover:border-accent-gold/60 hover:bg-white/[0.03] transition-colors"
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ResultReveal({
   data,
-  result,
+  final,
   coverage,
 }: {
   data: CaseData;
-  result: boolean;
+  final: FinalResult;
   coverage: number;
 }) {
-  const rank = rankFor(result, coverage);
+  const { correct, rank } = final;
 
   useEffect(() => {
     const t = setTimeout(() => playStamp(), 150);
@@ -428,14 +531,14 @@ function ResultReveal({
           animate={{ scale: 1, opacity: 1, rotate: -6 }}
           transition={{ type: "spring", stiffness: 260, damping: 16 }}
           className={`stamp text-2xl sm:text-4xl font-black ${
-            result ? "text-accent-gold" : "text-accent-red-bright"
+            correct ? "text-accent-gold" : "text-accent-red-bright"
           }`}
         >
-          {result ? "Çözüldü" : "Yanlış Şüpheli"}
+          {correct ? "Çözüldü" : "Yanlış Şüpheli"}
         </motion.p>
       </div>
       <p className="text-text-dim">
-        {result
+        {correct
           ? "Doğru şüpheliyi işaret ettin."
           : `Suçladığın kişi katil değildi. Gerçek katil: ${
               data.suspects.find((s) => s.id === data.solution.killerId)?.name
@@ -449,7 +552,7 @@ function ResultReveal({
         className="inline-flex flex-col items-center gap-1 rounded-sm border border-accent-gold/40 bg-panel px-6 py-3"
       >
         <p className="text-[11px] uppercase tracking-widest text-accent-gold font-mono-doc">
-          Dedektif Rütbesi
+          Dedektif Rütbesi · {rank.points} puan
         </p>
         <p className="font-display text-xl font-bold">{rank.label}</p>
         <p className="text-text-dim text-xs max-w-xs">{rank.description}</p>
