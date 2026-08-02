@@ -222,26 +222,68 @@ build + Playwright testi yaptım. Özet:
 Tüm değişiklikler GitHub'a push edildi (bkz. commit geçmişi:
 "Backlog 1/2", "Backlog 2/2", ve bu güncellemeyle birlikte final commit).
 
+## İkinci İyileştirme Turu (2026-08-02, sekizinci güncelleme)
+Kullanıcının 6 yeni isteği sırayla uygulandı:
+
+1. **Sekme kilidi:** "Soruşturmaya Başla"ya basılmadan Kanıtlar/Şüpheliler/
+   Zaman/Pano/Notlar erişilemiyor (🔒 ikonlu, devre dışı görünüyor).
+   `CaseGame.tsx`'e `started` state'i eklendi.
+2. **Daha az detaylı ipuçları:** Her 3 vakanın `hints[]` alanı, doğrudan
+   sonucu/şüpheliyi söylemeyen, daha muğlak metinlerle yeniden yazıldı.
+3. **Zorluk bazlı puan tavanı:** `src/lib/rank.ts` artık zorluğa göre
+   ölçekleniyor — kolay=100, orta=150, zor=200 maksimum puan. İç hesap
+   hâlâ 0-100% performans üzerinden, sonra zorluğun tavanına çarpılıyor.
+   **Vaka 01 "kolay" olarak yeniden sınıflandırıldı** (zaten en basit vaka
+   — yeni içerik yazmadan zorluk çeşitliliği elde edildi: kolay/orta/zor).
+4. **Yönlü ok bağlantılar:** `EvidenceBoard.tsx`'teki düz kırmızı çizgiler,
+   SVG `marker-end` ile ok ucuna çevrildi; yön hep ilk tıklanan karttan
+   ikinciye doğru (bağlantı verisi zaten bu sırayı tutuyordu).
+5. **4 yeni görsel belge türü:** `guvenlik_kamerasi` (video çerçevesi +
+   REC + zaman damgası mockup'ı), `sosyal_medya` (avatar/gönderi kartı),
+   `haber_kupuru` ("Meridyen Gazetesi" markalı, ortak evrene bağlanan sahte
+   gazete küpürü), `ses_kaydi` (dalga formu görselleştirmesi + döküm).
+   Hepsi tamamen CSS/SVG ile üretiliyor, dış dosya/görsel/ses YOK.
+   Retrofit: Vaka 01'e sosyal medya, Vaka 02'ye kamera+ses kaydı (biri
+   dönüştürüldü, biri yeni), Vaka 03'e haber küpürü eklendi.
+6. **Gerçek haber/OSINT talebi konusunda bilinçli sapma:** Kullanıcı gerçek
+   olaylara/haberlere internet linki istedi; bunun yerine TAMAMEN KURGUSAL
+   ama gerçekçi "Meridyen Gazetesi" haber küpürü ve sahte sosyal medya
+   gönderileri yapıldı — gerçek insanları/olayları kurguya karıştırmanın
+   etik/hukuki riski kullanıcıya açıklandı, dış link eklenmedi.
+
+**Yan ürün — isim çakışması düzeltmesi:** Vaka 03 içeriği yazılırken fark
+edilmeden Vaka 01 ve Vaka 02'deki isimlerle çakışan iki karakter adı vardı
+("Bora" → Vaka 01'in Bora Yalçın'ı, "Ferit Umay" → Vaka 01'in Ferit Kaya'sı).
+İkisi de yeniden adlandırıldı (Efe, Dr. Tarık Umay) — ortak evrende
+istemsiz/yanıltıcı çakışma olmasın diye.
+
+Playwright ile tam regresyon: 3 vakada da sekme kilidi + tam gezinme,
+mobil dokunmatik (kilitli/açık sekme sayısı doğrulandı), zorluk bazlı puan
+hesabı (kolay 70/100, zor 144/200 gibi doğru ölçeklendi) — **0 hata**.
+
 ## Sıradaki Adım
-1. `PLAN.md` §10'daki backlog'un **tamamı bitti** (2026-08-02) — sıradaki
-   büyük karar kullanıcıda: **Vercel'e deploy** mi, yoksa **Vaka 04** mü?
-   Kullanıcı daha önce "Vercel şimdilik kalsın" demişti, bu yüzden deploy
-   hâlâ yapılmadı — tekrar sorulabilir ya da içerik üretimine devam edilebilir.
-2. Faz 2 devam edebilir: Vaka 04 teması "ünlü/influencer cinayeti" kalan
-   son seçenek (villa zaten Vaka 03'te kullanıldı). Yeni vaka eklemek artık
-   kanıtlanmış şekilde kolay — `src/data/cases/`'a dosya + `index.ts`'e
-   kayıt, geri kalan her şey (ses/rütbe/pano/ipucu/zaman çizelgesi/rozet)
-   otomatik çalışıyor.
+1. İkinci iyileştirme turu da bitti (2026-08-02) — sıradaki büyük karar hâlâ
+   kullanıcıda: **Vercel'e deploy** mi, **Vaka 04** mü, yoksa yeni önerilen
+   fikirlerden (aşağıya bkz.) biri mi? Kullanıcı "Vercel şimdilik kalsın"
+   demişti.
+2. Vaka 04 teması "ünlü/influencer cinayeti" kalan son klasik seçenek.
+   Yeni vaka eklemek kanıtlanmış şekilde kolay ve artık 10 belge türünden
+   (resmi_rapor, whatsapp, telefon_dokumu, bilet_kaydi, gunluk_log, ifade,
+   eposta, guvenlik_kamerasi, sosyal_medya, haber_kupuru, ses_kaydi)
+   dilediğini seçip zenginleştirebiliriz.
 3. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
 4. Gerçek FİZİKSEL cihazda (özellikle iOS Safari) test hâlâ yapılmadı —
-   yalnızca Playwright'ın WebKit motoruyla (Chromium'dan daha yakın ama
-   birebir aynı değil) test edildi. Ses/animasyon gerçek iPhone'da bir kez
-   denenirse iyi olur.
-5. `PLAN.md` §7.1'deki bazı mekanik ilhamlar hâlâ uygulanmadı: kademeli
-   hedef sistemi (tek final suçlaması yerine ara adımlar — kısmen motiv/
-   yöntem sorularıyla karşılandı ama tam anlamıyla değil), tam sezonluk/
+   yalnızca Playwright'ın WebKit motoruyla test edildi.
+5. `PLAN.md` §7.1'deki bazı mekanik ilhamlar hâlâ uygulanmadı: tam sezonluk/
    bağlı vaka evreni (şu an sadece hafif flavor-text göndermeler var, §9'da
-   bilinçli olarak seçildi)
+   bilinçli olarak seçildi), tam kademeli hedef sistemi (motiv/yöntem
+   sorularıyla kısmen karşılandı)
+6. Bu turda kullanıcıya sunulan yeni fikir listesi (henüz seçim yapılmadı):
+   panoya zaman-tabanlı alibi çakışma oyunu, çoklu son/kısmi başarı, vaka
+   içi "arama motoru" aracı (isim/anahtar kelime ile kanıt tarama), günlük/
+   haftalık mini vaka, sesli anlatıcı iç ses efekti, film grenli/vinyet
+   görsel filtre, gerçek cihaz test turu. Detaylar için kullanıcıyla yapılan
+   son konuşmaya bakılabilir.
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).

@@ -144,12 +144,27 @@ Deniz, o modeli GECELERİMİ VEREREK ben yazdım. Şirket adına bile değil, "s
     },
     {
       id: "lobi-kamera",
-      type: "gunluk_log",
-      title: "Lobi Güvenlik Kamerası Dökümü",
-      meta: "Nova Güvenlik · Lobi Kamera Gözlem Notu",
-      body: `22:14  B.ETE lobiye girer, eski personel kartı okutulur (sistem uyarı verir ama görevli "eski çalışan, eşya almaya gelmiştir" diyerek geçirir).
-22:15  B.ETE resepsiyon önünde bekler.
-22:19  B.ETE bir kutu eşyayla lobiden çıkar. Asansöre hiç binmemiştir, 28. kata çıkmamıştır.`,
+      type: "guvenlik_kamerasi",
+      title: "Lobi Güvenlik Kamerası Görüntüsü",
+      meta: "Nova Güvenlik · Kamera 02 — Lobi",
+      cameraTimestamp: "CAM-02 · 22:14:37",
+      body: `22:14 — B.ETE lobiye girer, eski personel kartı okutulur (sistem uyarı verir ama görevli "eski çalışan, eşya almaya gelmiştir" diyerek geçirir).
+22:15 — B.ETE resepsiyon önünde bekler.
+22:19 — B.ETE bir kutu eşyayla lobiden çıkar. Asansöre hiç binmemiştir, 28. kata çıkmamıştır.`,
+    },
+    {
+      id: "ofis-ses-kaydi",
+      type: "ses_kaydi",
+      title: "Ofis Koridorundan Duyulan Ses Kaydı",
+      meta: "Temizlik personelinin telefonuyla yanlışlıkla kaydedilmiş",
+      audioDuration: "0:38",
+      body: `(Boğuk, net olmayan sesler)
+"...senin adına... bu kabul edilemez bir şey..."
+(bir şeylerin masaya sertçe konulduğu / devrildiği ses)
+"...yarın konuşacağız zaten, şimdi olmaz..."
+(ardından sessizlik, uzaklaşan ayak sesleri)
+
+Not: Kayıt saat 22:47 civarına ait, kimin sesi olduğu net olarak ayırt edilememektedir.`,
     },
     {
       id: "selin-ucus-kaydi",
@@ -184,9 +199,9 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
     { time: "23:30", description: "Yağmur, Deniz'i toplantıya çağırmaya gelip cesedi bulur." },
   ],
   hints: [
-    "Ana kart logunda kimsenin görünmemesi, o kişinin suçsuz olduğu anlamına gelmeyebilir. Kim bu logu değiştirebilir?",
-    "IT güvenlik yedek/anomali raporunu dikkatlice oku.",
-    "E-posta yazışmasındaki hem finansal hem duygusal gerilime bak.",
+    "Bir sistemde bir kaydın 'olmaması' her zaman masumiyet göstermez. Kimin o tür bir kaydı değiştirebilecek yetkisi olabileceğini düşün.",
+    "Dijital kanıtları inceleyen belgelerden birinde, ilk bakışta göze çarpmayan bir ayrıntı var.",
+    "Motivi en güçlü görünenler bazen doğru kişi olmayabilir — kimin gerçekten erişimi olduğuna odaklan.",
   ],
   motiveQuestion: {
     prompt: "Katilin asıl motivi neydi?",

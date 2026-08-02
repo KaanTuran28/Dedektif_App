@@ -48,6 +48,7 @@ interface FinalResult {
 
 export function CaseGame({ data }: { data: CaseData }) {
   const [step, setStep] = useState<Step>("giris");
+  const [started, setStarted] = useState(false);
   const [accusedId, setAccusedId] = useState<string | null>(null);
   const [motiveCorrect, setMotiveCorrect] = useState(false);
   const [final, setFinal] = useState<FinalResult | null>(null);
@@ -72,8 +73,15 @@ export function CaseGame({ data }: { data: CaseData }) {
   }
 
   function goStep(next: Step) {
+    if (next !== "giris" && !started) return;
     playTick();
     setStep(next);
+  }
+
+  function startInvestigation() {
+    setStarted(true);
+    playTick();
+    setStep("kanitlar");
   }
 
   const coverage =
@@ -104,7 +112,14 @@ export function CaseGame({ data }: { data: CaseData }) {
 
   function finalize(correct: boolean, motiveWasCorrect: boolean, methodCorrect: boolean) {
     const hintsUsed = getHintsUsed(data.id);
-    const rank = rankFor({ correctSuspect: correct, motiveCorrect: motiveWasCorrect, methodCorrect, coverage, hintsUsed });
+    const rank = rankFor({
+      correctSuspect: correct,
+      motiveCorrect: motiveWasCorrect,
+      methodCorrect,
+      coverage,
+      hintsUsed,
+      difficulty: data.difficulty,
+    });
     recordAccusation(data.id, accusedId ?? "", correct, rank.points, rank.label);
     const solvedCasesCount = allCases.filter((c) => getCaseProgress(c.id).solved).length;
     checkAchievements({
@@ -144,7 +159,7 @@ export function CaseGame({ data }: { data: CaseData }) {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {inInvestigation && (
+            {started && inInvestigation && (
               <p
                 title="İncelenen kanıt + şüpheli oranı — dedektif rütbeni etkiler"
                 className="hidden sm:block text-text-dim text-[11px] font-mono-doc border border-white/10 rounded-sm px-2 py-1.5"
@@ -152,7 +167,7 @@ export function CaseGame({ data }: { data: CaseData }) {
                 🔍 %{Math.round(coverage * 100)} incelendi
               </p>
             )}
-            {inInvestigation && <HintPanel caseId={data.id} hints={data.hints} />}
+            {started && inInvestigation && <HintPanel caseId={data.id} hints={data.hints} />}
             <button
               onClick={toggleSound}
               aria-label={soundOn ? "Sesi kapat" : "Sesi aç"}
@@ -160,7 +175,7 @@ export function CaseGame({ data }: { data: CaseData }) {
             >
               {soundOn ? "🔊" : "🔇"}
             </button>
-            {inInvestigation && (
+            {started && inInvestigation && (
               <button
                 onClick={() => goStep("suclama")}
                 className="rounded-sm bg-accent-red-bright px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
@@ -175,19 +190,28 @@ export function CaseGame({ data }: { data: CaseData }) {
           <nav className="max-w-3xl mx-auto px-4 sm:px-6 flex gap-1 overflow-x-auto">
             {TABS.map((t) => {
               const active = step === t.id;
+              const locked = t.id !== "giris" && !started;
               return (
                 <button
                   key={t.id}
                   onClick={() => goStep(t.id)}
+                  disabled={locked}
                   aria-current={active}
+                  aria-disabled={locked}
+                  title={locked ? "Önce soruşturmayı başlat" : undefined}
                   className={`relative shrink-0 px-4 sm:px-5 pt-2 pb-2.5 text-sm font-mono-doc transition-colors ${
-                    active ? "text-black" : "text-text-dim hover:text-text"
+                    locked
+                      ? "text-text-dim/30 cursor-not-allowed"
+                      : active
+                        ? "text-black"
+                        : "text-text-dim hover:text-text"
                   }`}
                   style={{
                     clipPath: "polygon(10% 0, 90% 0, 100% 100%, 0% 100%)",
-                    backgroundColor: active ? "var(--accent-gold)" : "transparent",
+                    backgroundColor: active && !locked ? "var(--accent-gold)" : "transparent",
                   }}
                 >
+                  {locked ? "🔒 " : ""}
                   {t.label}
                 </button>
               );
@@ -225,7 +249,7 @@ export function CaseGame({ data }: { data: CaseData }) {
                   <p className="text-paper-ink/70 text-sm mt-1">{data.victim.description}</p>
                 </div>
                 <button
-                  onClick={() => goStep("kanitlar")}
+                  onClick={startInvestigation}
                   className="w-full sm:w-auto rounded-sm bg-accent-red-bright px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
                 >
                   Soruşturmaya Başla
@@ -614,7 +638,7 @@ function ResultReveal({
         className="inline-flex flex-col items-center gap-1 rounded-sm border border-accent-gold/40 bg-panel px-6 py-3"
       >
         <p className="text-[11px] uppercase tracking-widest text-accent-gold font-mono-doc">
-          Dedektif Rütbesi · {rank.points} puan
+          Dedektif Rütbesi · {rank.points}/{rank.maxPoints} puan
         </p>
         <p className="font-display text-xl font-bold">{rank.label}</p>
         <p className="text-text-dim text-xs max-w-xs">{rank.description}</p>

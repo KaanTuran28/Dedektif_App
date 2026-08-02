@@ -13,6 +13,11 @@ const TYPE_ICON: Record<string, string> = {
   bilet_kaydi: "🎫",
   gunluk_log: "📓",
   ifade: "🗒️",
+  eposta: "✉️",
+  guvenlik_kamerasi: "🎥",
+  sosyal_medya: "📱",
+  haber_kupuru: "📰",
+  ses_kaydi: "🎙️",
 };
 
 const CANVAS_W = 1040;
@@ -150,7 +155,18 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
       const pa = positions[a];
       const pb = positions[b];
       if (!pa || !pb) return null;
-      return { a, b, x1: pa.x + 60, y1: pa.y + 30, x2: pb.x + 60, y2: pb.y + 30 };
+      const cx1 = pa.x + 60;
+      const cy1 = pa.y + 30;
+      const cx2 = pb.x + 60;
+      const cy2 = pb.y + 30;
+      // ok ucu hedef kartın altında kaybolmasın diye çizgiyi kart kenarında kes
+      const dx = cx2 - cx1;
+      const dy = cy2 - cy1;
+      const dist = Math.hypot(dx, dy) || 1;
+      const pullback = 58;
+      const x2 = dist > pullback ? cx2 - (dx / dist) * pullback : cx2;
+      const y2 = dist > pullback ? cy2 - (dy / dist) * pullback : cy2;
+      return { a, b, x1: cx1, y1: cy1, x2, y2 };
     })
     .filter(Boolean) as { a: string; b: string; x1: number; y1: number; x2: number; y2: number }[];
 
@@ -183,6 +199,19 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
             width={CANVAS_W}
             height={CANVAS_H}
           >
+            <defs>
+              <marker
+                id="board-arrowhead"
+                viewBox="0 0 10 10"
+                refX="8.5"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-red-bright)" />
+              </marker>
+            </defs>
             {lines.map((l, i) => (
               <line
                 key={i}
@@ -192,7 +221,8 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                 y2={l.y2}
                 stroke="var(--accent-red-bright)"
                 strokeWidth={2}
-                opacity={0.8}
+                opacity={0.85}
+                markerEnd="url(#board-arrowhead)"
               />
             ))}
           </svg>
