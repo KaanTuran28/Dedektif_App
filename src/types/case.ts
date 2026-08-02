@@ -106,6 +106,8 @@ export interface CaseData {
   title: string;
   difficulty: Difficulty;
   tagline: string;
+  /** false ise vaka "Yakında Açılacak" olarak kilitli gösterilir, oynanamaz */
+  available: boolean;
   synopsis: string;
   victim: {
     name: string;

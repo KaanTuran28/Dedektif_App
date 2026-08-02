@@ -6,6 +6,7 @@ export const vaka01: CaseData = {
   title: "Yıldız Ekspresi",
   difficulty: "kolay",
   tagline: "Kar fırtınasında mahsur kalan trende, kilitli bir kompartımanda bir cinayet işlendi.",
+  available: true,
   synopsis:
     "Ankara'dan Kars'a giden gece treni Yıldız Ekspresi, şiddetli bir kar fırtınası nedeniyle dağların arasında bir tünelde durmak zorunda kaldı. Sabaha karşı, özel kompartımanında seyahat eden zengin antika koleksiyoncusu Kemal Aydınlı, kendi koleksiyonundan bir Osmanlı hançeriyle öldürülmüş halde bulundu. Kompartımanın kapısı içeriden sürgülüydü, penceresi buzdan açılamaz durumdaydı. Tren tünelde durduğu için kimse inip kaçamazdı. Katil hâlâ trende, beş kişiden biri. Kanıtları incele, çelişkileri yakala ve katili bul.",
   victim: {
