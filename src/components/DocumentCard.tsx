@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { CaseDocument } from "@/types/case";
 import { tiltFor } from "@/lib/tilt";
+import { docColorFor } from "@/lib/docColor";
 import { playPaper } from "@/lib/sound";
 
 const TYPE_LABELS: Record<CaseDocument["type"], string> = {
@@ -54,11 +55,16 @@ export function DocumentCard({
 }) {
   const [open, setOpen] = useState(false);
   const tilt = tiltFor(doc.id);
+  const color = docColorFor(doc.type);
 
   return (
     <div
       className="relative rounded-sm border border-white/10 bg-panel overflow-hidden"
-      style={{ transform: open ? "none" : `rotate(${tilt}deg)` }}
+      style={{
+        transform: open ? "none" : `rotate(${tilt}deg)`,
+        borderLeftWidth: 4,
+        borderLeftColor: color.border,
+      }}
     >
       <div className="pin" />
       <button
@@ -72,7 +78,10 @@ export function DocumentCard({
         aria-expanded={open}
       >
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-accent-gold mb-1 font-mono-doc">
+          <p
+            className="text-[11px] uppercase tracking-widest mb-1 font-mono-doc"
+            style={{ color: color.text }}
+          >
             {TYPE_LABELS[doc.type]}
           </p>
           <p className="font-display text-lg sm:text-xl font-bold">{doc.title}</p>

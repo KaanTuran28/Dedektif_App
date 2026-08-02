@@ -202,7 +202,6 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
   ],
   hints: [
     "Bir sistemde bir kaydın 'olmaması' her zaman masumiyet göstermez. Kimin o tür bir kaydı değiştirebilecek yetkisi olabileceğini düşün.",
-    "Dijital kanıtları inceleyen belgelerden birinde, ilk bakışta göze çarpmayan bir ayrıntı var.",
     "Motivi en güçlü görünenler bazen doğru kişi olmayabilir — kimin gerçekten erişimi olduğuna odaklan.",
   ],
   motiveQuestion: {

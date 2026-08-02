@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Suspect } from "@/types/case";
 import { tiltFor } from "@/lib/tilt";
+import { suspectColorFor } from "@/lib/suspectColor";
 import { playPaper } from "@/lib/sound";
 
 export function SuspectCard({
@@ -18,11 +19,16 @@ export function SuspectCard({
   const [open, setOpen] = useState(false);
   const tilt = tiltFor(suspect.id);
   const tag = `Ş-${String(index + 1).padStart(2, "0")}`;
+  const color = suspectColorFor(suspect.id);
 
   return (
     <div
       className="relative rounded-sm border border-white/10 bg-panel overflow-hidden"
-      style={{ transform: open ? "none" : `rotate(${tilt}deg)` }}
+      style={{
+        transform: open ? "none" : `rotate(${tilt}deg)`,
+        borderLeftWidth: 4,
+        borderLeftColor: color,
+      }}
     >
       <div className="pin" />
       <button
@@ -36,11 +42,12 @@ export function SuspectCard({
         aria-expanded={open}
       >
         <div
-          className="relative shrink-0 h-16 w-16 sm:h-20 sm:w-20 rounded-sm overflow-hidden border border-white/15"
+          className="relative shrink-0 h-16 w-16 sm:h-20 sm:w-20 rounded-sm overflow-hidden border-2"
           style={{
             backgroundImage:
               "repeating-linear-gradient(to bottom, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 8px)",
             backgroundColor: "#0f0d0d",
+            borderColor: `${color}80`,
           }}
         >
           <svg

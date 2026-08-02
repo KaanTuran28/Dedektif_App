@@ -72,6 +72,42 @@ export const vaka01: CaseData = {
       statement:
         "\"Tüm gece koridorda devriyedeydim. Defterimde her hareketim yazılı, saklayacak bir şeyim yok.\"",
     },
+    {
+      id: "yusuf",
+      name: "Yusuf Aydınlı",
+      age: 31,
+      role: "Kayıp Oğul",
+      motive:
+        "Kemal'in ilk evliliğinden oğlu. Kemal onu ve annesini yıllar önce terk etmişti; yeni vasiyette adı hiç geçmiyordu. Trene, babasıyla resmi olarak yüzleşmek için kimliğini gizleyerek bindi.",
+      opportunity:
+        "Bileti kompartıman 11'e aitti, koridorun öbür ucunda; kimseye kim olduğunu söylemedi.",
+      statement:
+        "\"Evet, ondan hesap sormaya geldim. Ama kapısına kadar gidip vazgeçtim, yüzleşecek cesareti bulamadım, kompartımanıma döndüm.\"",
+    },
+    {
+      id: "sibel",
+      name: "Sibel Konuk",
+      age: 34,
+      role: "Gazeteci",
+      motive:
+        "Kemal'in kaçak eser ticaretini aylardır araştırıyordu, yayına hazır bir dosyası vardı. Kemal bunu öğrenip avukatlarıyla onu susturmakla tehdit etmişti.",
+      opportunity:
+        "Kompartımanı Kemal'inkine yakındı; tuvalete gitmek bahanesiyle sık sık kapısının önünden geçiyordu.",
+      statement:
+        "\"Röportaj malzemesi topluyordum sadece, kaynağımı korumak zorundayım. Ama kimseye zarar vermedim.\"",
+    },
+    {
+      id: "deniz",
+      name: "Deniz Ilgaz",
+      age: 43,
+      role: "Vagon Restoran Şefi",
+      motive:
+        "Geçen yıl Kemal'e özel bir tablo satmıştı, ödemesi hâlâ yapılmamıştı. O akşam parasını istemiş, Kemal onunla diğer yolcuların önünde alay ederek kovmuştu.",
+      opportunity:
+        "Restoran vagonunda çalışıyordu, oradan tüm vagonlara kolayca geçiş yapabiliyordu.",
+      statement:
+        "\"Param için gittim, evet, tartıştık. Ama vurup çıktım oradan, öldürmedim — param hâlâ yok üstelik.\"",
+    },
   ],
   documents: [
     {
@@ -174,13 +210,73 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
         comments: 38,
       },
     },
+    {
+      id: "yusuf-not-defteri",
+      type: "gunluk_log",
+      title: "Yusuf'un Not Defteri Sayfası",
+      meta: "Kompartıman 11'de bulundu, Yusuf Aydınlı'nın el yazısı",
+      body: `Bugün ya da hiç. Yıllarca kaçtım ama artık kaçamıyorum. Annem öldüğünde bir telefon bile etmedi. Şimdi de beni yokmuşum gibi bir vasiyetten siliyor. Sadece bir kere yüzüne bakıp "beni hatırlıyor musun" diye sormak istiyorum. Belki hiçbir şey demeden döneceğim. Belki de değil.`,
+    },
+    {
+      id: "sibel-eposta",
+      type: "eposta",
+      title: "Editöre Gönderilen E-posta",
+      meta: "Sibel Konuk'un dizüstü bilgisayarından, olaydan 3 gün önce",
+      emailHeader: {
+        from: "sibel.konuk@habermerkezi.example",
+        to: "editor@habermerkezi.example",
+        subject: "Kaçak Eser Dosyası — Kemal Aydınlı",
+        date: "Olaydan 3 gün önce",
+      },
+      body: `Dosya neredeyse hazır ama bir sorun var: Kemal Aydınlı avukatları aracılığıyla yayından önce beni susturmaya çalışıyor. Kars'a gidiyor, oradaki kaynağımla da görüşecekmiş — bu yolculuk dosyanın son parçası olabilir. Riskli olduğunu biliyorum ama trene bineceğim, uzaktan takip edeceğim onu. Yayın tarihini bir hafta erteleyelim, elimde daha güçlü kanıt olacak.`,
+    },
+    {
+      id: "restoran-sikayet-defteri",
+      type: "resmi_rapor",
+      title: "Restoran Vagonu Şikayet ve Hesap Defteri",
+      meta: "T.C. Devlet Demiryolları · Vagon Restoran · Deniz Ilgaz'ın kaydı",
+      body: `22:30 civarı — Kemal Aydınlı Bey, geçen sezon kendisine sattığım tabloya dair ödemeyi bir kez daha erteledi. Diğer masalardaki yolcuların önünde "böyle küçük hesapları benimle konuşacak seviyede değilsin" dedi. Sesini yükseltmedim, servise devam ettim. Parayı istemeye devam edeceğim ama bu şekilde konuşulmayı hak etmiyorum.
+
+(Vardiya amiri notu: Şikayet resmi olarak kayda geçmiştir, gerekirse işlem yapılacaktır.)`,
+    },
+    {
+      id: "koridor-kamera",
+      type: "guvenlik_kamerasi",
+      title: "Koridor Güvenlik Kamerası — 7. Vagon",
+      meta: "Kısmen arızalı kayıt, düşük çözünürlük",
+      cameraTimestamp: "03:0X:XX",
+      body: `Görüntüde koridorda bir gölge geçişi seçilebiliyor ancak kar fırtınası nedeniyle sinyal kaybı ve düşük çözünürlük yüzünden kimlik teşhisi yapılamamıştır. Boy, yürüyüş hızı ya da kıyafet detayı net değildir. Teknik ekip, kamera sisteminin gece 02:50 civarında kısa süreli arızalandığını, tam olarak ne zaman düzeldiğinin belirsiz olduğunu belirtmiştir.`,
+    },
+    {
+      id: "meridyen-haber",
+      type: "haber_kupuru",
+      title: "Koleksiyon Çevrelerinde Tartışma",
+      newsHeader: {
+        publication: "Meridyen Gazetesi",
+        headline: "Ünlü Koleksiyoncunun Eserleri Tartışma Yarattı",
+        byline: "Kültür-Sanat Servisi",
+        date: "Olaydan 9 gün önce",
+      },
+      body: `Sanat çevrelerinde tanınan koleksiyoner Kemal Aydınlı'nın son dönemde edindiği bazı parçaların kökeni hakkında sorular gündeme geldi. Rakip koleksiyonerler arasında "belgesi eksik parçalar" iddiaları dolaşırken, Aydınlı iddiaları "haset" olarak nitelendirip yorum yapmadı. Kültür mirası uzmanları, bu tür anlaşmazlıkların koleksiyoner çevrelerinde yeni olmadığını, geçmişte de benzer ortaklıkların mahkemelik davalara dönüştüğünü hatırlattı.`,
+    },
+    {
+      id: "kemal-sesli-not",
+      type: "ses_kaydi",
+      title: "Kemal'in Sesli Notu",
+      meta: "Telefonunda bulundu, olay gecesi kaydedilmiş",
+      audioDuration: "0:47",
+      body: `"Kendime not: Yusuf diye biri kompartımana geldi, tanımadım, tanımak da istemiyorum, güvenliğe söyleyeceğim... O gazeteci kadın bir şey biliyormuş gibi davranıyor, avukatları arayacağım sabah... Deniz'e bir kuruş daha vermem, o tablo zaten şaibeliydi... Emre'yle de konuşmam lazım, o defter meselesini kapatmalıyım."`,
+    },
   ],
   timeline: [
+    { time: "22:30", description: "Deniz, restoran vagonunda parasını istediği için Kemal'le tartışır, herkesin önünde küçümsenir." },
+    { time: "02:50", description: "Yusuf, kompartıman 11'den çıkıp koridorda dolaşır, Kemal'in kapısının önünde durur, sonra geri döner." },
     { time: "03:00", description: "Selim'in kompartımanındaki çay fincanı, aslında bu saatte demlenip içildiğini gösteriyor — kendisi '03:30'a kadar uyanıktım' diyor.", contradicts: "selim" },
+    { time: "03:05", description: "Sibel, tuvalete giderken Kemal'in kapısının önünden geçer; içeriden ses gelmediğini sonradan belirtiyor." },
     { time: "03:15", description: "Vagon restoranda akşam servisi biter." },
     { time: "03:20", description: "Emre, Kemal'in kompartımanından çıkar (son görülen kişi)." },
     { time: "03:25", description: "Emre 'rapor hazırlamaya' restorana gideceğini söyler." },
-    { time: "03:30–04:00", description: "Garson, Emre'yi restoranda görmediğini belirtiyor.", contradicts: "emre" },
+    { time: "03:30–04:00", description: "Deniz, Emre'yi restoranda görmediğini belirtiyor.", contradicts: "emre" },
     { time: "03:40", description: "Tren, çığ riski nedeniyle tünelde durur." },
     { time: "03:45", description: "Cinayet gerçekleşir (otopsi tahmini)." },
     { time: "03:50", description: "Nihal, koridorda görevli tarafından görülür — kendisi 'uyuyordum, hiçbir şey duymadım' diyor.", contradicts: "nihal" },
@@ -188,7 +284,6 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
   ],
   hints: [
     "Herkesin bir alibi'si var gibi görünüyor ama zamanlamalar hep doğrulanmış değil. Kim, iddia ettiği yerde olduğunu kanıtlayamıyor?",
-    "Kurbanın yaralanma şekli, saldırganın fiziksel özellikleri hakkında bir şey söylüyor olabilir. Adli belgelere tekrar bak.",
     "Olay yerinde sahibi belirsiz küçük bir eşya bulunmuştu. Şüphelilerin isimlerini bir kez daha gözden geçir.",
   ],
   motiveQuestion: {
@@ -212,6 +307,6 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
   solution: {
     killerId: "emre",
     explanation:
-      "Katil, asistan Emre Solak. Vagon restoranından sıvışıp yedek anahtarla kompartımana girdi, Kemal'i kendi hançeriyle öldürdü ve eski model sürgü mekanizmasını dışarıdan manipüle ederek kapıyı 'içeriden kilitli' gösterdi. Otopsi raporu saldırganın kısa boylu olduğunu gösteriyor (1.62–1.69 m) — bu aralığa Nihal ve Emre giriyordu. Olay yeri raporundaki 'E.S.' kazılı kol düğmesi ile görgü tanığının 'bilek hizasında parlayan bir şey' tanıklığı (erkek gömleğine ait bir kol düğmesi, kadın değil) ipucu zincirini Emre'ye bağlıyor. Motivi de en acil olandı: zimmet ortaya çıkmıştı, kovulma ve hapis tehdidi kapıdaydı. Diğer şüphelilerin çelişkileri gerçekti ama masum açıklamalara dayanıyordu: Nihal tuvalete gitmişti, Selim erkenden uyuyakalmıştı, Ferit sadece şartlı tahliye ihlali yapmamak için kimliğini gizliyordu, Bora ise anahtarını hiç kullanmamıştı.",
+      "Katil, asistan Emre Solak. Vagon restoranından sıvışıp yedek anahtarla kompartımana girdi, Kemal'i kendi hançeriyle öldürdü ve eski model sürgü mekanizmasını dışarıdan manipüle ederek kapıyı 'içeriden kilitli' gösterdi. Otopsi raporu saldırganın kısa boylu olduğunu gösteriyor (1.62–1.69 m) — bu aralığa Nihal ve Emre giriyordu. Olay yeri raporundaki 'E.S.' kazılı kol düğmesi ile görgü tanığının 'bilek hizasında parlayan bir şey' tanıklığı (erkek gömleğine ait bir kol düğmesi, kadın değil) ipucu zincirini Emre'ye bağlıyor. Motivi de en acil olandı: zimmet ortaya çıkmıştı, kovulma ve hapis tehdidi kapıdaydı. Diğer şüphelilerin hepsinin gerçek bir sırrı vardı ama hiçbiri cinayete karışmamıştı: Nihal tuvalete gitmişti, Selim erkenden uyuyakalmıştı, Ferit sadece şartlı tahliye ihlali yapmamak için kimliğini gizliyordu, Bora anahtarını hiç kullanmamıştı, Yusuf babasının kapısına kadar gidip geri dönmüştü, Sibel sadece haberi için gözlem yapıyordu, Deniz ise tartışıp öfkeyle ayrılmış ama parasını bile alamamıştı.",
   },
 };

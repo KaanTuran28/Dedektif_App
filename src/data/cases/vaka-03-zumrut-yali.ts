@@ -195,7 +195,6 @@ Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat 
   ],
   hints: [
     "Bu vakada herkesin bir sırrı var ama sadece birinin gerçekten zehire erişimi olabilirdi.",
-    "Kimin neye erişebildiğini gösteren kayıtları dikkatle karşılaştır — sıradan bir zehir değil bu.",
     "Kadehi kimin hazırlayıp taşıdığına dair bir tanıklık var, gözden kaçırma.",
   ],
   motiveQuestion: {
