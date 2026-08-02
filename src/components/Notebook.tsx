@@ -24,6 +24,7 @@ export function Notebook({ caseId }: { caseId: string }) {
           saveNote(caseId, e.target.value);
         }}
         placeholder="İpuçlarını, şüphelerini ve bağlantılarını buraya yaz..."
+        aria-label="Dedektif not defteri"
         disabled={!loaded}
         rows={10}
         className="w-full resize-y rounded-md paper-card px-3 py-2 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-accent-red-bright/60"

@@ -162,19 +162,86 @@ Kullanıcı 4 öneriden hepsini seçti, hepsi uygulandı:
   `vakalar/vaka-02-son-round.md` hem `src/data/cases/vaka-02-son-round.ts`).
   Build doğrulandı, GitHub'a push edildi.
 
+## Backlog Sprint — 13 Görevin Tamamı (2026-08-02, yedinci güncelleme)
+Kullanıcı `PLAN.md` §10'daki backlog'un **tamamını** sırayla yapmamı istedi.
+Kendi görev listemi oluşturup (13 görev) hepsini bitirdim, her aşamada
+build + Playwright testi yaptım. Özet:
+
+**Şema & çekirdek sistemler**
+- `CaseData` şemasına `timeline[]`, `hints[]`, `motiveQuestion`,
+  `methodQuestion` eklendi; Vaka 01 ve Vaka 02'ye geriye dönük işlendi.
+- `src/lib/rank.ts` artık puanlı: doğru suçlama(40) + kapsam(0-30) +
+  motiv(15) + yöntem(15) - ipucu(5/tane). A/B Sınıfı Dedektif / Şanslı
+  Tahmin / Vaka Kapandı eşikleri buna göre.
+- `src/lib/progress.ts`: `hintsUsed`, `bestPoints`, `bestRankLabel` eklendi.
+
+**Yeni oynanış özellikleri**
+- **İpucu paneli** (`HintPanel.tsx`): sınırlı ipucu, kullanınca rütbe düşüyor.
+- **Zaman Çizelgesi sekmesi** (`Timeline.tsx`): vakanın kronolojik olay şeridi.
+- **Suçlama sonrası motiv+yöntem soruları**: doğru şüpheliyi bulmak artık
+  yetmiyor, "neden" ve "nasıl"ı da bilmek gerekiyor, rütbeye yansıyor.
+- **Rozet/başarım sistemi** (`src/lib/achievements.ts`): Titiz Dedektif,
+  İlk Bakışta, Tam İsabet, Seri Dedektif — tüm vakalar genelinde kalıcı.
+- **Delil panosuna not iğneleme**: kartlara kısa kişisel not eklenebiliyor,
+  kalıcı.
+- **Sonuç ekranı paylaşım kartı** (`src/lib/shareCard.ts`): canvas ile
+  üretilen PNG, `navigator.share` destekleniyorsa paylaşım sayfası, yoksa
+  indirme. Dış servis/dosya kullanılmıyor.
+- **Vaka kapanış animasyonu**: "Vaka Seçimine Dön"e basınca "Dosya
+  Kapatıldı" damgası, sonra ana sayfaya yönlendiriyor.
+- **Mini istatistik paneli** (`StatsPanel.tsx`, ana sayfada): çözülen vaka
+  sayısı, ortalama puan, rozet durumu (kilitli/açık hepsi görünüyor).
+
+**Vaka 03 — "Zümrüt Yalı"**
+- Zor zorluk, villa/aile cinayeti teması, **zehirleme** yöntemi (Vaka
+  01=bıçak, Vaka 02=künt travma, Vaka 03=zehir — üç farklı yöntem
+  bilinçli çeşitlilik için). 6 şüpheli (Vaka 01/02'den daha fazla, "zor"
+  seviyeye uygun). Katil: kahya Sadi Yalman, "en sadık görünen kişi"
+  twist'i. Ortak evren kuralına uyarak synopsis'te Vaka 01 ve Vaka 02'ye
+  gönderme var.
+
+**Test turları ve bulunan gerçek hatalar (hepsi düzeltildi)**
+- WebKit (Safari motoru) + iPhone dokunmatik emülasyonuyla tam test —
+  0 hata. (Not: gerçek fiziksel cihaz testinin yerini tutmaz ama Chromium'a
+  göre çok daha yakın bir yaklaşım.)
+- **Erişilebilirlik taraması sırasında gerçek bir bug bulundu:** Delil
+  panosu kartlarına hem kendi `onKeyDown` (Enter/Space) hem de Framer
+  Motion'ın kendi yerleşik klavye-tap desteği aynı anda tepki veriyordu —
+  bu da her Enter basışında bağlantıyı önce kurup hemen geri açıyordu
+  (net etki: hiçbir şey olmuyormuş gibi görünüyordu). Kendi `onKeyDown`'ı
+  kaldırıp motion'ın yerleşik desteğine güvenmek sorunu çözdü. Şimdi board
+  tamamen klavyeyle de kullanılabiliyor (Tab ile kart seç, Enter ile
+  bağla/seç).
+- Diğer erişilebilirlik düzeltmeleri: açılış sinemasına `autoFocus`,
+  not defterine `aria-label`, pano not textarea'sına görünür focus ring.
+- Son regresyon: 2 vaka gerçekten çözülüp "Seri Dedektif" rozetinin doğru
+  açıldığı, ana sayfa sayaçlarının (2/3, ortalama puan, 3/4 rozet) doğru
+  güncellendiği, sayfa yenileme sonrası kalıcılığın çalıştığı, hızlı sekme
+  geçişi stresinin sorun çıkarmadığı doğrulandı — **0 konsol hatası**.
+
+Tüm değişiklikler GitHub'a push edildi (bkz. commit geçmişi:
+"Backlog 1/2", "Backlog 2/2", ve bu güncellemeyle birlikte final commit).
+
 ## Sıradaki Adım
-1. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
-2. Faz 2 devam: 2-3 vaka daha yazmak (Vaka 01 tren, Vaka 02 ofis temalıydı —
-   sırada "lüks villa" veya "ünlü/influencer" teması olabilir, bkz. PLAN.md)
-   (not: yeni vaka eklemek artık kanıtlanmış şekilde kolay — sadece
-   `src/data/cases/` içine dosya eklenip `index.ts`'e kaydediliyor,
-   ses/rütbe/pano otomatik çalışıyor)
+1. `PLAN.md` §10'daki backlog'un **tamamı bitti** (2026-08-02) — sıradaki
+   büyük karar kullanıcıda: **Vercel'e deploy** mi, yoksa **Vaka 04** mü?
+   Kullanıcı daha önce "Vercel şimdilik kalsın" demişti, bu yüzden deploy
+   hâlâ yapılmadı — tekrar sorulabilir ya da içerik üretimine devam edilebilir.
+2. Faz 2 devam edebilir: Vaka 04 teması "ünlü/influencer cinayeti" kalan
+   son seçenek (villa zaten Vaka 03'te kullanıldı). Yeni vaka eklemek artık
+   kanıtlanmış şekilde kolay — `src/data/cases/`'a dosya + `index.ts`'e
+   kayıt, geri kalan her şey (ses/rütbe/pano/ipucu/zaman çizelgesi/rozet)
+   otomatik çalışıyor.
 3. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
-4. `PLAN.md` §7.1'deki mekanik ilhamlarından hangilerinin Faz 2/3'e alınacağına karar vermek
-   (özellikle: kademeli hedef sistemi, sezonluk/bağlı vaka evreni)
-5. Gerçek cihazda (özellikle mobil Safari) ses/animasyon testi henüz yapılmadı —
-   yalnızca masaüstü Chromium'da test edildi, iOS'ta Web Audio autoplay
-   davranışı farklı olabilir, bir sonraki oturumda kontrol edilmeli
+4. Gerçek FİZİKSEL cihazda (özellikle iOS Safari) test hâlâ yapılmadı —
+   yalnızca Playwright'ın WebKit motoruyla (Chromium'dan daha yakın ama
+   birebir aynı değil) test edildi. Ses/animasyon gerçek iPhone'da bir kez
+   denenirse iyi olur.
+5. `PLAN.md` §7.1'deki bazı mekanik ilhamlar hâlâ uygulanmadı: kademeli
+   hedef sistemi (tek final suçlaması yerine ara adımlar — kısmen motiv/
+   yöntem sorularıyla karşılandı ama tam anlamıyla değil), tam sezonluk/
+   bağlı vaka evreni (şu an sadece hafif flavor-text göndermeler var, §9'da
+   bilinçli olarak seçildi)
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).

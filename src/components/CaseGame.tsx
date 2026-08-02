@@ -326,7 +326,8 @@ function IntroCinematic({
     <button
       onClick={onDone}
       aria-label="Girişi atla"
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background text-left cursor-pointer"
+      autoFocus
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background text-left cursor-pointer focus-visible:outline-accent-gold"
     >
       <motion.p
         initial={{ opacity: 0, letterSpacing: "0.1em" }}
