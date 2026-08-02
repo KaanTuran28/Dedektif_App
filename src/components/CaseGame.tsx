@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
@@ -15,6 +16,7 @@ import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
 import { allCases } from "@/data/cases";
+import { generateShareCard } from "@/lib/shareCard";
 
 type Step =
   | "giris"
@@ -517,14 +519,73 @@ function ResultReveal({
   coverage: number;
 }) {
   const { correct, rank } = final;
+  const [sharing, setSharing] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const t = setTimeout(() => playStamp(), 150);
     return () => clearTimeout(t);
   }, []);
 
+  async function handleShare() {
+    setSharing(true);
+    try {
+      const blob = await generateShareCard({
+        caseTitle: data.title,
+        rankLabel: rank.label,
+        points: rank.points,
+        correct,
+      });
+      if (!blob) return;
+      const file = new File([blob], `supheli-${data.id}.png`, { type: "image/png" });
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files: File[] }) => boolean;
+        share?: (data: { files: File[]; title?: string; text?: string }) => Promise<void>;
+      };
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: "ŞÜPHELİ", text: `${data.title} — ${rank.label}` });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `supheli-${data.id}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  function handleClose() {
+    playStamp();
+    setClosing(true);
+    setTimeout(() => router.push("/"), 650);
+  }
+
   return (
-    <div className="space-y-6 text-center">
+    <div className="space-y-6 text-center relative">
+      <AnimatePresence>
+        {closing && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -4 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background"
+          >
+            <motion.p
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 240, damping: 16 }}
+              className="stamp text-accent-red text-2xl sm:text-3xl"
+            >
+              Dosya Kapatıldı
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex justify-center py-4">
         <motion.p
           initial={{ scale: 2.6, opacity: 0, rotate: -14 }}
@@ -572,12 +633,22 @@ function ResultReveal({
         </p>
         <p className="leading-relaxed text-sm sm:text-base">{data.solution.explanation}</p>
       </motion.div>
-      <Link
-        href="/"
-        className="inline-block rounded-sm bg-accent-gold text-black px-6 py-3 font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity"
-      >
-        Vaka Seçimine Dön
-      </Link>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="rounded-sm border border-accent-gold/50 text-accent-gold px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors disabled:opacity-50"
+        >
+          {sharing ? "Hazırlanıyor..." : "Sonucu Paylaş"}
+        </button>
+        <button
+          onClick={handleClose}
+          className="rounded-sm bg-accent-gold text-black px-6 py-3 font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity"
+        >
+          Vaka Seçimine Dön
+        </button>
+      </div>
     </div>
   );
 }
