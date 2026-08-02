@@ -25,11 +25,6 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     label: "Seri Dedektif",
     description: "İki veya daha fazla vakayı çözdün.",
   },
-  {
-    id: "celiski-avcisi",
-    label: "Çelişki Avcısı",
-    description: "Bir vakanın zaman çizelgesindeki tüm çelişkileri yakaladın.",
-  },
 ];
 
 const STORAGE_KEY = "supheli:basarimlar";
@@ -53,11 +48,6 @@ function unlock(id: string) {
   if (!current.includes(id)) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...current, id]));
   }
-}
-
-export function unlockContradictionHunter() {
-  if (!isBrowser()) return;
-  unlock("celiski-avcisi");
 }
 
 export function checkAchievements(input: {

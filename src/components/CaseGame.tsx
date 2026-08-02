@@ -26,6 +26,7 @@ import {
 import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
+import { suspectColorFor } from "@/lib/suspectColor";
 import { allCases } from "@/data/cases";
 import { generateShareCard } from "@/lib/shareCard";
 
@@ -254,14 +255,6 @@ export function CaseGame({ data }: { data: CaseData }) {
                 ⏱ {formatRemaining(remainingMs)}
               </p>
             )}
-            {started && inInvestigation && (
-              <p
-                title="İncelenen kanıt + şüpheli oranı — dedektif rütbeni etkiler"
-                className="hidden sm:block text-text-dim text-[11px] font-mono-doc border border-white/10 rounded-sm px-2 py-1.5"
-              >
-                🔍 %{Math.round(coverage * 100)} incelendi
-              </p>
-            )}
             {started && inInvestigation && <HintPanel caseId={data.id} hints={data.hints} />}
             <button
               onClick={toggleSound}
@@ -403,9 +396,7 @@ export function CaseGame({ data }: { data: CaseData }) {
               </div>
             )}
 
-            {step === "zaman" && (
-              <Timeline events={data.timeline} suspects={data.suspects} caseId={data.id} />
-            )}
+            {step === "zaman" && <Timeline events={data.timeline} />}
 
             {step === "pano" && <EvidenceBoard data={data} />}
 
@@ -437,7 +428,7 @@ export function CaseGame({ data }: { data: CaseData }) {
             )}
 
             {step === "sonuc" && final && (
-              <ResultReveal data={data} final={final} coverage={coverage} />
+              <ResultReveal data={data} final={final} />
             )}
           </motion.div>
         </AnimatePresence>
@@ -575,6 +566,7 @@ function AccusationLineup({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {data.suspects.map((s) => {
           const selected = accusedId === s.id;
+          const color = suspectColorFor(s.id);
           return (
             <button
               key={s.id}
@@ -590,11 +582,12 @@ function AccusationLineup({
               }`}
             >
               <div
-                className="relative mx-auto mb-2 h-16 w-16 rounded-sm overflow-hidden border border-white/15"
+                className="relative mx-auto mb-2 h-16 w-16 rounded-sm overflow-hidden border-2"
                 style={{
                   backgroundImage:
                     "repeating-linear-gradient(to bottom, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 8px)",
                   backgroundColor: "#0f0d0d",
+                  borderColor: selected ? "var(--accent-red-bright)" : `${color}80`,
                 }}
               >
                 <svg
@@ -700,11 +693,9 @@ function FollowUpQuestionScreen({
 function ResultReveal({
   data,
   final,
-  coverage,
 }: {
   data: CaseData;
   final: FinalResult;
-  coverage: number;
 }) {
   const { correct, rank, reason } = final;
   const [sharing, setSharing] = useState(false);
@@ -819,9 +810,6 @@ function ResultReveal({
         </p>
         <p className="font-display text-xl font-bold">{rank.label}</p>
         <p className="text-text-dim text-xs max-w-xs">{rank.description}</p>
-        <p className="text-text-dim text-[11px] font-mono-doc mt-1">
-          İncelenen kanıt/şüpheli oranı: %{Math.round(coverage * 100)}
-        </p>
       </motion.div>
 
       <motion.div

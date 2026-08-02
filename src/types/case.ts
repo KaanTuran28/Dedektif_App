@@ -84,8 +84,7 @@ export type Difficulty = "kolay" | "orta" | "zor";
 export interface TimelineEvent {
   time: string;
   description: string;
-  /** Bu olay bir şüphelinin ifadesiyle çelişiyorsa/doğrudan ilgiliyse — Zaman
-   * Çizelgesi bulmacasında oyuncu bu şüpheliyi buraya sürükleyip bırakır */
+  /** Bu olayın ilişkili olduğu şüpheli — ileride vaka içeriğinde referans için tutulur */
   contradicts?: string;
 }
 

@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { allCases } from "@/data/cases";
 import { tiltFor } from "@/lib/tilt";
 import { StatsPanel } from "@/components/StatsPanel";
-import { HowToPlayModal } from "@/components/HowToPlayModal";
+import { TutorialFlow } from "@/components/TutorialFlow";
 import { formatRemaining, getCaseProgress, getRemainingMs, type CaseProgress } from "@/lib/progress";
 
 const GUIDE_SEEN_KEY = "supheli:rehber-gorundu";
@@ -83,6 +83,8 @@ export default function HomePage() {
             const progress = progressMap[c.id];
             const remaining = progress ? getRemainingMs(progress) : null;
             const inProgress = !!progress?.inProgress && remaining !== null && remaining > 0;
+            const alreadyPlayed = !inProgress && !!progress && (progress.solved || !!progress.failed);
+            const playedStamp = alreadyPlayed ? (progress!.solved ? "Çözüldü" : "Başarısız") : null;
 
             return (
               <motion.div
@@ -99,6 +101,16 @@ export default function HomePage() {
                     className="group relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl"
                   >
                     <div className="pin" />
+                    {playedStamp && (
+                      <span
+                        aria-hidden
+                        className={`stamp absolute -top-2 -right-2 sm:top-1 sm:right-1 text-[10px] sm:text-xs rotate-[10deg] pointer-events-none ${
+                          playedStamp === "Çözüldü" ? "text-accent-gold" : "text-accent-red-bright"
+                        }`}
+                      >
+                        {playedStamp}
+                      </span>
+                    )}
                     <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
                       Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
                     </p>
@@ -149,7 +161,7 @@ export default function HomePage() {
 
       <StatsPanel cases={allCases.filter((c) => c.available)} />
 
-      <HowToPlayModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <TutorialFlow open={guideOpen} onClose={() => setGuideOpen(false)} />
     </main>
   );
 }
