@@ -4,13 +4,16 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Suspect } from "@/types/case";
 import { tiltFor } from "@/lib/tilt";
+import { playPaper } from "@/lib/sound";
 
 export function SuspectCard({
   suspect,
   index,
+  onOpen,
 }: {
   suspect: Suspect;
   index: number;
+  onOpen?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const tilt = tiltFor(suspect.id);
@@ -23,7 +26,14 @@ export function SuspectCard({
     >
       <div className="pin" />
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          setOpen((v) => {
+            const next = !v;
+            if (next) onOpen?.(suspect.id);
+            playPaper();
+            return next;
+          });
+        }}
         className="w-full flex items-center gap-4 px-4 sm:px-5 py-4 text-left"
         aria-expanded={open}
       >

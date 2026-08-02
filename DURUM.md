@@ -67,14 +67,45 @@ bildirimiyle tam bir "dava dosyası" görsel diline geçildi:
 - Playwright ile hem masaüstü hem mobilde tekrar görsel test edildi, 0 konsol
   hatası. GitHub'a push edildi.
 
+## Oyun Zevki / "İçindeymiş Gibi Hissettirme" Geçişi (2026-08-02, üçüncü güncelleme)
+Kullanıcı 4 öneriden hepsini seçti, hepsi uygulandı:
+- **Ses tasarımı** (`src/lib/sound.ts`): dışarıdan ses dosyası YOK, tamamen
+  Web Audio API ile üretiliyor (telif riski sıfır) — kağıt hışırtısı (kanıt/
+  şüpheli kartı aç/kapa), damga "gümm" sesi (suçlama sonucu), tık sesi (sekme
+  geçişi/pano bağlama), ambiyans (kahverengi gürültü + hafif tiz katman,
+  tarayıcı autoplay kısıtı nedeniyle ilk kullanıcı etkileşiminden sonra
+  başlıyor). Header'da 🔊/🔇 aç-kapa butonu, tercih localStorage'da kalıcı.
+- **Açılış sineması**: vaka sayfası ilk açıldığında "DOSYA NO: 01" → başlık →
+  "Dosya Açılıyor" damgası beliren tam ekran bir intro (`IntroCinematic`,
+  `CaseGame.tsx` içinde). `useReducedMotion()` true ise tamamen atlanıyor
+  (erişilebilirlik). Tıklayınca da atlanabiliyor.
+- **Dedektif rütbe sistemi** (`src/lib/rank.ts`): kaç kanıt/şüpheli
+  incelendiği (`viewedDocs`/`viewedSuspects` state, kartların `onOpen`
+  callback'i ile besleniyor) suçlama anında bir "coverage" oranına
+  dönüşüyor. Doğru + yüksek kapsam = "A Sınıfı Dedektif", doğru + düşük
+  kapsam = "Şanslı Tahmin", yanlış = "Vaka Kapandı". Sonuç ekranında damga
+  animasyonunun altında ayrı bir rütbe kartı olarak gösteriliyor.
+- **Etkileşimli delil panosu** (`src/components/EvidenceBoard.tsx`, yeni
+  "Pano" sekmesi): tüm kanıt+şüpheli kartları sürüklenebilir küçük kartlar
+  olarak bir kork-pano üzerinde duruyor (motion `drag`), pozisyonlar
+  `localStorage`'da kalıcı (`src/lib/board.ts`). İki karta sırayla tıklayınca
+  (motion `onTap`, drag'den ayrı algılanıyor) aralarına kırmızı SVG ipliği
+  çiziliyor/kaldırılıyor, bağlantılar da kalıcı. "Panoyu Sıfırla" butonu var.
+- Playwright ile tüm yeni özellikler test edildi (intro, pano sürükle/bağla,
+  ses kapama, rütbeli sonuç ekranı) — 0 konsol hatası. GitHub'a push edildi.
+
 ## Sıradaki Adım
-1. GitHub'a ilk push yapıldı/yapılıyor (bkz. Kararlar Günlüğü)
-2. Kullanıcıya yerel test talimatı verildi (bkz. altta)
-3. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
-4. Faz 2: 3-4 vaka daha yazmak, vaka seçim ekranını çoklu vakaya göre geliştirmek
-5. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
-6. `PLAN.md` §7.1'deki mekanik ilhamlarından hangilerinin Faz 2/3'e alınacağına karar vermek
-   (özellikle: kademeli hedef sistemi, sezonluk/bağlı vaka evreni, skor sistemi)
+1. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
+2. Faz 2: 3-4 vaka daha yazmak, vaka seçim ekranını çoklu vakaya göre geliştirmek
+   (not: yeni vaka eklendiğinde `EvidenceBoard`/rütbe sistemi otomatik çalışır,
+   ekstra kod gerekmez — sadece `src/data/cases/` içine yeni vaka dosyası eklenip
+   `src/data/cases/index.ts`'e kaydedilmesi yeterli)
+3. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
+4. `PLAN.md` §7.1'deki mekanik ilhamlarından hangilerinin Faz 2/3'e alınacağına karar vermek
+   (özellikle: kademeli hedef sistemi, sezonluk/bağlı vaka evreni)
+5. Gerçek cihazda (özellikle mobil Safari) ses/animasyon testi henüz yapılmadı —
+   yalnızca masaüstü Chromium'da test edildi, iOS'ta Web Audio autoplay
+   davranışı farklı olabilir, bir sonraki oturumda kontrol edilmeli
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).

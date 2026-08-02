@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { CaseDocument } from "@/types/case";
 import { tiltFor } from "@/lib/tilt";
+import { playPaper } from "@/lib/sound";
 
 const TYPE_LABELS: Record<CaseDocument["type"], string> = {
   resmi_rapor: "Resmi Rapor",
@@ -20,7 +21,13 @@ function signatureFromMeta(meta?: string) {
   return first || null;
 }
 
-export function DocumentCard({ doc }: { doc: CaseDocument }) {
+export function DocumentCard({
+  doc,
+  onOpen,
+}: {
+  doc: CaseDocument;
+  onOpen?: (id: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const tilt = tiltFor(doc.id);
 
@@ -31,7 +38,14 @@ export function DocumentCard({ doc }: { doc: CaseDocument }) {
     >
       <div className="pin" />
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          setOpen((v) => {
+            const next = !v;
+            if (next) onOpen?.(doc.id);
+            playPaper();
+            return next;
+          });
+        }}
         className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left"
         aria-expanded={open}
       >
