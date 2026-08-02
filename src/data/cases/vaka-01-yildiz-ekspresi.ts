@@ -175,13 +175,14 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
     },
   ],
   timeline: [
+    { time: "03:00", description: "Selim'in kompartımanındaki çay fincanı, aslında bu saatte demlenip içildiğini gösteriyor — kendisi '03:30'a kadar uyanıktım' diyor.", contradicts: "selim" },
     { time: "03:15", description: "Vagon restoranda akşam servisi biter." },
     { time: "03:20", description: "Emre, Kemal'in kompartımanından çıkar (son görülen kişi)." },
     { time: "03:25", description: "Emre 'rapor hazırlamaya' restorana gideceğini söyler." },
-    { time: "03:30–04:00", description: "Garson, Emre'yi restoranda görmediğini belirtiyor." },
+    { time: "03:30–04:00", description: "Garson, Emre'yi restoranda görmediğini belirtiyor.", contradicts: "emre" },
     { time: "03:40", description: "Tren, çığ riski nedeniyle tünelde durur." },
     { time: "03:45", description: "Cinayet gerçekleşir (otopsi tahmini)." },
-    { time: "03:50", description: "Nihal, koridorda görevli tarafından görülür (tuvalete gidiyordu)." },
+    { time: "03:50", description: "Nihal, koridorda görevli tarafından görülür — kendisi 'uyuyordum, hiçbir şey duymadım' diyor.", contradicts: "nihal" },
     { time: "04:05", description: "Bora, devriye sırasında cesedi bulur." },
   ],
   hints: [

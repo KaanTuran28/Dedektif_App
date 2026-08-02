@@ -269,6 +269,38 @@ Playwright ile tam regresyon: 3 vakada da sekme kilidi + tam gezinme,
 mobil dokunmatik (kilitli/açık sekme sayısı doğrulandı), zorluk bazlı puan
 hesabı (kolay 70/100, zor 144/200 gibi doğru ölçeklendi) — **0 hata**.
 
+## Zaman Çizelgesi Bulmacaya Çevrildi (2026-08-02, dokuzuncu güncelleme)
+Kullanıcının önerilerden seçtiği "en büyük tekil kazanım": Zaman Çizelgesi
+artık salt-okunur değil, gerçek bir sürükle-bırak bulmacası.
+
+- **Şema:** `TimelineEvent`'e `contradicts?: suspectId` eklendi. Her vakada
+  1-3 olay bir şüphelinin ifadesiyle çelişecek şekilde işaretlendi (Vaka 01:
+  Emre/Nihal/Selim — Selim için yeni bir olay eklendi; Vaka 02: Ozan/Selin
+  — Selin için yeni bir olay eklendi; Vaka 03: Sadi).
+- **Mekanik** (`Timeline.tsx` baştan yazıldı): Çelişkisi olan şüpheliler bir
+  "kart tepsisi"nde duruyor, oyuncu Framer Motion `drag` +
+  `dragSnapToOrigin` ile kartı doğru olaya sürüklüyor. Doğru bırakınca olay
+  altın kesikli çerçeveye dönüşüp "✓ [İsim] ile eşleşti" yazıyor ve iki
+  notalık yükselen bir ses çalıyor (`playMatch`); yanlış bırakınca olay
+  hafifçe sallanıyor ve alçalan bir ses çalıyor (`playMismatch`), kart
+  `dragSnapToOrigin` sayesinde otomatik tepsiye geri dönüyor.
+- **Kalıcılık:** `src/lib/timelinePuzzle.ts`, çözülen eşleşmeleri
+  localStorage'da vaka başına saklıyor.
+- **Yeni rozet:** "Çelişki Avcısı" — bir vakadaki tüm çelişkileri
+  yakalayınca açılıyor (`unlockContradictionHunter`).
+- **Test:** Fare tabanlı sürükle-bırak Playwright'ta uçtan uca doğrulandı
+  (yanlış eşleştirme çözmüyor, doğru eşleştirme sırayla 1/3→2/3→3/3
+  ilerliyor, sayfa yenileme sonrası kalıcı, rozet doğru açılıyor) — 0 hata.
+  **Dürüst not:** Manuel `TouchEvent` simülasyonuyla ek bir dokunmatik test
+  denendi ama sonuçsuz kaldı — bu, Playwright/Chromium'un script'ten
+  gönderilen ham TouchEvent'leri Framer Motion'ın kullandığı Pointer
+  Events API'sine otomatik çevirmemesinden kaynaklanan bir **test
+  metodolojisi sınırlaması**, uygulama hatası değil (aynı `drag` mekanizması
+  zaten EvidenceBoard'da kullanılıyor ve gerçek `page.mouse` tabanlı testler
+  pointer event'leri doğru tetikliyor). Yine de gerçek bir telefonda bir kez
+  denenmesi iyi olur — bu not zaten "gerçek cihaz testi" açık maddesiyle
+  birleşti.
+
 ## Sıradaki Adım
 1. İkinci iyileştirme turu da bitti (2026-08-02) — sıradaki büyük karar hâlâ
    kullanıcıda: **Vercel'e deploy** mi, **Vaka 04** mü, yoksa yeni önerilen
