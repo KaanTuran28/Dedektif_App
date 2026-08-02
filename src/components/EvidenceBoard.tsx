@@ -155,7 +155,7 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
         </button>
       </div>
 
-      <div className="relative w-full overflow-auto rounded-sm cork-texture">
+      <div className="relative w-full overflow-auto rounded-sm cork-texture select-none">
         <div
           ref={containerRef}
           className="relative"

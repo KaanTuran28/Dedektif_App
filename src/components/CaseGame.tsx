@@ -10,14 +10,7 @@ import { Notebook } from "@/components/Notebook";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
 import { recordAccusation } from "@/lib/progress";
 import { rankFor } from "@/lib/rank";
-import {
-  isSoundEnabled,
-  playStamp,
-  playTick,
-  setSoundEnabled,
-  startAmbient,
-  stopAmbient,
-} from "@/lib/sound";
+import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
 
 type Step = "giris" | "kanitlar" | "supheliler" | "pano" | "notlar" | "suclama" | "sonuc";
 
@@ -43,21 +36,14 @@ export function CaseGame({ data }: { data: CaseData }) {
     setSoundOn(isSoundEnabled());
   }, []);
 
-  useEffect(() => {
-    return () => stopAmbient();
-  }, []);
-
   function toggleSound() {
     const next = !soundOn;
     setSoundOn(next);
     setSoundEnabled(next);
-    if (next && introDone) startAmbient();
-    if (!next) stopAmbient();
   }
 
   function finishIntro() {
     setIntroDone(true);
-    if (isSoundEnabled()) startAmbient();
   }
 
   function goStep(next: Step) {
@@ -102,6 +88,14 @@ export function CaseGame({ data }: { data: CaseData }) {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {step !== "sonuc" && (
+              <p
+                title="İncelenen kanıt + şüpheli oranı — dedektif rütbeni etkiler"
+                className="hidden sm:block text-text-dim text-[11px] font-mono-doc border border-white/10 rounded-sm px-2 py-1.5"
+              >
+                🔍 %{Math.round(coverage * 100)} incelendi
+              </p>
+            )}
             <button
               onClick={toggleSound}
               aria-label={soundOn ? "Sesi kapat" : "Sesi aç"}
@@ -306,6 +300,9 @@ function AccusationLineup({
   onSelect: (id: string) => void;
   onConfirm: () => void;
 }) {
+  const [confirming, setConfirming] = useState(false);
+  const accused = data.suspects.find((s) => s.id === accusedId);
+
   return (
     <div className="space-y-5">
       <p className="text-text-dim">
@@ -318,7 +315,10 @@ function AccusationLineup({
           return (
             <button
               key={s.id}
-              onClick={() => onSelect(s.id)}
+              onClick={() => {
+                onSelect(s.id);
+                setConfirming(false);
+              }}
               aria-pressed={selected}
               className={`relative rounded-sm border p-3 text-left transition-colors ${
                 selected
@@ -361,13 +361,45 @@ function AccusationLineup({
           );
         })}
       </div>
-      <button
-        onClick={onConfirm}
-        disabled={!accusedId}
-        className="w-full sm:w-auto rounded-sm bg-accent-red-bright px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Dosyayı Kapat
-      </button>
+      {!confirming && (
+        <button
+          onClick={() => setConfirming(true)}
+          disabled={!accusedId}
+          className="w-full sm:w-auto rounded-sm bg-accent-red-bright px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Dosyayı Kapat
+        </button>
+      )}
+
+      <AnimatePresence>
+        {confirming && accused && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="rounded-sm border border-accent-red-bright bg-accent-red-bright/10 p-4 space-y-3"
+          >
+            <p className="text-sm">
+              <strong>{accused.name}</strong> adlı kişiyi suçlamak üzeresin.
+              Bu karar <strong>geri alınamaz</strong>, emin misin?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirming(false)}
+                className="rounded-sm border border-white/20 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-text-dim hover:text-text hover:border-white/40 transition-colors"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={onConfirm}
+                className="rounded-sm bg-accent-red-bright px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
+              >
+                Evet, Suçla
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

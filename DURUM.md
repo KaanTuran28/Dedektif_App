@@ -123,6 +123,30 @@ Kullanıcı 4 öneriden hepsini seçti, hepsi uygulandı:
 - Playwright ile uçtan uca test edildi (yeni e-posta belgesi dahil), 0 hata.
   GitHub'a push edildi.
 
+## Oynanış Cilası + Stres Testi (2026-08-02, beşinci güncelleme)
+- **Sürekli ambiyans sesi tamamen kaldırıldı** (`src/lib/sound.ts`) — kullanıcı
+  "sürekli müzik/ses kötü" dedi. Artık ses SADECE etkileşimde çalıyor
+  (kağıt, tık, damga); arka planda çalan hiçbir şey yok.
+- **Suçlama onay adımı eklendi:** "Dosyayı Kapat"a basınca artık direkt
+  suçlamıyor, "X'i suçlamak üzeresin, emin misin? [Vazgeç] [Evet, Suçla]"
+  paneli açılıyor — yanlışlıkla dokunup geri alınamaz kararı bozma riskini
+  azaltıyor.
+- **Canlı ilerleme göstergesi eklendi:** Header'da "🔍 %XX incelendi" —
+  rütbe sistemine giren kanıt/şüpheli inceleme oranını artık oyuncu da
+  anlık görebiliyor (önceden tamamen görünmezdi, sadece sonuç ekranında
+  ortaya çıkıyordu).
+- **Kapsamlı stres testi yapıldı** (Playwright): hızlı sekme geçişi ×20,
+  kart açma/kapama art arda, ses aç/kapa spam, pano sürükleme stres testi,
+  suçlama akışında çift tıklama/iptal/tekrar seçme, sayfa yenileme sonrası
+  durum kontrolü, tarayıcı ileri/geri navigasyonu — **0 konsol hatası**.
+- **Bir gerçek kırılganlık bulundu ve düzeltildi:** Delil panosunda hızlı
+  fare sürüklemesi bazen arka plandaki talimat metnini yanlışlıkla seçip
+  (native text selection) kırmızı `::selection` rengiyle işaretliyordu.
+  Düzeltme: pano canvas'ına `select-none` eklendi
+  (`src/components/EvidenceBoard.tsx`).
+- Playwright ile doğrulandı: sürükleme sonrası artık hiç metin seçilmiyor,
+  ilerleme göstergesi canlı güncelleniyor. GitHub'a push edildi.
+
 ## Sıradaki Adım
 1. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
 2. Faz 2 devam: 2-3 vaka daha yazmak (Vaka 01 tren, Vaka 02 ofis temalıydı —
