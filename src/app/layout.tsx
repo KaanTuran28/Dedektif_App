@@ -46,6 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
+      data-scroll-behavior="smooth"
       className={`${playfair.variable} ${inter.variable} ${plexMono.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
