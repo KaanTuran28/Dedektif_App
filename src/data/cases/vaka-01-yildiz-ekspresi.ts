@@ -4,7 +4,7 @@ export const vaka01: CaseData = {
   id: "vaka-01-yildiz-ekspresi",
   order: 1,
   title: "Yıldız Ekspresi",
-  difficulty: "orta",
+  difficulty: "kolay",
   tagline: "Kar fırtınasında mahsur kalan trende, kilitli bir kompartımanda bir cinayet işlendi.",
   synopsis:
     "Ankara'dan Kars'a giden gece treni Yıldız Ekspresi, şiddetli bir kar fırtınası nedeniyle dağların arasında bir tünelde durmak zorunda kaldı. Sabaha karşı, özel kompartımanında seyahat eden zengin antika koleksiyoncusu Kemal Aydınlı, kendi koleksiyonundan bir Osmanlı hançeriyle öldürülmüş halde bulundu. Kompartımanın kapısı içeriden sürgülüydü, penceresi buzdan açılamaz durumdaydı. Tren tünelde durduğu için kimse inip kaçamazdı. Katil hâlâ trende, beş kişiden biri. Kanıtları incele, çelişkileri yakala ve katili bul.",
@@ -159,6 +159,20 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
       meta: "Süheyla Tekand, 74 · Kompartıman 6 · Kurbanın karşı komşusu",
       body: `"Uyuyamıyordum, kapıyı aralık bırakmıştım, trenin içi çok kuru oluyor da. Saat tam kaç bilmiyorum ama tren durduktan az sonraydı, koridordan biri geçti. Hızlı yürüyordu. Gözlüğüm yoktu, yüzünü net göremedim ama boyu kısaydı, benim oğlum kadar var ya da daha az — o da 1.68 falandır. Bilek hizasında bir şey parladı, ışığı öyle fark ettim. Kimseye laf etmek istemem ama sorunca söylemem gerekti."`,
     },
+    {
+      id: "kemal-sosyal-paylasim",
+      type: "sosyal_medya",
+      title: "Kemal'in Paylaşımı",
+      meta: "Olaydan 4 gün önce, herkese açık",
+      socialPost: {
+        author: "Kemal Aydınlı",
+        handle: "@kemalaydinli.sanat",
+        time: "4 gün önce",
+        text: "Koleksiyonuma çok özel bir Selçuklu tası daha katılıyor. Kars yolculuğunu sabırsızlıkla bekliyorum. Kıskananlar bilir 😏",
+        likes: 214,
+        comments: 38,
+      },
+    },
   ],
   timeline: [
     { time: "03:15", description: "Vagon restoranda akşam servisi biter." },
@@ -171,9 +185,9 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
     { time: "04:05", description: "Bora, devriye sırasında cesedi bulur." },
   ],
   hints: [
-    "Otopsi raporundaki açı analizini dikkatlice oku — katilin boyu hakkında bir şey söylüyor.",
-    "Restoran garsonunun anlattıklarıyla Emre'nin ifadesi örtüşmüyor. Bu çelişkiye odaklan.",
-    "Olay yeri raporundaki 'E.S.' harfleri kimin baş harfleri olabilir?",
+    "Herkesin bir alibi'si var gibi görünüyor ama zamanlamalar hep doğrulanmış değil. Kim, iddia ettiği yerde olduğunu kanıtlayamıyor?",
+    "Kurbanın yaralanma şekli, saldırganın fiziksel özellikleri hakkında bir şey söylüyor olabilir. Adli belgelere tekrar bak.",
+    "Olay yerinde sahibi belirsiz küçük bir eşya bulunmuştu. Şüphelilerin isimlerini bir kez daha gözden geçir.",
   ],
   motiveQuestion: {
     prompt: "Katilin asıl motivi neydi?",

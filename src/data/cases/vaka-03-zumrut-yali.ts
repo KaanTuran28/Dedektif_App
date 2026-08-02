@@ -61,7 +61,7 @@ export const vaka03: CaseData = {
     },
     {
       id: "umay",
-      name: "Dr. Ferit Umay",
+      name: "Dr. Tarık Umay",
       age: 58,
       role: "Aile Doktoru",
       motive:
@@ -76,7 +76,7 @@ export const vaka03: CaseData = {
       age: 61,
       role: "Kahya",
       motive:
-        "Necdet, gençliğinde Sadi'nin kardeşi Kemal'i bir iş anlaşmazlığında dolandırıp intihara sürüklemişti. Sadi bunu yakın zamanda kardeşinin eski günlüğünden öğrendi.",
+        "Necdet, gençliğinde Sadi'nin kardeşi Yusuf'u bir iş anlaşmazlığında dolandırıp intihara sürüklemişti. Sadi bunu yakın zamanda kardeşinin eski günlüğünden öğrendi.",
       opportunity: "Kırk yıldır evde çalışan güvenilir kahya; mutfağa, servis kadehlerine ve doktorun ilaç dolabına serbestçe erişebiliyor.",
       statement:
         "\"Kırk yıldır bu aileye hizmet ettim. Necdet Bey'e bir şey yapmamın hiçbir sebebi yok — o bana hep iyi davrandı.\"",
@@ -116,9 +116,9 @@ Taslak henüz imzalanmamıştı.`,
       title: "Kaan'ın Arkadaşıyla Yazışması",
       meta: "Kaan Erendil'in telefonundan · Olaydan bir hafta önce",
       messages: [
-        { sender: "Bora (arkadaş)", time: "23:10", text: "Ne oldu, dedenden para kopardın mı?" },
+        { sender: "Efe (arkadaş)", time: "23:10", text: "Ne oldu, dedenden para kopardın mı?" },
         { sender: "Kaan", time: "23:14", text: "Hayır lan, resmen yüzüme güldü. 'Bu son uyarın' dedi.", self: true },
-        { sender: "Bora (arkadaş)", time: "23:15", text: "Aileye söylerse yandın ama." },
+        { sender: "Efe (arkadaş)", time: "23:15", text: "Aileye söylerse yandın ama." },
         { sender: "Kaan", time: "23:20", text: "Biliyorum. Doğum günü partisinde bir yolunu bulmam lazım, borcu kapatmazsam işim bitik.", self: true },
       ],
     },
@@ -127,7 +127,7 @@ Taslak henüz imzalanmamıştı.`,
       type: "resmi_rapor",
       title: "Eski Malpraktis Şikayeti Özeti",
       meta: "Sağlık Bakanlığı Arşivi · 14 yıl önce, işlemsiz kapanmış",
-      body: `Dr. Ferit Umay hakkında, bir hastanın yanlış dozaj sonucu kalıcı hasar gördüğü iddiasıyla açılan şikayet, hastanın ailesiyle yapılan gizli bir maddi anlaşma sonrası geri çekilmiştir. Dosya kapanmış olmakla birlikte, tıp camiasında bilinmesi Dr. Umay'ın kariyerine ciddi zarar verebilir. Necdet Erendil'in bu anlaşmaya aracılık ettiği ve dosyanın bir kopyasını sakladığı bilinmektedir.`,
+      body: `Dr. Tarık Umay hakkında, bir hastanın yanlış dozaj sonucu kalıcı hasar gördüğü iddiasıyla açılan şikayet, hastanın ailesiyle yapılan gizli bir maddi anlaşma sonrası geri çekilmiştir. Dosya kapanmış olmakla birlikte, tıp camiasında bilinmesi Dr. Umay'ın kariyerine ciddi zarar verebilir. Necdet Erendil'in bu anlaşmaya aracılık ettiği ve dosyanın bir kopyasını sakladığı bilinmektedir.`,
     },
     {
       id: "ozel-dedektif-raporu",
@@ -142,7 +142,7 @@ Taslak henüz imzalanmamıştı.`,
       title: "İlaç Dolabı Erişim Kayıt Defteri",
       meta: "Zümrüt Yalı — Dr. Umay'ın özel odası",
       body: `Dolap, şifreli bir kilitle korunmaktadır. Şifreyi bilen yalnızca iki kişi kayıtlıdır:
-— Dr. Ferit Umay (kurucu/sahip)
+— Dr. Tarık Umay (kurucu/sahip)
 — Sadi Yalman (temizlik ve düzenleme için yıllar önce doktor tarafından yetkilendirilmiş)
 
 Son bir haftalık giriş kaydı:
@@ -153,7 +153,7 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
     {
       id: "kardes-mektubu",
       type: "gunluk_log",
-      title: "Kemal'in Son Mektubu",
+      title: "Yusuf'un Son Mektubu",
       meta: "Sadi Yalman'ın eşyaları arasında bulunmuş, otuz yıllık, el yazısı",
       body: `"Sadi kardeşim, eğer bunu okuyorsan artık burada değilim demektir. Necdet Bey'le kurduğumuz şirketi elimden aldı, imzaladığım kağıtların hileli olduğunu çok geç anladım. Her şeyimi kaybettim, borç içindeyim, sana yük olmak istemiyorum. Beni affet. Bunu kimseye anlatma, Necdet Bey güçlü biri, başına iş açma."
 
@@ -165,6 +165,21 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
       title: "İkinci Hizmetçi İfadesi",
       meta: "Nur Aydemir, 34 · Mutfak personeli",
       body: `"Kadehi ben hazırlamadım, Sadi Bey hazırladı, her zaman o hazırlar Necdet Bey'in özel içkisini, kimse karışmaz. Salona kendi götürdü, masaya bıraktı, sonra pasta için herkesi çağırdı. O birkaç dakika kadehin yanında kimse yoktu galiba, ben de mutfaktaydım. Sadi Bey çok sakin biriydi hep, bir şey fark etmedim."`,
+    },
+    {
+      id: "eski-skandal-haberi",
+      type: "haber_kupuru",
+      title: "Otuz Yıl Önceki Ortaklık Davası",
+      meta: "Gazete arşivinden bulunmuş, sararmış kupür",
+      newsHeader: {
+        publication: "Meridyen Gazetesi",
+        headline: "Ortaklık Davası Trajediyle Sonuçlandı",
+        byline: "Ekonomi Servisi",
+        date: "Otuz yıl önce",
+      },
+      body: `Genç iş insanı Necdet Erendil ile ortağı Yusuf Yalman arasındaki hisse devri anlaşmazlığı geçtiğimiz ay mahkemeye taşınmış, dava Erendil lehine sonuçlanmıştı. Yalman'ın, imzaladığı devir belgelerinin gerçek şartlarını bilmediğini öne sürerek itiraz ettiği ancak mahkemenin bu itirazı reddettiği öğrenildi.
+
+Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat haberi camiada üzüntüyle karşılandı. Erendil, "Eski ortağımın kaybından derin üzüntü duyuyorum" açıklamasını yaptı.`,
     },
   ],
   timeline: [
@@ -178,9 +193,9 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
     { time: "21:15", description: "Necdet Erendil hayatını kaybeder." },
   ],
   hints: [
-    "Toksikoloji raporundaki maddenin nereden temin edilebileceğini düşün — bu sıradan bir zehir değil.",
-    "İlaç dolabına kimlerin erişimi olduğunu gösteren kaydı dikkatle oku.",
-    "İkinci hizmetçinin ifadesi, kadehi kimin hazırlayıp taşıdığını doğruluyor.",
+    "Bu vakada herkesin bir sırrı var ama sadece birinin gerçekten zehire erişimi olabilirdi.",
+    "Kimin neye erişebildiğini gösteren kayıtları dikkatle karşılaştır — sıradan bir zehir değil bu.",
+    "Kadehi kimin hazırlayıp taşıdığına dair bir tanıklık var, gözden kaçırma.",
   ],
   motiveQuestion: {
     prompt: "Katilin asıl motivi neydi?",
@@ -203,6 +218,6 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
   solution: {
     killerId: "sadi",
     explanation:
-      "Katil, kırk yıllık kahya Sadi Yalman. Kardeşi Kemal'in, gençliğinde Necdet tarafından hileli bir ortaklık anlaşmasıyla dolandırılıp her şeyini kaybettiğini ve bu yüzden intihar ettiğini, yakın zamanda kardeşinin eski bir mektubundan öğrendi. Kırk yıldır ailenin en güvenilir hizmetkarı olarak hem mutfağa hem Dr. Umay'ın ilaç dolabına serbestçe erişebiliyordu — dolaptan aldığı digoksini, her zaman kendisinin hazırladığı özel viski kadehine kattı. Diğer beş şüphelinin motivleri gerçek ve gürültülüydü (miras, kumar borcu, aldatma tehdidi, malpraktis ifşası) ama hiçbirinin zehire gerçek bir erişimi yoktu: Aslan ve Kaan'ın fırsat penceresi vardı ama zehri nereden bulacaklardı; Defne yeni vasiyeti bilmiyordu; Yıldız'ın erişimi yoktu; Dr. Umay'ın erişimi vardı ama kadehi o hazırlamadı, hazırlayan hep Sadi'ydi. İlaç dolabı erişim kaydı ve hizmetçi ifadesi, ipucu zincirini doğrudan Sadi'ye bağlıyordu.",
+      "Katil, kırk yıllık kahya Sadi Yalman. Kardeşi Yusuf'un, gençliğinde Necdet tarafından hileli bir ortaklık anlaşmasıyla dolandırılıp her şeyini kaybettiğini ve bu yüzden intihar ettiğini, yakın zamanda kardeşinin eski bir mektubundan öğrendi. Kırk yıldır ailenin en güvenilir hizmetkarı olarak hem mutfağa hem Dr. Umay'ın ilaç dolabına serbestçe erişebiliyordu — dolaptan aldığı digoksini, her zaman kendisinin hazırladığı özel viski kadehine kattı. Diğer beş şüphelinin motivleri gerçek ve gürültülüydü (miras, kumar borcu, aldatma tehdidi, malpraktis ifşası) ama hiçbirinin zehire gerçek bir erişimi yoktu: Aslan ve Kaan'ın fırsat penceresi vardı ama zehri nereden bulacaklardı; Defne yeni vasiyeti bilmiyordu; Yıldız'ın erişimi yoktu; Dr. Umay'ın erişimi vardı ama kadehi o hazırlamadı, hazırlayan hep Sadi'ydi. İlaç dolabı erişim kaydı ve hizmetçi ifadesi, ipucu zincirini doğrudan Sadi'ye bağlıyordu.",
   },
 };

@@ -5,7 +5,11 @@ export type DocumentType =
   | "bilet_kaydi"
   | "gunluk_log"
   | "ifade"
-  | "eposta";
+  | "eposta"
+  | "guvenlik_kamerasi"
+  | "sosyal_medya"
+  | "haber_kupuru"
+  | "ses_kaydi";
 
 export interface ChatMessage {
   sender: string;
@@ -26,12 +30,28 @@ export interface EmailHeader {
   date: string;
 }
 
+export interface SocialPost {
+  author: string;
+  handle: string;
+  time: string;
+  text: string;
+  likes?: number;
+  comments?: number;
+}
+
+export interface NewsHeader {
+  publication: string;
+  headline: string;
+  byline?: string;
+  date: string;
+}
+
 export interface CaseDocument {
   id: string;
   type: DocumentType;
   title: string;
   meta?: string;
-  /** Düz metin / markdown-benzeri gövde (resmi_rapor, gunluk_log, ifade, bilet_kaydi, eposta) */
+  /** Düz metin / markdown-benzeri gövde (resmi_rapor, gunluk_log, ifade, bilet_kaydi, eposta, güvenlik kamerası gözlem notu, ses kaydı özeti, haber küpürü metni) */
   body?: string;
   /** whatsapp tipi için mesaj listesi */
   messages?: ChatMessage[];
@@ -39,6 +59,14 @@ export interface CaseDocument {
   dialogue?: DialogueLine[];
   /** eposta tipi için başlık alanları */
   emailHeader?: EmailHeader;
+  /** sosyal_medya tipi için gönderi bilgileri */
+  socialPost?: SocialPost;
+  /** haber_kupuru tipi için başlık alanları (gövde metni `body`'de) */
+  newsHeader?: NewsHeader;
+  /** guvenlik_kamerasi tipi için ekranda yanan zaman damgası */
+  cameraTimestamp?: string;
+  /** ses_kaydi tipi için süre göstergesi */
+  audioDuration?: string;
 }
 
 export interface Suspect {
