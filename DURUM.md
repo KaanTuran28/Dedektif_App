@@ -147,6 +147,21 @@ Kullanıcı 4 öneriden hepsini seçti, hepsi uygulandı:
 - Playwright ile doğrulandı: sürükleme sonrası artık hiç metin seçilmiyor,
   ilerleme göstergesi canlı güncelleniyor. GitHub'a push edildi.
 
+## Ortak Evren Kararı Netleşti (2026-08-02, altıncı güncelleme)
+- Açık kalan tasarım kararı çözüldü: **hafif ortak evren + easter egg'ler**
+  (bkz. `PLAN.md` §9 — tam kurallar orada). Özet: vakalar bağımsız çözülebilir
+  kalıyor, sıra şart değil, ama sonraki vakalar öncekilere tek cümlelik saf
+  flavor-text göndermeler yapabiliyor (asla çözüm/ipucu mantığına dokunmadan).
+- Kronolojik sıra korunuyor (Vaka 01 → Vaka 02 → ...), referans hep geriye
+  doğru.
+- İleride kullanılabilecek hazır bir araç olarak tekrarlayan bir gazete adı
+  ("Meridyen Gazetesi") ve gazeteci karakteri ("Pelin Ergüven") önerisi not
+  edildi — zorunlu değil, henüz hiçbir vakada kullanılmadı.
+- **Uygulandı:** Vaka 02'nin (`Son Round`) synopsis'ine Vaka 01'e ("Yıldız
+  Ekspresi") tek cümlelik geriye dönük bir gönderme eklendi (hem
+  `vakalar/vaka-02-son-round.md` hem `src/data/cases/vaka-02-son-round.ts`).
+  Build doğrulandı, GitHub'a push edildi.
+
 ## Sıradaki Adım
 1. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
 2. Faz 2 devam: 2-3 vaka daha yazmak (Vaka 01 tren, Vaka 02 ofis temalıydı —

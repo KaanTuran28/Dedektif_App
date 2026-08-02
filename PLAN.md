@@ -128,8 +128,9 @@ masaüstü/mobil app YAPILMAYACAK (en azından ilk fazlarda).
       kork-board + kırmızı iplik estetiği. Palet: #1A1A1A / #8B0000 / #D4AF37.
 - [x] İlk vaka teması → Tren/kapalı mekan gizemi ("Yıldız Ekspresi",
       bkz. `vakalar/vaka-01-yildiz-ekspresi.md`)
-- [ ] İlk vakanın tam belge metinleri (Faz 1'de yazılacak)
-- [ ] Vakalar arası ortak evren/karakter olacak mı
+- [x] İlk vakanın tam belge metinleri → yazıldı, bkz. `vakalar/vaka-01-belgeler.md`
+- [x] Vakalar arası ortak evren/karakter olacak mı → **Hafif ortak evren +
+      easter egg'ler**. Detay için bkz. §9.
 - [ ] Sorgulama mekaniği derinliği (düz okuma mı, seçmeli soru-cevap mı)
 - [ ] Vaka kilit sistemi mi, serbest seçim mi
 
@@ -175,3 +176,30 @@ sorunu yaratmamak için tüm vaka içerikleri bizim orijinal yazımımız olacak
   kağıt/krem tonları belge arka planları için
 - **Görsel dil:** Kork-board (mantar pano) + kırmızı iplikle bağlanan kanıtlar,
   dramatik başlık fontu + okunaklı gövde metni, dedektifin "duvar" hissi
+
+## 9. Ortak Evren Kanonu (Hafif Bağ + Easter Egg'ler)
+
+**Karar (2026-08-02):** Vakalar birbirinden **bağımsız çözülebilir** kalacak
+— sıra şart değil, bir vakayı oynamadan diğerini anlamak/çözmek mümkün.
+Ama hepsi aynı kurgusal Türkiye'de geçiyor ve aralarında **bulmaca
+mantığını hiç etkilemeyen**, sadece birden fazla vaka oynayan dikkatli
+oyuncuyu ödüllendiren küçük referanslar olacak.
+
+**Kurallar:**
+- Yeni bir vaka yazarken, mümkünse önceki vaka(lar)a **tek cümlelik, saf
+  flavor-text bir gönderme** ekle (genelde `synopsis` alanına — kanıt
+  belgelerine değil, çünkü kanıtlar çözüm mantığının parçası, oraya
+  eklenen bir detay yanlışlıkla ipucu sanılabilir).
+- Bu göndermeler **asla** çözüme, ipucuna ya da şüpheli kimliğine
+  dokunmaz — sadece "aynı dünyadayız" hissi verir (örn. bir önceki
+  vakadaki cinayetin ülke gündemini sarstığından bahsetmek).
+- Vakalar arası **kronolojik sıra** korunur (Vaka 01 önce, Vaka 02 sonra,
+  vb.) — sonraki vaka öncekine referans verebilir, tersi olmaz.
+- İleride (isteğe bağlı, henüz karar verilmedi) tekrarlayan bir gazete adı
+  (öneri: **Meridyen Gazetesi**) ve/veya cinayet vakalarını takip eden
+  tekrarlayan bir gazeteci karakteri (öneri: **Pelin Ergüven**) tüm
+  vakalarda flavor-text seviyesinde geçebilir — bir "easter egg" imzası
+  gibi. Zorunlu değil, sadece hazır bir araç.
+
+**Uygulandı:** Vaka 02 ("Son Round") synopsis'ine, Vaka 01'e ("Yıldız
+Ekspresi") tek cümlelik geriye dönük bir gönderme eklendi.
