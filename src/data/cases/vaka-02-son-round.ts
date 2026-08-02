@@ -6,6 +6,7 @@ export const vaka02: CaseData = {
   title: "Son Round",
   difficulty: "orta",
   tagline: "Büyük yatırım turunun imzalanacağı gece, genç bir CEO kendi ofisinde öldürüldü.",
+  available: false,
   synopsis:
     "Nova Teknoloji, İstanbul'da hızla büyüyen bir yapay zeka girişimi. Bu gece, şirketin değerini kat kat artıracak büyük bir yatırım turu imzalanacaktı. Saat 23:30'da, 28. kattaki CEO ofisinde kurucu ortak ve CEO Deniz Aral, kafasına aldığı sert bir darbeyle ölü bulundu. Suç aleti, kendi masasındaki kristal 'Yılın Girişimcisi' ödülü. Kata sadece kartlı geçişle giriliyor, her hareket loglanıyor — ama log, beklenenin aksine kimsenin orada olmadığını değil, bir kaydın eksik olduğunu gösteriyor. Katil hâlâ o gece binada olan beş kişiden biri. Birkaç ay önce ülke gündemini sarsan Yıldız Ekspresi cinayetinin ardından, kamuoyu bir kez daha benzer bir gizemle çalkalanıyor.",
   victim: {

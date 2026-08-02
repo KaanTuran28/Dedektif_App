@@ -6,6 +6,7 @@ export const vaka03: CaseData = {
   title: "Zümrüt Yalı",
   difficulty: "zor",
   tagline: "80. doğum günü kutlamasında, aile patriği kendi kadehinden içtiği zehirle can verdi.",
+  available: false,
   synopsis:
     "Boğaz kıyısındaki tarihi Zümrüt Yalı'da, Erendil Holding'in kurucusu Necdet Erendil'in 80. doğum günü kutlanıyor. Üç kuşak aile üyesi ve yakın çevresi toplanmış. Kutlama kadehi kaldırılırken Necdet aniden fenalaşıp hayatını kaybediyor — özel viski kadehine zehir katılmış. Herkesin bir motivi var: miras, borç, ifşa olacak bir sır. Ama zehire gerçekten erişimi olan tek kişiyi bulmak gerekiyor. Bu, Yıldız Ekspresi ve Son Round'dan sonra ülke gündemini üçüncü kez sarsan bir cinayet vakası.",
   victim: {

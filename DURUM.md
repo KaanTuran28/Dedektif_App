@@ -301,6 +301,28 @@ artık salt-okunur değil, gerçek bir sürükle-bırak bulmacası.
   denenmesi iyi olur — bu not zaten "gerçek cihaz testi" açık maddesiyle
   birleşti.
 
+## Arkadaş Testi İçin Kilitleme + Nasıl Oynanır Rehberi (2026-08-02, onuncu güncelleme)
+Kullanıcı canlı linki bir arkadaşına test için gönderecek, iki hazırlık istedi:
+
+1. **Sadece Vaka 01 açık:** `CaseData`'ya `available: boolean` eklendi.
+   Vaka 01 `true`, Vaka 02/03 `false`. Ana sayfada kilitli vakalar
+   "🔒 Yakında Açılacak" etiketiyle, tıklanamaz/soluk halde gösteriliyor.
+   **Direkt link korumasi da var:** `/vaka/vaka-02-son-round` gibi bir
+   linke doğrudan gidilirse de "Bu Dosya Henüz Açılmadı" ekranı çıkıyor —
+   sadece ana sayfa değil, route seviyesinde de kilitli. İstatistik paneli
+   de sadece açık vakaları sayıyor (0/1, 0/3 değil).
+   **Geri açmak kolay:** İleride tüm vakaları herkese açmak için tek
+   yapılacak şey `available: false` olan vakalarda bunu `true` yapmak.
+2. **"Nasıl Oynanır?" rehberi** (`HowToPlayModal.tsx`): 7 adımlı, ikonlu bir
+   modal. Sitenin **ilk ziyaretinde otomatik açılıyor** (localStorage
+   `supheli:rehber-gorundu` flag'i ile bir kereliğine), ayrıca ana sayfada
+   her zaman "📖 Nasıl Oynanır?" butonuyla tekrar açılabiliyor.
+
+Playwright ile doğrulandı: ilk ziyarette rehber otomatik açılıyor, ikinci
+ziyarette açılmıyor, kilitli kartlara tıklama hiçbir şey yapmıyor, direkt
+link de kilitli, Vaka 01 sorunsuz oynanabiliyor — 0 hata. GitHub'a push
+edildi, Vercel otomatik deploy edecek.
+
 ## Sıradaki Adım
 1. İkinci iyileştirme turu da bitti (2026-08-02) — sıradaki büyük karar hâlâ
    kullanıcıda: **Vercel'e deploy** mi, **Vaka 04** mü, yoksa yeni önerilen
