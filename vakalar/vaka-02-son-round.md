@@ -17,6 +17,10 @@ resepsiyondaydı ve kimseyi görmediğini söylüyor — ama kart logu, sanılan
 aksine, o katta o saatte kimsenin GÖRÜNMEDİĞİNİ değil, bir kişinin kaydının
 **eksik** olduğunu gösteriyor. Katil hâlâ o gece binada olan 5 kişiden biri.
 
+*(Ortak evren notu: synopsis'e, birkaç ay önce ülke gündemini sarsan
+Yıldız Ekspresi cinayetine tek cümlelik geriye dönük bir gönderme
+eklendi — bkz. PLAN.md §9.)*
+
 ## Kurban
 
 **Deniz Aral**, 34 — Nova Teknoloji'nin kurucu ortağı ve CEO'su. Karizmatik,
