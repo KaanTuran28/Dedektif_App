@@ -27,12 +27,10 @@ export function SuspectCard({
       <div className="pin" />
       <button
         onClick={() => {
-          setOpen((v) => {
-            const next = !v;
-            if (next) onOpen?.(suspect.id);
-            playPaper();
-            return next;
-          });
+          const next = !open;
+          setOpen(next);
+          if (next) onOpen?.(suspect.id);
+          playPaper();
         }}
         className="w-full flex items-center gap-4 px-4 sm:px-5 py-4 text-left"
         aria-expanded={open}

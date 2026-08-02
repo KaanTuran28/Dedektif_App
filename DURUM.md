@@ -94,12 +94,42 @@ Kullanıcı 4 öneriden hepsini seçti, hepsi uygulandı:
 - Playwright ile tüm yeni özellikler test edildi (intro, pano sürükle/bağla,
   ses kapama, rütbeli sonuç ekranı) — 0 konsol hatası. GitHub'a push edildi.
 
+## Vaka 02 — "Son Round" Eklendi (2026-08-02, dördüncü güncelleme)
+- Faz 2 başladı. İkinci vaka: **"Son Round"** — teknoloji şirketi ofisi teması
+  (Vaka 01'in tren/kapalı mekanından bilinçli olarak farklı bir ortam).
+- **Çözücü ipucu türü de bilinçli olarak farklı:** Vaka 01 fiziksel kanıta
+  (boy analizi) dayanıyordu, Vaka 02 dijital/adli bilişim kanıtına (kartlı
+  geçiş sistemi ana logunda katilin kaydının OLMAMASI — çünkü tek o kişi
+  admin yetkisiyle silebiliyor — ve bir yedek "gölge log" sunucusunda gerçek
+  kaydın bulunması). Oyuncuyu "log'da yoksa suçsuzdur" varsayımına karşı test
+  ediyor.
+- Katil: Ozan Kırca (CTO). İçerik: `vakalar/vaka-02-son-round.md` (iskelet) +
+  `vakalar/vaka-02-belgeler.md` (9 belgenin tam metni) + kod karşılığı
+  `src/data/cases/vaka-02-son-round.ts`, `src/data/cases/index.ts`'e eklendi.
+- **Yeni belge türü eklendi: `eposta`** (`src/types/case.ts`,
+  `DocumentCard.tsx`) — Kimden/Kime/Konu/Tarih başlıklı, resmi rapordan
+  görsel olarak ayrışan bir e-posta görünümü. Yeni vaka eklemek istisnasız
+  kolay: sadece `src/data/cases/` içine dosya ekleyip `index.ts`'e kaydetmek
+  yeterli, ses/rütbe/pano sistemleri otomatik çalışıyor.
+- **Gerçek bir bug bulundu ve düzeltildi:** `DocumentCard`/`SuspectCard`'da
+  `setOpen((v) => { ...yan etki (ses çalma, üst bileşene onOpen bildirimi)...
+  return !v })` şeklindeki kod React'in "state updater fonksiyonu SAF olmalı"
+  kuralını çiğniyordu → konsolda "Cannot update a component while rendering
+  a different component" hatası veriyordu. Düzeltme: yan etkiler updater
+  fonksiyonunun DIŞINA alındı (`const next = !open; setOpen(next); ...`).
+  Bu, Vaka 01'de fark edilmemişti çünkü Vaka 01 testlerinde bu spesifik
+  etkileşim yolu tetiklenmemişti — Playwright ile Vaka 02'yi test ederken
+  yakalandı.
+- Playwright ile uçtan uca test edildi (yeni e-posta belgesi dahil), 0 hata.
+  GitHub'a push edildi.
+
 ## Sıradaki Adım
 1. Vercel'e (veya benzeri ücretsiz host) deploy — henüz yapılmadı, kullanıcı onayı bekleniyor
-2. Faz 2: 3-4 vaka daha yazmak, vaka seçim ekranını çoklu vakaya göre geliştirmek
-   (not: yeni vaka eklendiğinde `EvidenceBoard`/rütbe sistemi otomatik çalışır,
-   ekstra kod gerekmez — sadece `src/data/cases/` içine yeni vaka dosyası eklenip
-   `src/data/cases/index.ts`'e kaydedilmesi yeterli)
+2. Faz 2 devam: 2-3 vaka daha yazmak (Vaka 01 tren, Vaka 02 ofis temalıydı —
+   sırada "lüks villa" veya "ünlü/influencer" teması olabilir, bkz. PLAN.md)
+   (not: yeni vaka eklemek artık kanıtlanmış şekilde kolay — sadece
+   `src/data/cases/` içine dosya eklenip `index.ts`'e kaydediliyor,
+   ses/rütbe/pano otomatik çalışıyor)
 3. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
 4. `PLAN.md` §7.1'deki mekanik ilhamlarından hangilerinin Faz 2/3'e alınacağına karar vermek
    (özellikle: kademeli hedef sistemi, sezonluk/bağlı vaka evreni)
