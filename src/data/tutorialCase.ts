@@ -24,7 +24,11 @@ export const TUTORIAL_CASE: CaseData = {
       role: "Muhasebeci",
       motive: "Maaşı bir haftadır gecikmişti, parayı 'ödünç' almayı düşünmüş olabilir.",
       opportunity: "Zarfın kaybolduğu aralıkta odaya son giren oydu.",
-      statement: "\"Klasör almak için girdim, zarfa hiç dokunmadım.\"",
+      statementIntro: "\"Klasör almak için girdim, zarfa hiç dokunmadım. Masaya bile yaklaşmadım.\"",
+      statementQA: [
+        { question: "Maaşınızın gecikmesi sizi zor durumda mı bıraktı?", answer: "Evet, biraz. Ama bu yüzden para çalacak biri değilim." },
+        { question: "Odada ne kadar kaldınız?", answer: "Bir dakikadan az, sadece klasörü alıp çıktım." },
+      ],
     },
     {
       id: "tarik",
@@ -33,7 +37,10 @@ export const TUTORIAL_CASE: CaseData = {
       role: "Kurye",
       motive: "Belirgin bir motivi yok, parayla ilgili bir sorunu bilinmiyor.",
       opportunity: "Sadece imza almak için birkaç saniye içerideydi.",
-      statement: "\"İmza aldım, hemen çıktım. Zarfı fark bile etmedim.\"",
+      statementIntro: "\"İmza aldım, hemen çıktım. Zarfı fark bile etmedim.\"",
+      statementQA: [
+        { question: "Masaya yaklaştınız mı?", answer: "Hayır, kapıdan imza aldım, içeri adım bile atmadım." },
+      ],
     },
   ],
   documents: [

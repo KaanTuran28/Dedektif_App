@@ -8,7 +8,7 @@ export const vaka01: CaseData = {
   tagline: "Kar fırtınasında mahsur kalan trende, kilitli bir kompartımanda bir cinayet işlendi.",
   available: true,
   synopsis:
-    "Ankara'dan Kars'a giden gece treni Yıldız Ekspresi, şiddetli bir kar fırtınası nedeniyle dağların arasında bir tünelde durmak zorunda kaldı. Sabaha karşı, özel kompartımanında seyahat eden zengin antika koleksiyoncusu Kemal Aydınlı, kendi koleksiyonundan bir Osmanlı hançeriyle öldürülmüş halde bulundu. Kompartımanın kapısı içeriden sürgülüydü, penceresi buzdan açılamaz durumdaydı. Tren tünelde durduğu için kimse inip kaçamazdı. Katil hâlâ trende, beş kişiden biri. Kanıtları incele, çelişkileri yakala ve katili bul.",
+    "Ankara'dan Kars'a giden gece treni Yıldız Ekspresi, yılın en şiddetli kar fırtınalarından birine yakalandı. Pencerelerin ardında rüzgar uğulduyor, vagonlar sarsıla sarsıla ilerliyordu; gece yarısını geçtiğinde tren, dağların arasındaki eski bir tünelde durmak zorunda kaldı — önden gelen çığ uyarısı, makinistleri beklemeye zorlamıştı. Yolcular kompartımanlarına çekilmiş, koridorlar sessizliğe bürünmüştü.\n\nSabaha karşı saat dörde doğru, vagon görevlisi Bora Yalçın'ın devriye turu bir çığlıkla değil, sessizlikle bozuldu: 7 numaralı kompartımanın kapısı aralıktı, içeride ışık yanıyordu ama cevap gelmiyordu. İçeri girdiğinde bulduğu manzara onu dondurdu — İstanbul'un tanınmış antika koleksiyoncusu Kemal Aydınlı, kendi koleksiyonuna ait sedef kakmalı bir Osmanlı hançeriyle göğsünden vurulmuş, yerde cansız yatıyordu.\n\nKompartımanın kapısı içeriden sürgülüydü. Penceresi, kışlık yalıtım yüzünden dıştan buzlanmış, açılamaz durumdaydı. Tren tünelde durduğu için kimse dışarı çıkıp kaçamazdı — katil hâlâ trendeydi, o gece uyanık ya da uyur görünen sekiz kişiden biri. Kemal Aydınlı'nın yıllara yayılan husumetleri, borçları, ihanetleri ve sırları şimdi tek tek koridorlara taşınıyordu. Kanıtları incele, çelişkileri yakala ve tünelin içinde kilitli kalan gerçeği bul.",
   victim: {
     name: "Kemal Aydınlı",
     age: 58,
@@ -25,8 +25,14 @@ export const vaka01: CaseData = {
         "Kemal boşanma sürecini başlatmış, mal paylaşımında Nihal'i büyük ölçüde dışlayan yeni bir vasiyet hazırlatmıştı.",
       opportunity:
         "Kompartımanın yan odasında seyahat ediyordu; bağlantı kapısının anahtarı ondaydı.",
-      statement:
-        "\"Uyuyordum, hiçbir şey duymadım. Kemal'le aramız gerginti ama onu öldürecek biri değilim ben.\"",
+      statementIntro:
+        "\"Otuz yıl oldu Kemal'le evleneli. İlk yıllar güzeldi, sonra iş büyüdükçe o değişti, ben de alıştım galiba — ya da alışmış numarası yaptım. Son bir ayda avukatıyla sık sık görüştüğünü biliyordum ama boşanma kağıtlarını görünce itiraf edeyim, çok kırıldım. O gece erken yattım, üzgündüm, uyku hapı almıştım. Tren durduğunda bile uyanmadım, sabaha karşı tuvalete kalktığımda görevli beni gördü, sonra her şeyi öğrendim.\"",
+      statementQA: [
+        { question: "Kocanızla aranızdaki anlaşmazlığı biliyor muydunuz?", answer: "Yeni vasiyeti görmüştüm, evet. Beni neredeyse hiçbir şeyden mahrum bırakıyordu. Kızgındım ama bu kadarını yapacak biri değilim." },
+        { question: "Uyku hapı aldığınızı doğrulayabilecek biri var mı?", answer: "Hayır, kompartımanda yalnızdım. Ama ilacın kutusu hâlâ çantamda, isterseniz bakın." },
+        { question: "Bağlantı kapısının anahtarı sizde miydi?", answer: "Evet, hep bendeydi. Ama o gece hiç kullanmadım, neden kullanayım ki?" },
+        { question: "Kocanızın ölümünden kim fayda sağlar?", answer: "Eski vasiyete göre ben. Yeni olan imzalanmamıştı hâlâ, bunu sonradan öğrendim." },
+      ],
     },
     {
       id: "emre",
@@ -36,8 +42,14 @@ export const vaka01: CaseData = {
       motive:
         "Kemal, Emre'nin galeriden zimmetine para geçirdiğini öğrenmişti; onu kovup şikayet edeceğini söylemişti.",
       opportunity: "Kemal'in kompartıman anahtarının yedeğini asistan olarak taşıyordu.",
-      statement:
-        "\"Vagon restoranında oturup rapor hazırlıyordum, saatlerce oradaydım. Kemal Bey'i son gördüğümde gayet iyiydi.\"",
+      statementIntro:
+        "\"Kemal Bey'in yanında üç yıldır çalışıyorum, ona çok şey borçluyum. O gece vagon restoranında oturmuş, ertesi gün Kars'taki alım için rapor hazırlıyordum. Saat kaçta çıktığımı tam hatırlamıyorum ama uzun süre orada kaldım. Kemal Bey'i en son kompartımanına döndüğünde gördüm, gayet iyiydi, bana ertesi günün planını anlattı. Sonra ben de kendi yerime geçtim, uyudum. Sabah haberi alınca inanamadım.\"",
+      statementQA: [
+        { question: "Kemal Bey'le aranızda son günlerde bir gerginlik yaşandı mı?", answer: "Hayır, hiçbir şey yoktu, çok iyi anlaşıyorduk." },
+        { question: "Restoran vagonunda sizi gören oldu mu?", answer: "Garson vardı sanırım, ama o kadar yoğun bir gece değildi, dikkat etmemiş olabilir." },
+        { question: "Kompartıman anahtarınız neredeydi?", answer: "Bende, asistan olarak hep taşırım. Ama o gece hiç kullanmadım." },
+        { question: "Kol düğmenizden biri eksik mi?", answer: "(uzun bir sessizlik) Fark etmemiştim. Belki kaybetmişimdir, bilmiyorum." },
+      ],
     },
     {
       id: "selim",
@@ -47,8 +59,14 @@ export const vaka01: CaseData = {
       motive:
         "Kemal'le yıllardır süren bir rekabetleri vardı; Kemal'in Selçuklu tasını 'kaçak' yollardan aldığını ifşa etmekle tehdit ediyordu.",
       opportunity: "Koridorun karşı ucunda, aynı vagonda kalıyordu.",
-      statement:
-        "\"Kitap okuyordum, saat 03:30'a kadar uyanıktım. Kemal'le aramızda husumet var ama bu kadarı da olmaz.\"",
+      statementIntro:
+        "\"Kemal'le otuz yılı aşkın bir rekabetimiz vardı, bunu saklamayacağım. Aynı müzayedelere girer, aynı eserlerin peşinden koşardık. Son dönemde onun bazı parçalarının kaynağı hakkında ciddi şüphelerim vardı, bunu ona da söyledim, kızdı. O gece kompartımanımda kitap okuyordum, çay içtim, saat 03:30 gibi hâlâ uyanık olduğumu sanıyordum ama galiba bir ara dalmışım, tam hatırlamıyorum. Uyandığımda tren durmuştu, sonra kargaşa başladı.\"",
+      statementQA: [
+        { question: "Çayınızı ne zaman içtiniz?", answer: "02:30 gibi demlemiştim sanırım. Sonra kitaba döndüm." },
+        { question: "Kemal'i tehdit ettiğiniz doğru mu?", answer: "Tehdit değil, uyarıydı. 'Bunu ifşa ederim' dedim, bu bir tehdit mi sayılır bilmiyorum." },
+        { question: "Uyuduğunuzu şimdi mi fark ediyorsunuz?", answer: "Utanarak söylüyorum ama evet. Yaşım gereği erken uyuklarım bazen, farkında bile olmam." },
+        { question: "Kompartımanınızdan çıktınız mı hiç?", answer: "Hayır, sabaha kadar oradaydım, eminim." },
+      ],
     },
     {
       id: "ferit",
@@ -58,8 +76,13 @@ export const vaka01: CaseData = {
       motive:
         "Yıllar önce Kemal'le ortak bir dolandırıcılık işine karışmış, Kemal suçu üstüne yıkıp hapse girmesine izin vermişti. Yeni tahliye oldu.",
       opportunity: "Bileti son anda, farklı bir isimle alınmıştı — gizlenme çabası.",
-      statement:
-        "\"Bu trende olduğumu inkar etmiyorum ama Kemal'le konuşmadım bile. Eski defterleri kapatmaya çalışıyordum, o kadar.\"",
+      statementIntro:
+        "\"On iki yıl önce Kemal'le ortak bir işe girdik, sonra her şey yolundan çıktı. Bir dolandırıcılık suçlaması geldi, ben içeri girdim, o dışarıda kaldı — evet, bu adaletsizdi ve evet, hâlâ öfkeliyim. Yeni tahliye oldum, bu trende olmam tesadüf değil, itiraf ediyorum, biletimi başka bir isimle aldım çünkü Kemal'in beni fark edip yolculuğu değiştirmesinden korktum. Ama ona yaklaşmadım bile. Sadece izledim, ne yapacağıma karar veremedim.\"",
+      statementQA: [
+        { question: "Neden farklı bir isimle bilet aldınız?", answer: "Şartlı tahliyeyle dışarıdayım, Kemal'le aynı ortamda görünmek bile sorun yaratabilirdi. Saklanmak zorundaydım." },
+        { question: "Kemal'le konuştunuz mu hiç o gece?", answer: "Hayır, bir kez bile. Kompartımanımdan neredeyse hiç çıkmadım." },
+        { question: "Ona hâlâ kızgın mısınız?", answer: "Elbette. On iki yılımı aldı benden. Ama onu öldürmek intikam değil, yeni bir hapis cezası demek — buna değmez." },
+      ],
     },
     {
       id: "bora",
@@ -69,8 +92,14 @@ export const vaka01: CaseData = {
       motive:
         "Kemal, geçen sefer 'kaybettiği' değerli bir kolyeyle ilgili Bora hakkında şikayette bulunacağını söylemişti.",
       opportunity: "Master anahtar ondaydı, tüm kompartımanlara girebilirdi.",
-      statement:
-        "\"Tüm gece koridorda devriyedeydim. Defterimde her hareketim yazılı, saklayacak bir şeyim yok.\"",
+      statementIntro:
+        "\"On beş yıldır bu hatta çalışıyorum, her şeyi kayda geçiririm, öğretilen budur. O gece rutin devriyedeydim, restoran vagonunu kontrol ettim, koridorları dolaştım. Çığ uyarısı gelince lokomotif ekibiyle telsizden konuştum, bu birkaç dakikamı aldı, defterime tam olarak yazamadım çünkü elimde telsiz vardı. Sonra tekrar tura çıktım, 7 numaralı kapıyı aralık bulunca içeri seslendim, cevap gelmeyince girdim ve o hâlde buldum.\"",
+      statementQA: [
+        { question: "Master anahtarınız her zaman üzerinizde mi?", answer: "Evet, göreve başlarken teslim alırım, mesai bitene kadar bende kalır." },
+        { question: "Kemal Bey'le bir sorununuz var mıydı?", answer: "Geçen sefer kaybolan bir kolye yüzünden beni suçlamıştı, adil değildi ama şikayet resmi olarak sonuçlanmadı." },
+        { question: "Telsiz görüşmesi defterinize neden işlenmedi?", answer: "Elim doluydu, unuttum yazmayı. Lokomotif ekibi konuşmayı doğrulayabilir." },
+        { question: "7 numaralı kapıya varana kadar başka biriyle karşılaştınız mı?", answer: "Hayır, koridor boştu. Kar fırtınası yüzünden herkes kompartımanlarına çekilmişti." },
+      ],
     },
     {
       id: "yusuf",
@@ -81,8 +110,14 @@ export const vaka01: CaseData = {
         "Kemal'in ilk evliliğinden oğlu. Kemal onu ve annesini yıllar önce terk etmişti; yeni vasiyette adı hiç geçmiyordu. Trene, babasıyla resmi olarak yüzleşmek için kimliğini gizleyerek bindi.",
       opportunity:
         "Bileti kompartıman 11'e aitti, koridorun öbür ucunda; kimseye kim olduğunu söylemedi.",
-      statement:
-        "\"Evet, ondan hesap sormaya geldim. Ama kapısına kadar gidip vazgeçtim, yüzleşecek cesareti bulamadım, kompartımanıma döndüm.\"",
+      statementIntro:
+        "\"Kemal benim babam ama bunu ona söylemeyeli yıllar oldu. Annemi ve beni terk ettiğinde ben sekiz yaşındaydım. Yıllarca ondan hiçbir haber almadım, sonra geçen ay bir avukat aradı, yeni vasiyette adımın hiç geçmediğini öğrendim. Bu treni öğrendiğimde bir dürtüyle bilet aldım, ona söylemeden, kompartıman 11'e yerleştim. Onunla yüzleşmek istiyordum, sadece konuşmak. Kapısına kadar gittim gece, elimi kaldırdım ama vuramadım. Korktum, geri döndüm, kompartımanımda sabahı ettim.\"",
+      statementQA: [
+        { question: "Neden kimliğinizi gizlediniz?", answer: "Çünkü onu şaşırtmak, hazırlıksız yakalamak istedim. Belki de sadece cesaretim yoktu doğrudan yüzleşmeye." },
+        { question: "Kapısına kaç kere gittiniz?", answer: "Bir kere. Uzun süre orada durdum ama kapıyı çalmadım." },
+        { question: "Sizi kapının önünde gören oldu mu?", answer: "Bilmiyorum, koridor karanlıktı, kimseyle karşılaşmadım sanıyorum." },
+        { question: "Geri döndükten sonra kompartımanınızdan çıktınız mı?", answer: "Hayır, sabaha kadar oradaydım. Uyuyamadım ama dışarı çıkmadım." },
+      ],
     },
     {
       id: "sibel",
@@ -93,8 +128,14 @@ export const vaka01: CaseData = {
         "Kemal'in kaçak eser ticaretini aylardır araştırıyordu, yayına hazır bir dosyası vardı. Kemal bunu öğrenip avukatlarıyla onu susturmakla tehdit etmişti.",
       opportunity:
         "Kompartımanı Kemal'inkine yakındı; tuvalete gitmek bahanesiyle sık sık kapısının önünden geçiyordu.",
-      statement:
-        "\"Röportaj malzemesi topluyordum sadece, kaynağımı korumak zorundayım. Ama kimseye zarar vermedim.\"",
+      statementIntro:
+        "\"Aylardır Kemal Aydınlı'nın koleksiyonundaki bazı parçaların nereden geldiğini araştırıyorum, kaçak eser ticaretine dair ciddi bulgularım var. Bu yolculuğu, Kars'taki kaynağımla buluşacağını öğrendiğim için seçtim, itiraf ediyorum, onu gözlemliyordum. Kompartımanım onunkine yakındı, birkaç kez tuvalete gitme bahanesiyle önünden geçtim, ne yaptığını anlamaya çalıştım. Ama içeri girmedim, onunla konuşmadım bile. Sabah olanları duyunca dehşete düştüm — haberim için değil, bir insan öldü çünkü.\"",
+      statementQA: [
+        { question: "Kemal Bey sizin araştırmanızdan haberdar mıydı?", answer: "Evet, avukatları aracılığıyla beni susturmaya çalışıyordu. Bu bir tehditti ama beni durdurmadı." },
+        { question: "Kapısının önünden kaç kez geçtiniz?", answer: "İki, belki üç kez. Saatini tam hatırlamıyorum." },
+        { question: "İçeriden bir ses duydunuz mu?", answer: "Hayır, son geçişimde sessizdi. O yüzden bir şey olduğunu düşünmedim." },
+        { question: "Kaynağınızın kimliğini paylaşır mısınız?", answer: "Hayır, gazetecilik etiği buna izin vermiyor. Ama bu cinayetle ilgisi yok, emin olabilirsiniz." },
+      ],
     },
     {
       id: "deniz",
@@ -105,8 +146,14 @@ export const vaka01: CaseData = {
         "Geçen yıl Kemal'e özel bir tablo satmıştı, ödemesi hâlâ yapılmamıştı. O akşam parasını istemiş, Kemal onunla diğer yolcuların önünde alay ederek kovmuştu.",
       opportunity:
         "Restoran vagonunda çalışıyordu, oradan tüm vagonlara kolayca geçiş yapabiliyordu.",
-      statement:
-        "\"Param için gittim, evet, tartıştık. Ama vurup çıktım oradan, öldürmedim — param hâlâ yok üstelik.\"",
+      statementIntro:
+        "\"Geçen yıl Kemal Bey'e kendi param ve emeğimle yaptığım bir tablo sattım, güzel bir fiyata anlaştık ama ödeme hep ertelendi. O akşam, restoranda, bir kez daha sordum parayı. Diğer masaların önünde beni küçümsedi, 'bu kadar küçük hesaplarla benimle konuşacak seviyede değilsin' dedi. Utandım, öfkelendim ama servise devam ettim, işim bu. Gece boyunca restoran ve mutfak arasında gidip geldim, yoğun bir vardiyaydı. Sabah haberi aldığımda hâlâ param yoktu, hâlâ da yok.\"",
+      statementQA: [
+        { question: "Tartışmadan sonra Kemal Bey'le tekrar konuştunuz mu?", answer: "Hayır, o kompartımanına çekildi, ben restoranda kaldım." },
+        { question: "Vardiyanız boyunca sizi gören oldu mu?", answer: "Mutfak personeli vardı ama gece ilerledikçe çoğu dinlenmeye çekildi. Yalnız kaldığım anlar oldu, itiraf ediyorum." },
+        { question: "Restoran vagonundan başka vagonlara geçtiniz mi?", answer: "Malzeme almak için bir kez depo vagonuna gittim, birkaç dakika sürdü, o kadar." },
+        { question: "Emre Solak'ı restoranda gördünüz mü?", answer: "Hayır, o gece onu hiç görmedim, oysa 'orada rapor hazırlıyordum' diyormuş, garip." },
+      ],
     },
   ],
   documents: [

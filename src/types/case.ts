@@ -69,6 +69,11 @@ export interface CaseDocument {
   audioDuration?: string;
 }
 
+export interface StatementExchange {
+  question: string;
+  answer: string;
+}
+
 export interface Suspect {
   id: string;
   name: string;
@@ -76,7 +81,10 @@ export interface Suspect {
   role: string;
   motive: string;
   opportunity: string;
-  statement: string;
+  /** Şüphelinin olayı kendi ağzından anlattığı, ifadenin giriş bölümü */
+  statementIntro: string;
+  /** Girişten sonraki polis sorgu-cevap kısmı */
+  statementQA: StatementExchange[];
 }
 
 export type Difficulty = "kolay" | "orta" | "zor";
