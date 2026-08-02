@@ -49,6 +49,8 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [positions, setPositions] = useState<Record<string, BoardPosition>>({});
   const [connections, setConnections] = useState<[string, string][]>([]);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [editingNote, setEditingNote] = useState<string | null>(null);
   const [anchor, setAnchor] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -78,12 +80,25 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
     });
     setPositions(initial);
     setConnections(saved.connections);
+    setNotes(saved.notes);
     setLoaded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.id]);
 
-  function persist(nextPositions: Record<string, BoardPosition>, nextConnections: [string, string][]) {
-    setBoardState(data.id, { positions: nextPositions, connections: nextConnections });
+  function persist(
+    nextPositions: Record<string, BoardPosition>,
+    nextConnections: [string, string][],
+    nextNotes: Record<string, string> = notes
+  ) {
+    setBoardState(data.id, { positions: nextPositions, connections: nextConnections, notes: nextNotes });
+  }
+
+  function updateNote(id: string, text: string) {
+    setNotes((prev) => {
+      const next = { ...prev, [id]: text };
+      persist(positions, connections, next);
+      return next;
+    });
   }
 
   function handleTap(id: string) {
@@ -124,7 +139,9 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
     nodes.forEach((n, i) => (fresh[n.id] = defaultPosition(n.id, i)));
     setPositions(fresh);
     setConnections([]);
-    persist(fresh, []);
+    setNotes({});
+    setEditingNote(null);
+    persist(fresh, [], {});
     playPaper();
   }
 
@@ -184,6 +201,8 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
             nodes.map((n) => {
               const pos = positions[n.id] ?? { x: 0, y: 0 };
               const selected = anchor === n.id;
+              const editing = editingNote === n.id;
+              const hasNote = !!notes[n.id]?.trim();
               return (
                 <motion.div
                   key={n.id}
@@ -194,14 +213,24 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                   onDragEnd={handleDragEnd}
                   onTap={() => handleTap(n.id)}
                   whileDrag={{ scale: 1.06, zIndex: 30 }}
-                  className={`absolute w-[120px] cursor-grab active:cursor-grabbing select-none rounded-sm border px-2.5 py-2 text-xs bg-panel shadow-lg ${
-                    selected
-                      ? "border-accent-gold ring-2 ring-accent-gold"
-                      : "border-white/15"
-                  }`}
+                  className={`absolute cursor-grab active:cursor-grabbing select-none rounded-sm border px-2.5 py-2 text-xs bg-panel shadow-lg transition-[width] ${
+                    editing ? "w-[200px] z-20" : "w-[120px]"
+                  } ${selected ? "border-accent-gold ring-2 ring-accent-gold" : "border-white/15"}`}
                   style={{ left: pos.x, top: pos.y }}
                 >
                   <div className="pin" />
+                  <button
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingNote(editing ? null : n.id);
+                      playTick();
+                    }}
+                    className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-accent-gold text-black text-[10px] flex items-center justify-center shadow"
+                    aria-label="Not ekle"
+                  >
+                    {hasNote ? "●" : "✎"}
+                  </button>
                   {n.kind === "suspect" ? (
                     <>
                       <p className="font-display font-bold leading-tight truncate">
@@ -218,6 +247,24 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                         {n.label}
                       </p>
                     </>
+                  )}
+                  {editing ? (
+                    <textarea
+                      autoFocus
+                      value={notes[n.id] ?? ""}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onChange={(e) => updateNote(n.id, e.target.value)}
+                      onBlur={() => setEditingNote(null)}
+                      placeholder="Kısa bir not..."
+                      rows={3}
+                      className="mt-1.5 w-full resize-none rounded-sm border border-accent-gold/40 bg-background px-1.5 py-1 text-[11px] text-text outline-none"
+                    />
+                  ) : (
+                    hasNote && (
+                      <p className="mt-1 text-[10px] text-accent-gold/90 italic line-clamp-2">
+                        {notes[n.id]}
+                      </p>
+                    )
                   )}
                 </motion.div>
               );

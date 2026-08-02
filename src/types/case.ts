@@ -53,6 +53,22 @@ export interface Suspect {
 
 export type Difficulty = "kolay" | "orta" | "zor";
 
+export interface TimelineEvent {
+  time: string;
+  description: string;
+}
+
+export interface AccusationOption {
+  id: string;
+  label: string;
+  correct: boolean;
+}
+
+export interface FollowUpQuestion {
+  prompt: string;
+  options: AccusationOption[];
+}
+
 export interface CaseData {
   id: string;
   order: number;
@@ -67,6 +83,14 @@ export interface CaseData {
   };
   suspects: Suspect[];
   documents: CaseDocument[];
+  /** Kronolojik olay şeridi — Zaman Çizelgesi aracında gösterilir */
+  timeline: TimelineEvent[];
+  /** Takılan oyuncu için sırayla açılan ipucu metinleri (genelde 3 tane) */
+  hints: string[];
+  /** Suçlama sonrası sorulan "neden" takip sorusu, rütbeye katkı sağlar */
+  motiveQuestion: FollowUpQuestion;
+  /** Suçlama sonrası sorulan "nasıl" takip sorusu, rütbeye katkı sağlar */
+  methodQuestion: FollowUpQuestion;
   solution: {
     killerId: string;
     explanation: string;

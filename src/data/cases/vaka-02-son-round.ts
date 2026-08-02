@@ -171,6 +171,41 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       body: `"Deniz'i son kez 22:25'te gördüm, ofisine çekiliyordu, biraz gergindi. Ben resepsiyonda kaldım, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım'la birlikteydim, ikisi de doğrular. 23:30'da toplantı bitti, herkes onu bekliyordu, ben çağırmaya gittim... O halde buldum."`,
     },
   ],
+  timeline: [
+    { time: "19:30", description: "Selin ön görüşme için ofise gelir, misafir kartı alır, ardından havalimanına gider." },
+    { time: "20:15", description: "Selin'in uçağı İstanbul'dan kalkar." },
+    { time: "21:48–21:52", description: "Deniz, Ozan ve Aylin gece toplantısı için 28. kata girer." },
+    { time: "22:14–22:19", description: "Barış lobiye girer, eşyalarını alıp 5 dakikada çıkar (28. kata çıkmaz)." },
+    { time: "22:40", description: "Aylin kendi ofisine kartla girer." },
+    { time: "22:45", description: "Ozan'ın gerçek girişi (yalnızca gölge log'da var)." },
+    { time: "22:50–23:10", description: "Cinayet gerçekleşir." },
+    { time: "23:15", description: "Ozan çıkar (yalnızca gölge log'da var)." },
+    { time: "23:20", description: "Aylin çıkar." },
+    { time: "23:30", description: "Yağmur, Deniz'i toplantıya çağırmaya gelip cesedi bulur." },
+  ],
+  hints: [
+    "Ana kart logunda kimsenin görünmemesi, o kişinin suçsuz olduğu anlamına gelmeyebilir. Kim bu logu değiştirebilir?",
+    "IT güvenlik yedek/anomali raporunu dikkatlice oku.",
+    "E-posta yazışmasındaki hem finansal hem duygusal gerilime bak.",
+  ],
+  motiveQuestion: {
+    prompt: "Katilin asıl motivi neydi?",
+    options: [
+      { id: "m1", label: "Hisse sulandırma + kendi geliştirdiği teknolojinin patentinin elinden alınması", correct: true },
+      { id: "m2", label: "Finansal usulsüzlüğün ifşa olma korkusu", correct: false },
+      { id: "m3", label: "Haksız işten çıkarılma", correct: false },
+      { id: "m4", label: "Yatırım anlaşmasının bozulması", correct: false },
+    ],
+  },
+  methodQuestion: {
+    prompt: "Katil, giriş kaydını nasıl 'yok' gösterdi?",
+    options: [
+      { id: "y1", label: "CTO olarak sahip olduğu admin yetkisiyle kendi log kaydını ana sistemden sildi", correct: true },
+      { id: "y2", label: "Hiç kart kullanmadan merdivenden çıktı", correct: false },
+      { id: "y3", label: "Başka birinin kartını çaldı", correct: false },
+      { id: "y4", label: "Güvenlik kamerasını manuel olarak kapattı", correct: false },
+    ],
+  },
   solution: {
     killerId: "ozan",
     explanation:

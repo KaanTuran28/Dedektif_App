@@ -160,6 +160,39 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
       body: `"Uyuyamıyordum, kapıyı aralık bırakmıştım, trenin içi çok kuru oluyor da. Saat tam kaç bilmiyorum ama tren durduktan az sonraydı, koridordan biri geçti. Hızlı yürüyordu. Gözlüğüm yoktu, yüzünü net göremedim ama boyu kısaydı, benim oğlum kadar var ya da daha az — o da 1.68 falandır. Bilek hizasında bir şey parladı, ışığı öyle fark ettim. Kimseye laf etmek istemem ama sorunca söylemem gerekti."`,
     },
   ],
+  timeline: [
+    { time: "03:15", description: "Vagon restoranda akşam servisi biter." },
+    { time: "03:20", description: "Emre, Kemal'in kompartımanından çıkar (son görülen kişi)." },
+    { time: "03:25", description: "Emre 'rapor hazırlamaya' restorana gideceğini söyler." },
+    { time: "03:30–04:00", description: "Garson, Emre'yi restoranda görmediğini belirtiyor." },
+    { time: "03:40", description: "Tren, çığ riski nedeniyle tünelde durur." },
+    { time: "03:45", description: "Cinayet gerçekleşir (otopsi tahmini)." },
+    { time: "03:50", description: "Nihal, koridorda görevli tarafından görülür (tuvalete gidiyordu)." },
+    { time: "04:05", description: "Bora, devriye sırasında cesedi bulur." },
+  ],
+  hints: [
+    "Otopsi raporundaki açı analizini dikkatlice oku — katilin boyu hakkında bir şey söylüyor.",
+    "Restoran garsonunun anlattıklarıyla Emre'nin ifadesi örtüşmüyor. Bu çelişkiye odaklan.",
+    "Olay yeri raporundaki 'E.S.' harfleri kimin baş harfleri olabilir?",
+  ],
+  motiveQuestion: {
+    prompt: "Katilin asıl motivi neydi?",
+    options: [
+      { id: "m1", label: "Zimmete geçirdiği para ortaya çıkmıştı, kovulma ve hapis tehdidi vardı", correct: true },
+      { id: "m2", label: "Miras/vasiyet paylaşımından pay alamama", correct: false },
+      { id: "m3", label: "Kaçak eser ticaretinin ifşa olma korkusu", correct: false },
+      { id: "m4", label: "Geçmişteki bir dolandırıcılığın intikamı", correct: false },
+    ],
+  },
+  methodQuestion: {
+    prompt: "Katil kompartımana nasıl girip 'içeriden kilitli' görüntüsü yarattı?",
+    options: [
+      { id: "y1", label: "Yedek anahtarla girdi, eski model sürgüyü dışarıdan ince bir aletle manipüle etti", correct: true },
+      { id: "y2", label: "Buzlu pencereyi kırıp içeri girdi", correct: false },
+      { id: "y3", label: "Görevlinin master anahtarını çaldı", correct: false },
+      { id: "y4", label: "Kurban kapıyı kendi açtı, saldırgan çıkarken normal şekilde kilitledi", correct: false },
+    ],
+  },
   solution: {
     killerId: "emre",
     explanation:
