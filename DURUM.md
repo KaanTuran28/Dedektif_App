@@ -43,6 +43,30 @@
   - `npm run build` başarılı, `/vaka/[caseId]` `generateStaticParams` ile
     statik olarak önceden üretiliyor (SSG).
 
+## Görsel Tasarım Geçişi (2026-08-02, aynı gün ikinci güncelleme)
+İlk MVP "düz yazı okuyormuşuz gibi" hissettiriyordu — kullanıcı geri
+bildirimiyle tam bir "dava dosyası" görsel diline geçildi:
+- `motion` (Framer Motion) eklendi: sekme geçişleri, kanıt/şüpheli kartı
+  açılma animasyonu, suçlama sonucunda **damga (stamp) animasyonu**
+  (ÇÖZÜLDÜ altın / YANLIŞ ŞÜPHELİ kırmızı). `MotionConfig reducedMotion="user"`
+  ile erişilebilirlik (azaltılmış hareket tercihi) global olarak saygı görüyor.
+- Yeni fontlar: IBM Plex Mono (resmi belgeler/bilet/log — "yazılmış" hissi),
+  Caveat (el yazısı — ifade imzası, günlük log etiketi, slogan).
+- Kanıt kartları artık türüne göre farklı görünüyor: resmi_rapor kırmızı
+  eğik "RESMİ" damgalı kağıt, whatsapp gerçek telefon ekranı mockup'ı içinde,
+  bilet_kaydi bilet kuponu gibi, ifade ataşlı+el yazısı imzalı kağıt.
+- Şüpheli kartları "mugshot" tarzına çevrildi: silüet + cetvel-arka planlı
+  fotoğraf çerçevesi + altın "Ş-01" vaka etiketi.
+- Katili Suçla ekranı artık bir "teşhis dizisi" (lineup): seçilen şüphelinin
+  fotoğrafında kırmızı hedef halkası beliriyor.
+- Ana sayfa kork-pano (corkboard) dokusu + kırmızı iplik + iğneyle
+  tutturulmuş dosya kartı halini aldı.
+- Tüm kartlarda id'den türetilen sabit (deterministic) hafif eğim var
+  (`src/lib/tilt.ts`) — "pinlenmiş ama mükemmel hizalı değil" hissi,
+  hydration hatası yaratmadan (Math.random KULLANILMADI, bilerek).
+- Playwright ile hem masaüstü hem mobilde tekrar görsel test edildi, 0 konsol
+  hatası. GitHub'a push edildi.
+
 ## Sıradaki Adım
 1. GitHub'a ilk push yapıldı/yapılıyor (bkz. Kararlar Günlüğü)
 2. Kullanıcıya yerel test talimatı verildi (bkz. altta)
