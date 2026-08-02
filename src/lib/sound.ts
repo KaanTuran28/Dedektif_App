@@ -2,12 +2,13 @@
 
 /**
  * Hafif, tamamen prosedürel (Web Audio API ile üretilen) efekt sesleri.
- * Dışarıdan ses dosyası yüklenmez — telif/lisans derdi yok, sıfır ağ isteği.
+ * Dışarıdan ses dosyası YOK — telif riski sıfır, ağ isteği yok.
+ * Bilinçli olarak sadece ETKİLEŞİM anlarında çalar — sürekli/ambiyans
+ * müzik/ses YOK (kullanıcı geri bildirimiyle kaldırıldı, rahatsız ediyordu).
  */
 
 let ctx: AudioContext | null = null;
 let muted = false;
-let ambientNodes: { stop: () => void } | null = null;
 
 const STORAGE_KEY = "supheli:sesli";
 
@@ -33,7 +34,6 @@ export function setSoundEnabled(enabled: boolean) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
   }
-  if (!enabled) stopAmbient();
 }
 
 function noiseBuffer(c: AudioContext, seconds: number) {
@@ -105,63 +105,4 @@ export function playStamp() {
   src.connect(filter).connect(noiseGain).connect(c.destination);
   src.start();
   src.stop(c.currentTime + 0.08);
-}
-
-/** arkaplan ambiyansı: kahverengi gürültü (tren uğultusu) + hafif yağmur katmanı, döngülü */
-export function startAmbient() {
-  if (muted || !isSoundEnabled() || ambientNodes) return;
-  const c = getCtx();
-  if (!c) return;
-
-  const master = c.createGain();
-  master.gain.value = 0;
-  master.connect(c.destination);
-  master.gain.linearRampToValueAtTime(0.05, c.currentTime + 2);
-
-  // brown noise (tren/motor uğultusu)
-  const bufferSize = 4 * c.sampleRate;
-  const brownBuffer = c.createBuffer(1, bufferSize, c.sampleRate);
-  const data = brownBuffer.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    last = (last + 0.02 * white) / 1.02;
-    data[i] = last * 3.5;
-  }
-  const brownSrc = c.createBufferSource();
-  brownSrc.buffer = brownBuffer;
-  brownSrc.loop = true;
-  const lowpass = c.createBiquadFilter();
-  lowpass.type = "lowpass";
-  lowpass.frequency.value = 220;
-  brownSrc.connect(lowpass).connect(master);
-  brownSrc.start();
-
-  // hafif yüksek frekans "yağmur/tel cızırtısı" katmanı
-  const hissSrc = c.createBufferSource();
-  hissSrc.buffer = noiseBuffer(c, 4);
-  hissSrc.loop = true;
-  const hipass = c.createBiquadFilter();
-  hipass.type = "highpass";
-  hipass.frequency.value = 4000;
-  const hissGain = c.createGain();
-  hissGain.gain.value = 0.15;
-  hissSrc.connect(hipass).connect(hissGain).connect(master);
-  hissSrc.start();
-
-  ambientNodes = {
-    stop: () => {
-      master.gain.cancelScheduledValues(c.currentTime);
-      master.gain.linearRampToValueAtTime(0, c.currentTime + 0.6);
-      setTimeout(() => {
-        brownSrc.stop();
-        hissSrc.stop();
-      }, 700);
-    },
-  };
-}
-
-export function stopAmbient() {
-  ambientNodes?.stop();
-  ambientNodes = null;
 }
