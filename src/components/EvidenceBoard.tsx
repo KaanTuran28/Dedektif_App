@@ -213,7 +213,11 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                   onDragEnd={handleDragEnd}
                   onTap={() => handleTap(n.id)}
                   whileDrag={{ scale: 1.06, zIndex: 30 }}
-                  className={`absolute cursor-grab active:cursor-grabbing select-none rounded-sm border px-2.5 py-2 text-xs bg-panel shadow-lg transition-[width] ${
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selected}
+                  aria-label={`${n.label}${hasNote ? " (notlu)" : ""} — bağlamak için etkinleştir`}
+                  className={`absolute cursor-grab active:cursor-grabbing select-none rounded-sm border px-2.5 py-2 text-xs bg-panel shadow-lg transition-[width] focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:outline-none ${
                     editing ? "w-[200px] z-20" : "w-[120px]"
                   } ${selected ? "border-accent-gold ring-2 ring-accent-gold" : "border-white/15"}`}
                   style={{ left: pos.x, top: pos.y }}
@@ -257,7 +261,7 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                       onBlur={() => setEditingNote(null)}
                       placeholder="Kısa bir not..."
                       rows={3}
-                      className="mt-1.5 w-full resize-none rounded-sm border border-accent-gold/40 bg-background px-1.5 py-1 text-[11px] text-text outline-none"
+                      className="mt-1.5 w-full resize-none rounded-sm border border-accent-gold/40 bg-background px-1.5 py-1 text-[11px] text-text outline-none focus:ring-2 focus:ring-accent-gold/60"
                     />
                   ) : (
                     hasNote && (

@@ -204,28 +204,36 @@ oyuncuyu ödüllendiren küçük referanslar olacak.
 **Uygulandı:** Vaka 02 ("Son Round") synopsis'ine, Vaka 01'e ("Yıldız
 Ekspresi") tek cümlelik geriye dönük bir gönderme eklendi.
 
-## 10. İyileştirme Backlog'u (2026-08-02'de önerildi, kullanıcı seçecek)
+## 10. İyileştirme Backlog'u — TAMAMLANDI (2026-08-02)
+
+Kullanıcı "hepsini sırayla yap" dedi, tamamı uygulandı. Detaylı uygulama
+notları `DURUM.md`'de ("Backlog Sprint" bölümü). Özet durum:
 
 **İçerik & Tekrar Oynanabilirlik**
-- Yeni vaka(lar) — villa/influencer/küçük kasaba (orta efor)
-- Zorluk çeşitliliği — bir "kolay" öğretici vaka + bir "zor" çok-şüpheli vaka (küçük efor)
-- İpucu sistemi — sınırlı ipucu hakkı, rütbeyi düşürür ama vazgeçmeyi önler (orta efor)
-- Rozetler/başarımlar — localStorage'da biriken küçük ödüller (küçük efor)
+- [x] Yeni vaka — Vaka 03 "Zümrüt Yalı" (villa/aile, zor zorluk, zehirleme)
+- [x] Zorluk çeşitliliği — Vaka 01/02 orta, Vaka 03 zor (kolay öğretici vaka henüz yok, gelecekte eklenebilir)
+- [x] İpucu sistemi — `HintPanel.tsx`, 3 ipucu/vaka, kullanım rütbeyi düşürüyor
+- [x] Rozetler/başarımlar — `src/lib/achievements.ts`, 4 rozet
 
 **Oynanış Derinliği**
-- Panoya not iğneleme — delil panosu kartlarına kişisel not (küçük efor)
-- Suçlamada motiv/yöntem sorusu — sadece "kim" değil "neden/nasıl", rütbe buna göre (orta efor)
-- Zaman çizelgesi aracı — alibi saatlerini sürükleyerek çelişki yakalama (büyük efor)
+- [x] Panoya not iğneleme — `EvidenceBoard.tsx`, kart başına kişisel not
+- [x] Suçlamada motiv/yöntem sorusu — `FollowUpQuestionScreen`, puanlı rütbeye dahil
+- [x] Zaman çizelgesi aracı — `Timeline.tsx` — **kapsam daraltıldı:** tam
+      etkileşimli "alibi'leri sürükleyerek çelişki yakalama" yerine sade,
+      salt-okunur kronolojik şerit yapıldı (büyük efor/risk dengesi için
+      bilinçli karar). İleride drag-tabanlı versiyon eklenebilir.
 
 **His / Atmosfer**
-- Sonuç ekranı paylaşım kartı — rütbeyi gösteren, sosyal medyada paylaşılabilir görsel (orta efor,
-  "ücretsiz yayınlama" hedefine organik büyüme açısından değerli)
-- Vaka kapanış animasyonu — dosyanın fiziksel kapanma sekansı (küçük efor)
-- Mini istatistik ekranı — kaç vaka çözüldü, ortalama rütbe (küçük efor)
+- [x] Sonuç ekranı paylaşım kartı — `src/lib/shareCard.ts`, canvas ile
+      üretilen PNG, dış servis yok
+- [x] Vaka kapanış animasyonu — "Dosya Kapatıldı" damgası
+- [x] Mini istatistik ekranı — `StatsPanel.tsx`, ana sayfada
 
 **Sağlamlık**
-- Gerçek mobil cihazda test — özellikle iOS Safari dokunmatik/ses davranışı hiç denenmedi
-- Erişilebilirlik taraması — tam klavye navigasyonu, ekran okuyucu uyumluluğu (orta efor)
-
-Kullanıcı bunlardan hangilerini önceliklendireceğine karar verecek, seçilenler
-buradan işaretlenip `DURUM.md`'ye taşınacak.
+- [x] Mobil/dokunmatik test — Playwright WebKit + iPhone emülasyonuyla
+      (gerçek fiziksel cihazın yerini tutmuyor, not: bir sonraki fırsatta
+      gerçek iPhone'da denenmeli)
+- [x] Erişilebilirlik taraması — klavye navigasyonu tam çalışıyor. Bu
+      sırada gerçek bir bug bulunup düzeltildi: delil panosu kartlarında
+      özel `onKeyDown` ile Framer Motion'ın kendi yerleşik klavye-tap
+      desteği çakışıp birbirini iptal ediyordu (bkz. DURUM.md detay).
