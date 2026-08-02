@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #141212;
+  --panel: #1e1a1a;
+  --paper: #ede6d6;
+  --paper-ink: #241f1a;
+  --accent-red: #8b0000;
+  --accent-red-bright: #b3231c;
+  --accent-gold: #d4af37;
+  --text: #f2ede4;
+  --text-dim: #b8afa2;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-panel: var(--panel);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-accent-red: var(--accent-red);
+  --color-accent-red-bright: var(--accent-red-bright);
+  --color-accent-gold: var(--accent-gold);
+  --color-text: var(--text);
+  --color-text-dim: var(--text-dim);
+  --font-display: var(--font-playfair);
+  --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.paper-card {
+  background-color: var(--paper);
+  color: var(--paper-ink);
+}
+
+::selection {
+  background: var(--accent-red-bright);
+  color: var(--text);
 }
