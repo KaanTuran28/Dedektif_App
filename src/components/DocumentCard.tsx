@@ -13,6 +13,7 @@ const TYPE_LABELS: Record<CaseDocument["type"], string> = {
   bilet_kaydi: "Kayıt",
   gunluk_log: "Günlük / Log",
   ifade: "İfade",
+  eposta: "E-posta",
 };
 
 function signatureFromMeta(meta?: string) {
@@ -39,12 +40,10 @@ export function DocumentCard({
       <div className="pin" />
       <button
         onClick={() => {
-          setOpen((v) => {
-            const next = !v;
-            if (next) onOpen?.(doc.id);
-            playPaper();
-            return next;
-          });
+          const next = !open;
+          setOpen(next);
+          if (next) onOpen?.(doc.id);
+          playPaper();
         }}
         className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left"
         aria-expanded={open}
@@ -170,6 +169,27 @@ function DocumentBody({ doc }: { doc: CaseDocument }) {
         {sig && (
           <p className="font-hand text-2xl mt-5 text-right text-paper-ink/80">
             {sig}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (doc.type === "eposta") {
+    const h = doc.emailHeader;
+    return (
+      <div className="paper-card paper-torn relative px-4 sm:px-6 py-5">
+        {h && (
+          <div className="mb-4 pb-3 border-b border-paper-ink/15 font-mono-doc text-xs sm:text-sm space-y-0.5">
+            <p><span className="text-accent-red">Kimden:</span> {h.from}</p>
+            <p><span className="text-accent-red">Kime:</span> {h.to}</p>
+            <p><span className="text-accent-red">Konu:</span> {h.subject}</p>
+            <p><span className="text-accent-red">Tarih:</span> {h.date}</p>
+          </div>
+        )}
+        {doc.body && (
+          <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">
+            {doc.body}
           </p>
         )}
       </div>

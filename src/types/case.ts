@@ -4,7 +4,8 @@ export type DocumentType =
   | "telefon_dokumu"
   | "bilet_kaydi"
   | "gunluk_log"
-  | "ifade";
+  | "ifade"
+  | "eposta";
 
 export interface ChatMessage {
   sender: string;
@@ -18,17 +19,26 @@ export interface DialogueLine {
   text: string;
 }
 
+export interface EmailHeader {
+  from: string;
+  to: string;
+  subject: string;
+  date: string;
+}
+
 export interface CaseDocument {
   id: string;
   type: DocumentType;
   title: string;
   meta?: string;
-  /** Düz metin / markdown-benzeri gövde (resmi_rapor, gunluk_log, ifade, bilet_kaydi) */
+  /** Düz metin / markdown-benzeri gövde (resmi_rapor, gunluk_log, ifade, bilet_kaydi, eposta) */
   body?: string;
   /** whatsapp tipi için mesaj listesi */
   messages?: ChatMessage[];
   /** telefon_dokumu tipi için diyalog satırları */
   dialogue?: DialogueLine[];
+  /** eposta tipi için başlık alanları */
+  emailHeader?: EmailHeader;
 }
 
 export interface Suspect {
