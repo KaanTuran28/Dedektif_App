@@ -11,7 +11,18 @@ import { Notebook } from "@/components/Notebook";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
 import { Timeline } from "@/components/Timeline";
 import { HintPanel } from "@/components/HintPanel";
-import { getCaseProgress, getHintsUsed, recordAccusation } from "@/lib/progress";
+import {
+  endCaseManually,
+  formatRemaining,
+  getCaseProgress,
+  getHintsUsed,
+  getRemainingMs,
+  markDocViewed,
+  markSuspectViewed,
+  markTimedOut,
+  recordAccusation,
+  startCase,
+} from "@/lib/progress";
 import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { isSoundEnabled, playStamp, playTick, setSoundEnabled } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
@@ -39,16 +50,31 @@ const TABS: { id: Step; label: string }[] = [
   { id: "notlar", label: "Notlar" },
 ];
 
+type EndReason = "suclama" | "sure-doldu" | "vazgecildi";
+
 interface FinalResult {
   correct: boolean;
   motiveCorrect: boolean;
   methodCorrect: boolean;
   rank: DetectiveRank;
+  reason: EndReason;
+}
+
+function zeroRank(data: CaseData): DetectiveRank {
+  return rankFor({
+    correctSuspect: false,
+    motiveCorrect: false,
+    methodCorrect: false,
+    coverage: 0,
+    hintsUsed: 0,
+    difficulty: data.difficulty,
+  });
 }
 
 export function CaseGame({ data }: { data: CaseData }) {
   const [step, setStep] = useState<Step>("giris");
   const [started, setStarted] = useState(false);
+  const [ready, setReady] = useState(false);
   const [accusedId, setAccusedId] = useState<string | null>(null);
   const [motiveCorrect, setMotiveCorrect] = useState(false);
   const [final, setFinal] = useState<FinalResult | null>(null);
@@ -56,11 +82,58 @@ export function CaseGame({ data }: { data: CaseData }) {
   const [soundOn, setSoundOn] = useState(true);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
   const [viewedSuspects, setViewedSuspects] = useState<Set<string>>(new Set());
+  const [remainingMs, setRemainingMs] = useState<number | null>(null);
+  const [endConfirming, setEndConfirming] = useState(false);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     setSoundOn(isSoundEnabled());
   }, []);
+
+  // Sayfa açıldığında: devam eden bir oturum var mı, süresi dolmuş mu, hiç başlamamış mı?
+  useEffect(() => {
+    const progress = getCaseProgress(data.id);
+    if (progress.inProgress && progress.startedAt) {
+      const remaining = getRemainingMs(progress);
+      if (remaining !== null && remaining <= 0) {
+        markTimedOut(data.id);
+        setStarted(true);
+        setIntroDone(true);
+        setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "sure-doldu" });
+        setStep("sonuc");
+      } else {
+        setStarted(true);
+        setIntroDone(true);
+        setStep("kanitlar");
+        setViewedDocs(new Set(progress.viewedDocIds ?? []));
+        setViewedSuspects(new Set(progress.viewedSuspectIds ?? []));
+      }
+    }
+    setReady(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.id]);
+
+  // Canlı geri sayım — her saniye kontrol eder, süre dolarsa otomatik sonlandırır
+  useEffect(() => {
+    if (!started) return;
+    function tick() {
+      const progress = getCaseProgress(data.id);
+      if (!progress.inProgress || !progress.startedAt) {
+        setRemainingMs(null);
+        return;
+      }
+      const rem = getRemainingMs(progress);
+      setRemainingMs(rem);
+      if (rem !== null && rem <= 0) {
+        markTimedOut(data.id);
+        setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "sure-doldu" });
+        setStep("sonuc");
+      }
+    }
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [started, data.id]);
 
   function toggleSound() {
     const next = !soundOn;
@@ -79,9 +152,17 @@ export function CaseGame({ data }: { data: CaseData }) {
   }
 
   function startInvestigation() {
+    startCase(data.id);
     setStarted(true);
     playTick();
     setStep("kanitlar");
+  }
+
+  function handleEndCase() {
+    endCaseManually(data.id);
+    setEndConfirming(false);
+    setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "vazgecildi" });
+    setStep("sonuc");
   }
 
   const coverage =
@@ -131,9 +212,11 @@ export function CaseGame({ data }: { data: CaseData }) {
       methodCorrect,
       solvedCasesCount,
     });
-    setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank });
+    setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank, reason: "suclama" });
     setStep("sonuc");
   }
+
+  if (!ready) return null;
 
   if (!introDone) {
     return (
@@ -159,6 +242,18 @@ export function CaseGame({ data }: { data: CaseData }) {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {started && inInvestigation && remainingMs !== null && (
+              <p
+                title="Vaka için kalan süre"
+                className={`hidden sm:block text-[11px] font-mono-doc border rounded-sm px-2 py-1.5 ${
+                  remainingMs < 5 * 60 * 1000
+                    ? "border-accent-red-bright text-accent-red-bright"
+                    : "border-white/10 text-text-dim"
+                }`}
+              >
+                ⏱ {formatRemaining(remainingMs)}
+              </p>
+            )}
             {started && inInvestigation && (
               <p
                 title="İncelenen kanıt + şüpheli oranı — dedektif rütbeni etkiler"
@@ -175,6 +270,14 @@ export function CaseGame({ data }: { data: CaseData }) {
             >
               {soundOn ? "🔊" : "🔇"}
             </button>
+            {started && inInvestigation && (
+              <button
+                onClick={() => setEndConfirming(true)}
+                className="hidden sm:block rounded-sm border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-text-dim hover:text-text hover:border-white/30 transition-colors"
+              >
+                Vazgeç
+              </button>
+            )}
             {started && inInvestigation && (
               <button
                 onClick={() => goStep("suclama")}
@@ -231,6 +334,16 @@ export function CaseGame({ data }: { data: CaseData }) {
           >
             {step === "giris" && (
               <div className="space-y-6">
+                {started && (
+                  <div className="rounded-sm border border-accent-gold/40 bg-accent-gold/10 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-sm font-semibold">🕵️ Vaka devam ediyor</p>
+                    {remainingMs !== null && (
+                      <p className="font-mono-doc text-sm text-accent-gold">
+                        ⏱ Kalan süre: {formatRemaining(remainingMs)}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -248,12 +361,14 @@ export function CaseGame({ data }: { data: CaseData }) {
                   </p>
                   <p className="text-paper-ink/70 text-sm mt-1">{data.victim.description}</p>
                 </div>
-                <button
-                  onClick={startInvestigation}
-                  className="w-full sm:w-auto rounded-sm bg-accent-red-bright px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
-                >
-                  Soruşturmaya Başla
-                </button>
+                {!started && (
+                  <button
+                    onClick={startInvestigation}
+                    className="w-full sm:w-auto rounded-sm bg-accent-red-bright px-6 py-3 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
+                  >
+                    Soruşturmaya Başla
+                  </button>
+                )}
               </div>
             )}
 
@@ -263,7 +378,10 @@ export function CaseGame({ data }: { data: CaseData }) {
                   <DocumentCard
                     key={doc.id}
                     doc={doc}
-                    onOpen={(id) => setViewedDocs((prev) => new Set(prev).add(id))}
+                    onOpen={(id) => {
+                      setViewedDocs((prev) => new Set(prev).add(id));
+                      markDocViewed(data.id, id);
+                    }}
                   />
                 ))}
               </div>
@@ -276,7 +394,10 @@ export function CaseGame({ data }: { data: CaseData }) {
                     key={s.id}
                     suspect={s}
                     index={i}
-                    onOpen={(id) => setViewedSuspects((prev) => new Set(prev).add(id))}
+                    onOpen={(id) => {
+                      setViewedSuspects((prev) => new Set(prev).add(id));
+                      markSuspectViewed(data.id, id);
+                    }}
                   />
                 ))}
               </div>
@@ -321,6 +442,46 @@ export function CaseGame({ data }: { data: CaseData }) {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {endConfirming && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+            onClick={() => setEndConfirming(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-md border border-accent-red-bright/50 bg-panel p-6 shadow-2xl"
+            >
+              <p className="font-display text-lg font-bold mb-2">Vakadan Vazgeç?</p>
+              <p className="text-text-dim text-sm mb-5">
+                Bu vaka <strong>başarısız</strong> olarak kapanacak ve çözümü
+                göreceksin. Geri dönüşü yok.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setEndConfirming(false)}
+                  className="flex-1 rounded-sm border border-white/20 px-4 py-2.5 text-sm font-semibold uppercase tracking-wide text-text-dim hover:text-text hover:border-white/40 transition-colors"
+                >
+                  Devam Et
+                </button>
+                <button
+                  onClick={handleEndCase}
+                  className="flex-1 rounded-sm bg-accent-red-bright px-4 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
+                >
+                  Evet, Vazgeç
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
@@ -545,7 +706,7 @@ function ResultReveal({
   final: FinalResult;
   coverage: number;
 }) {
-  const { correct, rank } = final;
+  const { correct, rank, reason } = final;
   const [sharing, setSharing] = useState(false);
   const [closing, setClosing] = useState(false);
   const router = useRouter();
@@ -622,15 +783,29 @@ function ResultReveal({
             correct ? "text-accent-gold" : "text-accent-red-bright"
           }`}
         >
-          {correct ? "Çözüldü" : "Yanlış Şüpheli"}
+          {correct
+            ? "Çözüldü"
+            : reason === "sure-doldu"
+              ? "Süre Doldu"
+              : reason === "vazgecildi"
+                ? "Vazgeçildi"
+                : "Yanlış Şüpheli"}
         </motion.p>
       </div>
       <p className="text-text-dim">
         {correct
           ? "Doğru şüpheliyi işaret ettin."
-          : `Suçladığın kişi katil değildi. Gerçek katil: ${
-              data.suspects.find((s) => s.id === data.solution.killerId)?.name
-            }.`}
+          : reason === "sure-doldu"
+            ? `1 saat içinde vakayı çözemedin. Gerçek katil: ${
+                data.suspects.find((s) => s.id === data.solution.killerId)?.name
+              }.`
+            : reason === "vazgecildi"
+              ? `Vakadan vazgeçtin. Gerçek katil: ${
+                  data.suspects.find((s) => s.id === data.solution.killerId)?.name
+                }.`
+              : `Suçladığın kişi katil değildi. Gerçek katil: ${
+                  data.suspects.find((s) => s.id === data.solution.killerId)?.name
+                }.`}
       </p>
 
       <motion.div

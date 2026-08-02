@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { motion, motionValue, useTransform, type MotionValue } from "motion/react";
 import type { CaseData } from "@/types/case";
 import { getBoardState, setBoardState, connectionKey, type BoardPosition } from "@/lib/board";
 import { playPaper, playTick } from "@/lib/sound";
@@ -25,6 +25,9 @@ const CANVAS_H = 640;
 const COLS = 4;
 const CELL_W = CANVAS_W / COLS;
 const CELL_H = 155;
+const CARD_CENTER_X = 60;
+const CARD_CENTER_Y = 30;
+const PULLBACK = 58;
 
 function hash(str: string, salt: number) {
   let h = salt;
@@ -50,9 +53,12 @@ interface BoardNode {
   sub: string;
 }
 
+type MotionPair = { x: MotionValue<number>; y: MotionValue<number> };
+
 export function EvidenceBoard({ data }: { data: CaseData }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [positions, setPositions] = useState<Record<string, BoardPosition>>({});
+  const motionRefs = useRef<Record<string, MotionPair>>({});
+  const positionsRef = useRef<Record<string, BoardPosition>>({});
   const [connections, setConnections] = useState<[string, string][]>([]);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [editingNote, setEditingNote] = useState<string | null>(null);
@@ -77,13 +83,26 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
     [data]
   );
 
+  function ensurePair(id: string, initial: BoardPosition): MotionPair {
+    let pair = motionRefs.current[id];
+    if (!pair) {
+      pair = { x: motionValue(initial.x), y: motionValue(initial.y) };
+      motionRefs.current[id] = pair;
+    }
+    return pair;
+  }
+
   useEffect(() => {
     const saved = getBoardState(data.id);
     const initial: Record<string, BoardPosition> = {};
     nodes.forEach((n, i) => {
-      initial[n.id] = saved.positions[n.id] ?? defaultPosition(n.id, i);
+      const pos = saved.positions[n.id] ?? defaultPosition(n.id, i);
+      initial[n.id] = pos;
+      const pair = ensurePair(n.id, pos);
+      pair.x.set(pos.x);
+      pair.y.set(pos.y);
     });
-    setPositions(initial);
+    positionsRef.current = initial;
     setConnections(saved.connections);
     setNotes(saved.notes);
     setLoaded(true);
@@ -101,7 +120,7 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
   function updateNote(id: string, text: string) {
     setNotes((prev) => {
       const next = { ...prev, [id]: text };
-      persist(positions, connections, next);
+      persist(positionsRef.current, connections, next);
       return next;
     });
   }
@@ -122,27 +141,28 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
       ? connections.filter((c) => connectionKey(c[0], c[1]) !== key)
       : [...connections, [anchor, id]];
     setConnections(next);
-    persist(positions, next);
+    persist(positionsRef.current, next);
     setAnchor(null);
     playTick();
   }
 
-  function handleDrag(id: string, dx: number, dy: number) {
-    setPositions((prev) => {
-      const base = prev[id] ?? { x: 0, y: 0 };
-      const next = { ...prev, [id]: { x: base.x + dx, y: base.y + dy } };
-      return next;
-    });
-  }
-
-  function handleDragEnd() {
-    persist(positions, connections);
+  function handleDragEnd(id: string) {
+    const pair = motionRefs.current[id];
+    if (!pair) return;
+    positionsRef.current = { ...positionsRef.current, [id]: { x: pair.x.get(), y: pair.y.get() } };
+    persist(positionsRef.current, connections, notes);
   }
 
   function resetBoard() {
     const fresh: Record<string, BoardPosition> = {};
-    nodes.forEach((n, i) => (fresh[n.id] = defaultPosition(n.id, i)));
-    setPositions(fresh);
+    nodes.forEach((n, i) => {
+      const pos = defaultPosition(n.id, i);
+      fresh[n.id] = pos;
+      const pair = ensurePair(n.id, pos);
+      pair.x.set(pos.x);
+      pair.y.set(pos.y);
+    });
+    positionsRef.current = fresh;
     setConnections([]);
     setNotes({});
     setEditingNote(null);
@@ -150,32 +170,13 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
     playPaper();
   }
 
-  const lines = connections
-    .map(([a, b]) => {
-      const pa = positions[a];
-      const pb = positions[b];
-      if (!pa || !pb) return null;
-      const cx1 = pa.x + 60;
-      const cy1 = pa.y + 30;
-      const cx2 = pb.x + 60;
-      const cy2 = pb.y + 30;
-      // ok ucu hedef kartın altında kaybolmasın diye çizgiyi kart kenarında kes
-      const dx = cx2 - cx1;
-      const dy = cy2 - cy1;
-      const dist = Math.hypot(dx, dy) || 1;
-      const pullback = 58;
-      const x2 = dist > pullback ? cx2 - (dx / dist) * pullback : cx2;
-      const y2 = dist > pullback ? cy2 - (dy / dist) * pullback : cy2;
-      return { a, b, x1: cx1, y1: cy1, x2, y2 };
-    })
-    .filter(Boolean) as { a: string; b: string; x1: number; y1: number; x2: number; y2: number }[];
-
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <p className="text-text-dim text-sm">
           Kartları sürükleyip düzenle. Bağlamak için iki kartı sırayla tıkla —
-          aralarına kırmızı iplik gerilsin.
+          aralarına kırmızı iplik gerilsin. Bağlı iki kartı aynı şekilde
+          tekrar seçersen ip kalkar.
           {anchor && (
             <span className="text-accent-gold"> Şimdi ikinci kartı seç…</span>
           )}
@@ -212,24 +213,19 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                 <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-red-bright)" />
               </marker>
             </defs>
-            {lines.map((l, i) => (
-              <line
-                key={i}
-                x1={l.x1}
-                y1={l.y1}
-                x2={l.x2}
-                y2={l.y2}
-                stroke="var(--accent-red-bright)"
-                strokeWidth={2}
-                opacity={0.85}
-                markerEnd="url(#board-arrowhead)"
-              />
-            ))}
+            {loaded &&
+              connections.map(([a, b], i) => {
+                const pairA = motionRefs.current[a];
+                const pairB = motionRefs.current[b];
+                if (!pairA || !pairB) return null;
+                return <ConnectionLine key={i} pairA={pairA} pairB={pairB} />;
+              })}
           </svg>
 
           {loaded &&
             nodes.map((n) => {
-              const pos = positions[n.id] ?? { x: 0, y: 0 };
+              const pos = positionsRef.current[n.id] ?? { x: 0, y: 0 };
+              const pair = ensurePair(n.id, pos);
               const selected = anchor === n.id;
               const editing = editingNote === n.id;
               const hasNote = !!notes[n.id]?.trim();
@@ -239,8 +235,8 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                   drag
                   dragMomentum={false}
                   dragConstraints={containerRef}
-                  onDrag={(_e, info) => handleDrag(n.id, info.delta.x, info.delta.y)}
-                  onDragEnd={handleDragEnd}
+                  style={{ x: pair.x, y: pair.y, left: 0, top: 0 }}
+                  onDragEnd={() => handleDragEnd(n.id)}
                   onTap={() => handleTap(n.id)}
                   whileDrag={{ scale: 1.06, zIndex: 30 }}
                   role="button"
@@ -250,7 +246,6 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
                   className={`absolute cursor-grab active:cursor-grabbing select-none rounded-sm border px-2.5 py-2 text-xs bg-panel shadow-lg transition-[width] focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:outline-none ${
                     editing ? "w-[200px] z-20" : "w-[120px]"
                   } ${selected ? "border-accent-gold ring-2 ring-accent-gold" : "border-white/15"}`}
-                  style={{ left: pos.x, top: pos.y }}
                 >
                   <div className="pin" />
                   <button
@@ -306,5 +301,42 @@ export function EvidenceBoard({ data }: { data: CaseData }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/** İki karta bağlı ok — kartlar sürüklenirken React re-render tetiklemeden,
+ * doğrudan motion value'lar üzerinden canlı takip eder (performans için). */
+function ConnectionLine({ pairA, pairB }: { pairA: MotionPair; pairB: MotionPair }) {
+  const x1 = useTransform(pairA.x, (v) => v + CARD_CENTER_X);
+  const y1 = useTransform(pairA.y, (v) => v + CARD_CENTER_Y);
+  const x2raw = useTransform(pairB.x, (v) => v + CARD_CENTER_X);
+  const y2raw = useTransform(pairB.y, (v) => v + CARD_CENTER_Y);
+
+  const x2 = useTransform([x1, y1, x2raw, y2raw], (latest) => {
+    const [X1, Y1, X2, Y2] = latest as number[];
+    const dx = X2 - X1;
+    const dy = Y2 - Y1;
+    const dist = Math.hypot(dx, dy) || 1;
+    return dist > PULLBACK ? X2 - (dx / dist) * PULLBACK : X2;
+  });
+  const y2 = useTransform([x1, y1, x2raw, y2raw], (latest) => {
+    const [X1, Y1, X2, Y2] = latest as number[];
+    const dx = X2 - X1;
+    const dy = Y2 - Y1;
+    const dist = Math.hypot(dx, dy) || 1;
+    return dist > PULLBACK ? Y2 - (dy / dist) * PULLBACK : Y2;
+  });
+
+  return (
+    <motion.line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
+      stroke="var(--accent-red-bright)"
+      strokeWidth={2}
+      opacity={0.85}
+      markerEnd="url(#board-arrowhead)"
+    />
   );
 }
