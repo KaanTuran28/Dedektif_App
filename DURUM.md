@@ -12,6 +12,14 @@
   böyle devam edecek, başka bir isimle/bot kimliğiyle commit ATILMAYACAK.
 - `gh` CLI zaten `KaanTuran28` hesabına authenticated.
 
+## Canlı Yayın (2026-08-02)
+- **Oyun artık canlıda:** https://dedektif-app.vercel.app (doğrulandı — 3
+  vaka, doğru zorluk etiketleriyle görünüyor)
+- Vercel dashboard: https://vercel.com/t-x/dedektif-app (kullanıcının kendi
+  hesabı üzerinden GitHub reposuna bağlı)
+- GitHub `main` dalına her push otomatik olarak Vercel'de yeniden deploy
+  ediyor (continuous deployment) — ayrıca manuel deploy adımı gerekmiyor.
+
 ## Neredeyiz
 - Referans ürün (Trendyol'daki 4 vakalı dedektif kutu oyunu) ve dijital
   benzerleri (cinayetoyunu.com, 5N1Dedektif, Chronicles of Crime) araştırıldı.
