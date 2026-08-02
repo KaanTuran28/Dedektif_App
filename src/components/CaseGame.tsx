@@ -733,6 +733,7 @@ function ResultReveal({
         rankLabel: rank.label,
         points: rank.points,
         correct,
+        reason,
       });
       if (!blob) return;
       const file = new File([blob], `supheli-${data.id}.png`, { type: "image/png" });

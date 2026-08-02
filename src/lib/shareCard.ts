@@ -5,6 +5,7 @@ export interface ShareCardInput {
   rankLabel: string;
   points: number;
   correct: boolean;
+  reason: "suclama" | "sure-doldu" | "vazgecildi";
 }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
@@ -78,11 +79,29 @@ export async function generateShareCard(input: ShareCardInput): Promise<Blob | n
   ctx.lineWidth = 2;
   ctx.strokeRect(cardX, cardY, cardW, cardH);
 
-  ctx.textAlign = "left";
-  ctx.fillStyle = red;
-  ctx.font = "700 20px 'Courier New', monospace";
-  ctx.fillText(input.correct ? "ÇÖZÜLDÜ" : "YANLIŞ ŞÜPHELİ", cardX + 40, cardY + 55);
+  const stampText = input.correct
+    ? "ÇÖZÜLDÜ"
+    : input.reason === "sure-doldu"
+      ? "SÜRE DOLDU"
+      : input.reason === "vazgecildi"
+        ? "VAZGEÇİLDİ"
+        : "YANLIŞ ŞÜPHELİ";
+  const stampColor = input.correct ? gold : red;
 
+  ctx.save();
+  ctx.translate(cardX + cardW - 130, cardY + 55);
+  ctx.rotate((-8 * Math.PI) / 180);
+  ctx.strokeStyle = stampColor;
+  ctx.lineWidth = 4;
+  ctx.font = "700 22px Georgia, serif";
+  ctx.textAlign = "center";
+  const stampW = ctx.measureText(stampText).width + 36;
+  ctx.strokeRect(-stampW / 2, -26, stampW, 44);
+  ctx.fillStyle = stampColor;
+  ctx.fillText(stampText, 0, 3);
+  ctx.restore();
+
+  ctx.textAlign = "left";
   ctx.fillStyle = paperInk;
   ctx.font = "700 44px Georgia, serif";
   const titleLines = wrapText(ctx, input.caseTitle, cardW - 80);

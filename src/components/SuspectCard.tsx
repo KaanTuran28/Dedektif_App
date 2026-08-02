@@ -22,10 +22,12 @@ export function SuspectCard({
   const color = suspectColorFor(suspect.id);
 
   return (
-    <div
+    <motion.div
+      animate={{ rotate: open ? 0 : tilt }}
+      whileHover={{ y: -3 }}
+      transition={{ type: "spring", stiffness: 320, damping: 26 }}
       className="relative rounded-sm border border-white/10 bg-panel overflow-hidden"
       style={{
-        transform: open ? "none" : `rotate(${tilt}deg)`,
         borderLeftWidth: 4,
         borderLeftColor: color,
       }}
@@ -139,6 +141,6 @@ export function SuspectCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
