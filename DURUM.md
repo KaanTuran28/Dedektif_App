@@ -3,9 +3,10 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (TAM ORTAK OYUN ODASI özelliği TAMAMLANDI —
-oda kur/katıl, paylaşımlı pano, oybirliğiyle katil/motiv/yöntem oylaması,
-sohbet hepsi tek sistemde birleşti, bkz. "Ortak Oyun Odası Tamamlandı")
+**Son güncelleme:** 2026-08-03 (TAM ORTAK OYUN ODASI özelliği TAMAMLANDI +
+**kritik service worker önbellek hatası düzeltildi** — kullanıcı "GitHub'a
+gidiyor ama Vercel'de yüklenmiyor" dedi, bkz. "Service Worker Önbellek
+Hatası Bulundu ve Düzeltildi")
 
 ## GitHub
 - Repo: https://github.com/KaanTuran28/Dedektif_App.git (public, kullanıcının kendi hesabı)
@@ -540,11 +541,51 @@ Yapılanlar:
   oturumdan önce var olan dosyalarda (bkz. önceki not) — yeni eklenen iki
   düzeltmede yeni bir lint hatası yok.
 
+## Service Worker Önbellek Hatası Bulundu ve Düzeltildi (2026-08-03, yirminci güncelleme)
+Kullanıcı "GitHub'a gidiyor ama Vercel'de yüklenmiyor" dedi. Vercel deploy
+durumu GitHub commit status'ları üzerinden (`gh api .../status`) kontrol
+edildi — build başarıyla tamamlanmıştı ("Deployment has completed"), yani
+build hatası değildi. Tarayıcı eklentisi kurulu olmadığı için canlı sitede
+gerçek bir JS/konsol incelemesi yapılamadı, ama kod incelemesiyle **gerçek
+ve ciddi bir hata** bulundu:
+
+- **Kök neden:** `public/sw.js` (PWA service worker) **cache-first**
+  stratejisi kullanıyordu (`return cached || network`) — önbellekte bir
+  şey varsa onu hemen döndürüyor, ağdan gelen taze sürümü sadece arka
+  planda "bir sonraki sefer" için güncelliyordu. Next.js her `npm run
+  build`'de JS/CSS dosyalarının adını (content hash) değiştiriyor. Sonuç:
+  daha önce siteyi ziyaret etmiş biri (deploy'dan önce), yeni bir deploy
+  sonrası hâlâ ESKİ önbellekteki HTML'i alıyor, o HTML artık sunucuda
+  OLMAYAN eski dosya adlarına işaret ediyor → JS dosyaları 404 veriyor →
+  uygulama hiç başlamıyor, sayfa boş/bozuk kalıyor. Bu, siteyi daha önce
+  ziyaret etmiş HERKESİ (geliştirici dahil) her yeni deploy'dan sonra
+  etkileyen klasik bir "PWA + hash'li dosya adları" hatası.
+- **Düzeltme:** Strateji **network-first**'e çevrildi — her istek önce
+  ağdan denenir (her zaman taze), önbellek SADECE ağ erişilemezken
+  (gerçek çevrimdışı durum) devreye giriyor. Ayrıca `CACHE_NAME`
+  `supheli-v1` → `supheli-v2` yapıldı ki mevcut (bozuk) önbellek, yeni
+  service worker aktive olduğunda otomatik silinsin (`activate`
+  handler'daki eski-cache-temizleme mantığı zaten vardı, sadece isim hiç
+  değişmediği için hiç tetiklenmiyordu).
+- **Kullanıcının yapması gereken (bir kereliğine):** Bu düzeltme
+  deploy olduktan sonra, daha önce siteyi ziyaret etmiş bir tarayıcıda
+  BİR KEZ sert yenileme (Ctrl+Shift+R) ya da site verilerini temizleme
+  gerekebilir — yeni service worker'ın devreye girip eski önbelleği
+  silmesi için. Ondan sonra hiç bozulmamış gibi, her deploy sonrası
+  otomatik taze içerik gelecek.
+- **Doğrulanamayan kısım (dürüst not):** Bu oturumda gerçek bir tarayıcıda
+  canlı siteyi açıp konsolu görme imkânı olmadı (kullanıcı Chrome
+  eklentisini kurmadı), bu yüzden teşhis tamamen kod incelemesine dayanıyor
+  — yüksek güvenle doğru teşhis ama kullanıcının deploy sonrası gerçekten
+  düzeldiğini teyit etmesi gerekiyor.
+
 ## Sıradaki Adım
-1. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
+1. **Kullanıcı bu düzeltmenin canlıda işe yaradığını doğrulamalı** (bir
+   kereliğine sert yenileme sonrası).
+2. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
    (yerelde Playwright ile kapsamlı doğrulandı ama gerçek ağ gecikmesiyle
    bir kez daha denemek faydalı).
-2. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
+3. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
    cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
    Playwright WebKit emülasyonu var), Vaka 04 içeriği, oda modunda süre
    sınırı / presence-kopma takibi eklemek istenirse, önceden var olan
