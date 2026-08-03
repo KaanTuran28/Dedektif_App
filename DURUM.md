@@ -499,16 +499,56 @@ StatsPanel.tsx — hiçbiri değişmedi), yeni dosyalar (RoomEvidenceBoard.tsx,
 RoomCaseGame.tsx) aynı deseni birebir taklit ettiği için aynı uyarıyı
 veriyor. Regresyon değil, ayrı bir gündem maddesi olarak bekliyor.
 
+## Güvenlik/Süreç Denetimi ve İki Gerçek Hata Bulundu (2026-08-03, ondokuzuncu güncelleme)
+Kullanıcı "testlerini yap, güvenlik ve süreç hatalarını kontrol et" dedi.
+Yapılanlar:
+- **Deployed Firestore kuralları** `firebase_get_security_rules` ile çekilip
+  yerel `firestore.rules` ile birebir eşleştiği doğrulandı.
+- **Kod denetimi:** `room.ts`'teki tüm transaction'lar tek tek elden
+  geçirildi (yarış durumu, katılımcı sayısı tutarlılığı, kural
+  şekli/boyut sınırları). Kimlik doğrulama olmadığı için "kim yazdığını"
+  değil "ne yazıldığını" doğrulayan kural tasarımı bilinçli kabul edildi
+  (zaten önceki turda belgelenmişti).
+- **GERÇEK HATA #1 (süreç):** `leaveRoom`, bir katılımcı ayrıldığında oy
+  çözümleme mantığını (`tryResolvePhase`) yeniden ÇALIŞTIRMIYORDU — yani 3
+  kişiden 2'si aynı şeyi oyladıktan sonra anlaşmayan 3. kişi odadan
+  ayrılsa bile, tur otomatik ilerlemiyor, birinin oyunu TEKRAR vermesi
+  gerekiyordu. Düzeltme: oy çözümleme mantığı `castVote` içinden saf bir
+  `tryResolvePhase(room, phase)` fonksiyonuna çıkarıldı, hem `castVote`
+  hem `leaveRoom` kendi transaction'ları içinde bu fonksiyonu çağırıyor.
+  İki bağımsız Playwright context'i ile doğrulandı: 3 kişi katılıp 2'si
+  anlaşmazlığa düşünce (2/3, henüz sıfırlanmıyor) 3. kişi ayrılınca
+  anlaşmazlık doğru şekilde otomatik sıfırlanıyor (0/2), sonra kalan 2
+  kişi hemfikir olunca tur doğru ilerliyor.
+- **GERÇEK HATA #2 (süreç/UX regresyonu):** Yeni `CaseEntry.tsx`, sayfa
+  yenilendiğinde HER ZAMAN açılış sinematiğine ve mod seçim ekranına
+  dönüyordu — devam eden bir solo oyunu ya da katılınmış bir odayı
+  "unutuyordu". Bu, projenin önceden kurulmuş "Kaldığın Yerden Devam Et"
+  ilkesini bozan bir regresyondu. Düzeltme: `CaseEntry` artık mount
+  olurken `getStoredRoomCode`/`getCaseProgress(...).inProgress` kontrolü
+  yapıp uygun moda (ve sinematiği atlayarak) otomatik dönüyor.
+- **Ek kenar durum testleri (Playwright):** solo mod regresyon yok,
+  geçersiz oda koduyla katılma doğru hata veriyor, sayfa yenileme sonrası
+  odaya otomatik dönme (düzeltmeden sonra), paylaşımlı ipucu sınırı aşılmaya
+  çalışılınca hata vermiyor (buton devre dışı kalıyor) — hepsi 0 konsol
+  hatasıyla doğrulandı.
+- Test sırasında görülen "HTTP 400 FAILED_PRECONDITION" hataları yine
+  Firestore'un eşzamanlı transaction retry mekanizmasının beklenen/zararsız
+  gürültüsü (önceki turda da not edilmişti).
+- `npm run build` temiz. `npm run lint`'teki "Cannot access refs during
+  render" / "Avoid calling setState in effect" uyarıları hâlâ SADECE bu
+  oturumdan önce var olan dosyalarda (bkz. önceki not) — yeni eklenen iki
+  düzeltmede yeni bir lint hatası yok.
+
 ## Sıradaki Adım
-1. **Henüz push edilmedi** — kullanıcıdan onay bekleniyor (büyük bir
-   özellik, Firestore güvenlik kuralları dahil).
-2. Push sonrası: canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama
-   iyi olur (yerelde zaten Playwright ile doğrulandı ama gerçek ağ
-   gecikmesiyle bir kez daha denemek faydalı).
-3. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
+1. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
+   (yerelde Playwright ile kapsamlı doğrulandı ama gerçek ağ gecikmesiyle
+   bir kez daha denemek faydalı).
+2. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
    cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
    Playwright WebKit emülasyonu var), Vaka 04 içeriği, oda modunda süre
-   sınırı / presence-kopma takibi eklemek istenirse.
+   sınırı / presence-kopma takibi eklemek istenirse, önceden var olan
+   (bu oturuma ait olmayan) lint hatalarının temizlenmesi.
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).
