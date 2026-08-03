@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allCases, getCaseById } from "@/data/cases";
-import { CaseEntry } from "@/components/CaseEntry";
+import { CaseGame } from "@/components/CaseGame";
 
 export function generateStaticParams() {
   return allCases.map((c) => ({ caseId: c.id }));
@@ -39,5 +39,5 @@ export default async function CasePage({
     );
   }
 
-  return <CaseEntry data={caseData} />;
+  return <CaseGame data={caseData} />;
 }
