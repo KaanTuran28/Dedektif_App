@@ -3,7 +3,9 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (Vaka sayfasına mod seçimi geri geldi —
+**Son güncelleme:** 2026-08-03 (Mod seçimi (Tek/Çoklu) artık en başta, ana
+sayfada — vaka seçimi ondan SONRA geliyor. bkz. "Giriş Akışı Yeniden
+Düzenlendi: Mod Önce, Vaka Sonra". Önceki: Vaka sayfasına mod seçimi geri geldi —
 "Tek Başına Oyna" / "Arkadaşlarınla Oyna", ikincisi case-agnostic oda
 akışına gidiyor, hangi vaka sayfasından girildiğinden bağımsız ortak
 oylamayla vaka seçiliyor. bkz. "Vaka Sayfasına Mod Seçimi Geri Getirildi".
@@ -662,6 +664,32 @@ birebir aynısı, sadece giriş noktası da vaka sayfaları olsun.
 - **Not:** `/oda` rotası da ayrıca duruyor (ana sayfadan "👥 Arkadaşlarınla
   Oyna" ile) — iki farklı giriş noktası (ana sayfa/`​/oda` ve herhangi bir
   vaka sayfası) aynı case-agnostic oda akışına çıkıyor, kod tekrarı yok.
+
+## Giriş Akışı Yeniden Düzenlendi: Mod Önce, Vaka Sonra (2026-08-03, yirmiüçüncü güncelleme)
+Kullanıcı bir önceki turdaki "vaka seçildikten sonra mod seç" akışını
+beğenmedi, sırayı tersine çevirmek istedi: önce mod (tek/çoklu), sonra
+vaka. Yapılan değişiklik:
+
+- **`src/app/page.tsx` artık salt bir giriş ekranı:** başlık/slogan +
+  "📖 Nasıl Oynanır?" + "Tek Başına Oyna" + "👥 Arkadaşlarınla Oyna". Vaka
+  kartları ve istatistik paneli buradan kaldırıldı.
+- **Yeni `src/app/vaka/page.tsx`:** eski ana sayfadaki vaka kartı grid'i +
+  `StatsPanel` buraya taşındı, "← Ana Sayfaya Dön" geri linki eklendi.
+  "Tek Başına Oyna" butonu buraya yönlendiriyor.
+- **`CaseEntry.tsx` tekrar kaldırıldı** (bir önceki turda geri getirilmişti,
+  şimdi mod seçimi ana sayfada olduğu için `/vaka/[caseId]` yine doğrudan
+  `CaseGame`'i render ediyor — hiç ara ekran yok, tıklayınca direkt oyuna
+  giriyor).
+- **İç linkler güncellendi:** `CaseGame`'in header'ındaki "← Vaka Seçimi"
+  ve sonuç ekranındaki "Vaka Seçimine Dön" artık `/` yerine `/vaka`'ya
+  gidiyor (StatsPanel'in de olduğu asıl vaka listesi). `/oda`'nın "Odadan
+  Ayrıl"/sonuç ekranı hâlâ `/`'ye (ana giriş ekranı) dönüyor — mantıklı,
+  çünkü oradan yeniden oda kurup çoklu oynamaya devam edebilir ya da tek
+  başına oynamaya geçebilir.
+- **Test:** Ana sayfada artık vaka kartı yok, sadece 2 buton; "Tek Başına
+  Oyna" → `/vaka` → kart tıklanınca hiç ara ekran olmadan direkt oyuna
+  giriyor; "Arkadaşlarınla Oyna" → `/oda` → ortak vaka oylaması hâlâ
+  sorunsuz çalışıyor (regresyon yok). `npm run build` temiz.
 
 ## Sıradaki Adım
 1. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını

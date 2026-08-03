@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allCases, getCaseById } from "@/data/cases";
-import { CaseEntry } from "@/components/CaseEntry";
+import { CaseGame } from "@/components/CaseGame";
 
 export function generateStaticParams() {
   return allCases.map((c) => ({ caseId: c.id }));
@@ -30,7 +30,7 @@ export default async function CasePage({
           {caseData.title} yakında açılacak. Şimdilik oynanabilir vakaya göz atabilirsin.
         </p>
         <Link
-          href="/"
+          href="/vaka"
           className="inline-block rounded-sm bg-accent-gold text-black px-6 py-3 font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity"
         >
           Vaka Seçimine Dön
@@ -39,5 +39,5 @@ export default async function CasePage({
     );
   }
 
-  return <CaseEntry data={caseData} />;
+  return <CaseGame data={caseData} />;
 }
