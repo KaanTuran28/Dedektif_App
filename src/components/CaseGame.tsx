@@ -11,6 +11,7 @@ import { Notebook } from "@/components/Notebook";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
 import { Timeline } from "@/components/Timeline";
 import { HintPanel } from "@/components/HintPanel";
+import { getBoardState } from "@/lib/board";
 import {
   endCaseManually,
   formatRemaining,
@@ -182,6 +183,11 @@ export function CaseGame({ data }: { data: CaseData }) {
 
   function finalize(correct: boolean, motiveWasCorrect: boolean, methodCorrect: boolean) {
     const hintsUsed = getHintsUsed(data.id);
+    const board = getBoardState(data.id);
+    const supportingCount = board.anchorId
+      ? board.connections.filter(([a, b]) => a === board.anchorId || b === board.anchorId).length
+      : 0;
+    const theoryMatched = board.anchorId === data.solution.killerId && supportingCount >= 3;
     const rank = rankFor({
       correctSuspect: correct,
       motiveCorrect: motiveWasCorrect,
@@ -189,6 +195,7 @@ export function CaseGame({ data }: { data: CaseData }) {
       coverage,
       hintsUsed,
       difficulty: data.difficulty,
+      theoryMatched,
     });
     recordAccusation(data.id, accusedId ?? "", correct, rank.points, rank.label);
     const solvedCasesCount = allCases.filter((c) => getCaseProgress(c.id).solved).length;
@@ -200,6 +207,7 @@ export function CaseGame({ data }: { data: CaseData }) {
       motiveCorrect: motiveWasCorrect,
       methodCorrect,
       solvedCasesCount,
+      theoryMatched,
     });
     setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank });
     setStep("sonuc");
@@ -371,6 +379,7 @@ export function CaseGame({ data }: { data: CaseData }) {
                         <DocumentCard
                           key={doc.id}
                           doc={doc}
+                          caseId={data.id}
                           onOpen={(id) => {
                             setViewedDocs((prev) => new Set(prev).add(id));
                             markDocViewed(data.id, id);

@@ -3,9 +3,17 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (Spoiler'sız kapanışlar, oda modunda
-paylaşımlı süre, boş oda otomatik silme, /vaka'da vaka kilitleme —
-hepsi tamamlandı ve test edildi. **Kullanıcının yapması gereken tek şey:
+**Son güncelleme:** 2026-08-03 (İkinci bulmaca türü eklendi: Kombinasyon
+Kilidi — 3 vakanın hepsine birer tane, Şifreli Kayıt ile aynı kalıcılık/
+başarım altyapısını paylaşıyor. bkz. "Kombinasyon Kilidi Bulmacası
+Eklendi". Öncesinde aynı gün: Şifreli Kayıt bulmaca mekaniği — her vakaya
+birer tane (Vaka 02'de kullanıcının istediği kilitli USB bellek dahil) — ve
+Pano'ya "Ana Şüpheli" çapası + bağlantı etiketleme + teori bonusu eklendi,
+Vaka 01/02'nin en belirgin ipuçları yumuşatıldı, Playwright ile test edildi
+— 0 hata, `npm run build` temiz. Henüz GitHub'a push EDİLMEDİ. bkz. "Şifreli
+Kayıt Bulmacası + Pano'ya Amaç Kazandırma". Önceki: Spoiler'sız kapanışlar,
+oda modunda paylaşımlı süre, boş oda otomatik silme, /vaka'da vaka kilitleme
+— hepsi tamamlandı ve test edildi. **Kullanıcının yapması gereken tek şey:
 Firebase Console'da TTL politikasını etkinleştirmek** — aşağıda anlatılıyor.
 bkz. "Spoiler'sız Kapanışlar, Oda Süresi, Otomatik Temizlik". Önceki: Oda
 modunda vaka seçimi sonrası açılış
@@ -778,15 +786,145 @@ tam ne anlama geliyor) sorup netleştirdim, sonra uygulamaya geçtim:
   geriye alındı, yeni bir katılımcı odaya girer girmez "Süre Doldu" görüp
   otomatik ayrılıp ana sayfaya döndüğü doğrulandı. `npm run build` temiz.
 
+## Şifreli Kayıt Bulmacası + Pano'ya Amaç Kazandırma (2026-08-03, yirmialtıncı güncelleme)
+Kullanıcı playtest geri bildirimi iletti: vaka çok kolay çözülüyor, "panodan
+filan belli olmuş" (pano bilgi sızdırıyor gibi + genel zorluk düşük + pano
+gerçek bir doğrulama adımı değil), pano çok boş duruyor/işe yaramıyor, ve
+belgeleri çözmek için gerçek bulmacalar istendi (örnek: base64 şifreli bir
+USB bellek, hikaye içinde anlatılan, kolay olmayan bir çözüm yolu). Plan
+modunda tasarlanıp onaylandıktan sonra uygulandı:
+
+- **Yeni "Şifreli Kayıt" bulmaca mekaniği** (`src/types/case.ts`'e yeni
+  `sifreli_kayit` DocumentType + `cipherEncoded`/`cipherAnswer`/
+  `cipherReveal`/`cipherHints` alanları): Kodlama şeması
+  `ters-çevrilmiş(base64(düz metin))` — oyuncu ham metni bir online base64
+  çözücüye yapıştırırsa bozuk çıktı alır, "ayna" fikrini fark etmesi
+  gerekir. Bu fark ediş her vakada BAŞKA bir belgede saf flavor-text bir
+  ipucuyla (bir karakterin "tersten yazma huyu") saklandı — Base64/şifreleme
+  kelimeleri hiç geçmiyor. `src/lib/cipher.ts` (encode/normalize yardımcıları)
+  ve `src/lib/cipherPuzzle.ts` (localStorage çözülme/ipucu durumu, `board.ts`
+  deseniyle aynı) yeni dosyalar. `DocumentCard.tsx`'e yeni `sifreli_kayit`
+  render dalı: kilitliyken şifreli metin + cevap input'u + kademeli ipucu
+  paneli, doğru cevapla `cipherReveal` açığa çıkıyor (yanlışta shake+ses).
+  Bu tip belgeler SADECE çözülünce "incelendi" sayılıyor (coverage/rütbe
+  hesabına öyle giriyor). Yeni başarım **"Kod Kırıcı"** eklendi
+  (`achievements.ts`'e `unlockAchievement` export edildi).
+  **3 vakanın hepsine birer tane eklendi:** Vaka 01 — Emre'nin telefonundaki
+  kilitli not (zimmet panikini doğrulayan); Vaka 02 — kullanıcının verdiği
+  örneğe birebir uyan, Deniz'in çekmecesinde bulunan **kilitli USB bellek**
+  (Ozan'a dair özel notu); Vaka 03 — Sadi'nin odasında bulunan şifreli sayfa
+  (kardeşine dair itirafı). Oda modunda bu bulmaca senkron DEĞİL, her
+  katılımcı kendi cihazında bağımsız çözüyor — bilinçli kapsam kararı.
+- **Pano'ya gerçek amaç kazandırıldı** (`EvidenceBoard.tsx`, sadece solo —
+  oda modu kapsam dışı bırakıldı, aşağıda gerekçesi var): Yeni **"🎯 Ana
+  Şüphelin" seçici** — panonun üstünde şüpheli isimlerinden oluşan bir çip
+  sırası, birine dokunarak "ana teorini" ilan ediyorsun (localStorage'da
+  `board.ts`'in `BoardState.anchorId` alanında kalıcı). Çapalanan şüpheliye
+  bağlı iplikler panoda kalın/altın renkte, normal bağlantılardan görsel
+  olarak ayrışıyor. Canlı bir "Teorin: {isim} · N destekleyici kanıt bağlı"
+  göstergesi eklendi. **Bağlantı etiketleme:** iki kart bağlanınca
+  Motiv/Fırsat/Çelişki/Diğer seçilebilen küçük bir panel açılıyor, seçim
+  iplik üstünde renkli bir noktayla işaretleniyor (`BoardState.connectionTags`).
+  **Ödül (cezasız, opsiyonel):** Suçlama anında çapadaki şüpheli gerçek
+  katille eşleşiyor VE ≥3 destekleyici bağlantı varsa `rank.ts`'e eklenen
+  küçük bir `theoryMatched` bonusu (+5 puan, mevcut 0-100 aralığa dahil) +
+  yeni başarım **"Teorisyen"** açılıyor (`CaseGame.tsx`'in `finalize()`'ı artık
+  suçlama anında `getBoardState` ile pano durumunu okuyup `rankFor`/
+  `checkAchievements`'a geçiriyor). Panoyu hiç kullanmayan kimse hiçbir şey
+  kaybetmiyor. Ayrıca kanvasa düşük maliyetli CSS-only görsel cila eklendi
+  (vinyet + "DOSYA NO" filigranı) — hem solo hem oda panosunda.
+- **Kapsam kararı — Oda modu:** `RoomEvidenceBoard.tsx` sadece görsel cilayı
+  aldı (yeni `sifreli_kayit` ikonu + aynı vinyet/filigran); çapa+etiketleme
+  mekaniği Firestore şeması/kuralları + yeniden deploy gerektireceğinden bu
+  turda solo'ya öncelik verildi (playtest geri bildirimi solo oynanıştan
+  geldiği için). İstenirse ayrı bir tur olarak oda moduna da taşınabilir.
+- **En belirgin ipucu yumuşatıldı:** Vaka 01'in olay yeri raporundaki "E.S."
+  kol düğmesi kazıması (katilin baş harfleriyle birebir örtüşen, "kolay"
+  vaka için bile fazla doğrudan bir ipucuydu) artık kısmen okunaklı ("...S.")
+  — aynı mantık zinciri (kısa boy aralığı + eksik kol düğmesi itirafı)
+  korunuyor ama tek belgeden doğrudan okunamıyor. Vaka 02'de IT anomali
+  raporundaki "Ozan Kırca'nın dizüstü bilgisayarıyla eşleşiyor" cümlesi de
+  benzer şekilde yumuşatıldı (artık envanter sicil no + "CTO'ya tahsisli"
+  üzerinden bir adım daha dolaylı).
+- **Test (Playwright, bu oturumda proje bağımlılığı olarak kurulu değildi —
+  `AppData\Local\ms-playwright` altında tarayıcılar zaten kuruluydu, script
+  scratchpad'te ayrı bir `npm install playwright` ile çalıştırıldı):
+  3 vakanın hepsinde şifreli kayıt kartı açma → yanlış cevapla kilitli kalma
+  → doğru cevapla (normalize edilmiş, TR karakter toleranslı) çözülme →
+  sayfa yenileme sonrası kalıcılık → "Kod Kırıcı" başarımının localStorage'a
+  yazılması doğrulandı. Panoda ana şüpheli seçimi, iki kartı bağlayınca
+  etiketleme panelinin çıkması, "destekleyici kanıt" sayacının güncellenmesi
+  doğrulandı. Mobil viewport'ta (iPhone 13 emülasyonu) yatay taşma yok,
+  kilitli kart input'u ve pano çalışıyor. Genel nav taraması (`/`, `/vaka`,
+  `/oda`, vaka sayfaları) — **0 konsol hatası**. `npm run build` temiz.
+  **Dürüst not:** Oda modunda (RoomCaseGame/RoomEvidenceBoard) bu turda canlı
+  iki-katılımcılı bir regresyon testi YAPILMADI — yapılan değişiklikler bu
+  dosyalarda tamamen katkısal/görsel (bir ikon girdisi + iki dekoratif `div`,
+  `DocumentCard`'a `caseId` prop'u eklenmesi dışında mantık değişmedi), risk
+  düşük değerlendirildi ama bir sonraki fırsatta gerçek bir oda testiyle
+  doğrulanması iyi olur.
+
+## Kombinasyon Kilidi Bulmacası Eklendi (2026-08-03, yirmiyedinci güncelleme)
+Kullanıcı "şifreli kayıt" bulmacasının aynı numara üç kez tekrarladığını (hep
+"tersten oku") fark ettirmeden, bulmaca çeşitliliği ve ek "oyun zevki"
+önerileri istedi. Seçilen ek mekanik: **kombinasyon kilidi** (kripto bilgisi
+gerektirmeyen, en erişilebilir tür) — diğer öneriler (çelişki yakalama
+ödülü, sorgu ekranında soru seçimi) bu turda ertelendi, kullanıcı sadece
+bulmacayı istedi.
+
+- **Yeni `kilitli_kasa` DocumentType** (`src/types/case.ts`): `lockDigits`,
+  `lockAnswer`, `lockReveal`, `lockHints`. Aynı `cipherPuzzle.ts` kalıcılık/
+  başarım altyapısı (`isCipherSolved`/`markCipherSolved`/ipucu sayaçları)
+  `sifreli_kayit` ile birebir paylaşılıyor — kod tekrarı yok, "Kod Kırıcı"
+  başarımı artık her iki bulmaca türünü de kapsıyor (açıklaması güncellendi).
+- **Mekanik:** 3 haneli bir kombinasyon kilidi, hanelerin her biri vaka
+  içindeki BAŞKA belgelerde küçük, ayrı bir "bulunmuş nesne/ayrıntı" olarak
+  saklı (bir zar, bir madalyon, bir post-it, bir versiyon numarası...).
+  Oyuncu üç rakamı toplayıp **küçükten büyüğe sıralayarak** dener — bu kural
+  konumla ilgili karmaşayı ortadan kaldırıyor (hangi hane nereye gider diye
+  uğraşmaya gerek yok), `src/lib/cipher.ts`'e eklenen `digitsMatch` rakam
+  dışı karakterleri yok sayarak karşılaştırıyor. `DocumentCard.tsx`'e yeni
+  `KilitliKasaBody` bileşeni: rakam-only input (`inputMode="numeric"`,
+  otomatik rakam dışı karakter filtreleme), yanlışta shake+ses, doğruda
+  `lockReveal` açığa çıkıyor. `docColor.ts`/`docCategories.ts` güncellendi —
+  kategori adı "🔐 Şifreli Kayıtlar"dan **"🔐 Kilitli Kayıtlar"**a
+  genelleştirildi (iki bulmaca türünü de kapsasın diye), pano ikonu 🗝️.
+- **3 vakanın hepsine birer tane eklendi** (dijital USB'den farklı, "analog"
+  bir bulmaca hissi için bilinçli olarak fiziksel kilitli kutu/çekmece
+  seçildi): Vaka 01 — Kemal'in pirinç kutusu (zar=1, madalyon=4, sesli
+  not="yedi"=7 → kod 147, içinden Selçuklu tasının sahte olduğuna dair
+  belge çıkıyor); Vaka 02 — Deniz'in anı kutusu (haber küpürü=9, ortaklık
+  özeti=3, e-posta versiyon no=6 → kod 369, içinden üç kurucunun eski bir
+  fotoğrafı çıkıyor — ironik/duygusal bir bonus); Vaka 03 — Necdet'in
+  çekmecesi (vasiyet taslağı=2, kredi kartı notu=5, hisse devri
+  incelemesi=9 → kod 259, içinden Necdet'in Sadi'ye hiç gönderemediği,
+  Yusuf'un ölümünü bildiğini itiraf eden bir mektup taslağı çıkıyor).
+  Üçü de çözüme dokunmuyor, sadece bonus/duygusal derinlik katıyor.
+- **Test (Playwright, scratchpad'te ayrı kurulu):** 3 vakanın hepsinde
+  yanlış kodun kilidi açmadığı, rakamların DOĞRU sırayla (küçükten büyüğe)
+  girilmesi gerektiği (ters sıra da başarısız oluyor — sıralama kuralının
+  gerçekten işlediği doğrulandı), doğru kodun açtığı — **0 konsol hatası**.
+  `npm run build` temiz.
+
 ## Sıradaki Adım
-1. **Kullanıcı Firebase Console'dan TTL politikasını etkinleştirmeli**
+1. **Bu oturumun değişiklikleri henüz GitHub'a push edilmedi** — kullanıcı
+   onaylarsa commit atılıp push edilebilir (yerelde tamamen çalışır durumda,
+   `npm run build` temiz).
+2. Oda modunda (RoomCaseGame/RoomEvidenceBoard) gerçek iki-katılımcılı bir
+   regresyon testi henüz yapılmadı bu turda (bkz. "Şifreli Kayıt Bulmacası +
+   Pano'ya Amaç Kazandırma" — dürüst not) — risk düşük ama bir sonraki
+   fırsatta doğrulanmalı.
+3. İstenirse pano'daki "Ana Şüpheli" çapası + bağlantı etiketleme mekaniği
+   oda moduna da taşınabilir (Firestore şema/kural değişikliği + yeniden
+   deploy gerektirir, bu turda bilinçli olarak kapsam dışı bırakıldı).
+4. **Kullanıcı Firebase Console'dan TTL politikasını etkinleştirmeli**
    (yukarıdaki adımlar) — kod tarafı zaten hazır, bu tek manuel adım kaldı.
-2. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
+5. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
    doğrulamalı (bir kereliğine sert yenileme sonrası).
-2. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
+6. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
    (yerelde Playwright ile kapsamlı doğrulandı ama gerçek ağ gecikmesiyle
    bir kez daha denemek faydalı).
-3. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
+7. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
    cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
    Playwright WebKit emülasyonu var), Vaka 04 içeriği, oda modunda süre
    sınırı / presence-kopma takibi eklemek istenirse, önceden var olan

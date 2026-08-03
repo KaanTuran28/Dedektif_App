@@ -25,6 +25,16 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     label: "Seri Dedektif",
     description: "İki veya daha fazla vakayı çözdün.",
   },
+  {
+    id: "kod-kirici",
+    label: "Kod Kırıcı",
+    description: "Bir vakada şifreli ya da kilitli bir kaydı kendi başına çözdün.",
+  },
+  {
+    id: "teorisyen",
+    label: "Teorisyen",
+    description: "Panoda doğru şüpheliyi çapaladın ve en az 3 kanıtla teorini destekledin.",
+  },
 ];
 
 const STORAGE_KEY = "supheli:basarimlar";
@@ -50,6 +60,14 @@ function unlock(id: string) {
   }
 }
 
+/** Belirli, bağımsız bir olayda (ör. bir şifre bulmacasının çözülmesi) doğrudan
+ * tetiklenen başarımlar için — `checkAchievements`'ın suçlama-sonu akışını
+ * beklemesine gerek olmayan durumlarda kullanılır. */
+export function unlockAchievement(id: string) {
+  if (!isBrowser()) return;
+  unlock(id);
+}
+
 export function checkAchievements(input: {
   caseId: string;
   correct: boolean;
@@ -58,10 +76,12 @@ export function checkAchievements(input: {
   motiveCorrect: boolean;
   methodCorrect: boolean;
   solvedCasesCount: number;
+  theoryMatched?: boolean;
 }) {
   if (!isBrowser() || !input.correct) return;
   if (input.coverage >= 0.9) unlock("titiz-dedektif");
   if (input.hintsUsed === 0) unlock("ilk-bakista");
   if (input.motiveCorrect && input.methodCorrect) unlock("tam-isabet");
   if (input.solvedCasesCount >= 2) unlock("seri-dedektif");
+  if (input.theoryMatched) unlock("teorisyen");
 }

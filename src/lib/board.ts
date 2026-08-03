@@ -3,10 +3,16 @@ export interface BoardPosition {
   y: number;
 }
 
+export type ConnectionTag = "motiv" | "firsat" | "celiski" | "diger";
+
 export interface BoardState {
   positions: Record<string, BoardPosition>;
   connections: [string, string][];
   notes: Record<string, string>;
+  /** Panodaki "Ana Şüpheli" çapa yuvasına yerleştirilen şüphelinin id'si */
+  anchorId?: string;
+  /** connectionKey(a,b) -> etiket, bağlantının ne tür bir akıl yürütme olduğunu işaretler */
+  connectionTags?: Record<string, ConnectionTag>;
 }
 
 const STORAGE_PREFIX = "supheli:pano:";
@@ -25,6 +31,8 @@ export function getBoardState(caseId: string): BoardState {
       positions: parsed.positions ?? {},
       connections: parsed.connections ?? [],
       notes: parsed.notes ?? {},
+      anchorId: parsed.anchorId,
+      connectionTags: parsed.connectionTags ?? {},
     };
   } catch {
     return { positions: {}, connections: [], notes: {} };

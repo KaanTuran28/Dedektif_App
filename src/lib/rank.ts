@@ -15,6 +15,9 @@ export interface RankInput {
   coverage: number;
   hintsUsed: number;
   difficulty: Difficulty;
+  /** Panoda ana şüpheli olarak doğru kişi çapalanmış VE en az 3 destekleyici
+   * kanıt bağlanmışsa true — küçük bir bonus puan verir, zorunlu değildir. */
+  theoryMatched?: boolean;
 }
 
 /** Zorluk arttıkça maksimum puan da artar — aynı performans, daha zor
@@ -42,6 +45,7 @@ export function rankFor(input: RankInput): DetectiveRank {
   percent += Math.round(input.coverage * 30);
   percent += input.motiveCorrect ? 15 : 0;
   percent += input.methodCorrect ? 15 : 0;
+  percent += input.theoryMatched ? 5 : 0;
   percent -= input.hintsUsed * 5;
   percent = Math.max(0, Math.min(100, percent));
 
