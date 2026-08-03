@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { allCases } from "@/data/cases";
 import { tiltFor } from "@/lib/tilt";
 import { StatsPanel } from "@/components/StatsPanel";
-import { formatRemaining, getCaseProgress, getRemainingMs, type CaseProgress } from "@/lib/progress";
+import {
+  endCaseManually,
+  formatRemaining,
+  getCaseProgress,
+  getRemainingMs,
+  type CaseProgress,
+} from "@/lib/progress";
 
 export default function VakaSecimPage() {
   const [progressMap, setProgressMap] = useState<Record<string, CaseProgress>>({});
+  const router = useRouter();
 
   useEffect(() => {
     function refresh() {
@@ -21,6 +29,20 @@ export default function VakaSecimPage() {
     const interval = setInterval(refresh, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const activeCaseId =
+    allCases.find((c) => {
+      const progress = progressMap[c.id];
+      const remaining = progress ? getRemainingMs(progress) : null;
+      return !!progress?.inProgress && remaining !== null && remaining > 0;
+    })?.id ?? null;
+
+  function handleAbandon(e: React.MouseEvent, caseId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    endCaseManually(caseId);
+    router.push("/");
+  }
 
   return (
     <main className="flex-1 flex flex-col items-center px-3 sm:px-4 py-8 sm:py-12">
@@ -46,6 +68,7 @@ export default function VakaSecimPage() {
             const inProgress = !!progress?.inProgress && remaining !== null && remaining > 0;
             const alreadyPlayed = !inProgress && !!progress && (progress.solved || !!progress.failed);
             const playedStamp = alreadyPlayed ? (progress!.solved ? "Çözüldü" : "Başarısız") : null;
+            const lockedByOther = c.available && !inProgress && activeCaseId !== null && activeCaseId !== c.id;
 
             return (
               <motion.div
@@ -53,14 +76,11 @@ export default function VakaSecimPage() {
                 initial={{ opacity: 0, y: 18, rotate: 0 }}
                 animate={{ opacity: 1, y: 0, rotate: tilt }}
                 transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
-                whileHover={c.available ? { rotate: 0, y: -3 } : undefined}
+                whileHover={c.available && !lockedByOther ? { rotate: 0, y: -3 } : undefined}
                 className="relative"
               >
-                {c.available ? (
-                  <Link
-                    href={`/vaka/${c.id}`}
-                    className="group relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl"
-                  >
+                {c.available && !lockedByOther ? (
+                  <div className="group relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl">
                     <div className="pin" />
                     {playedStamp && (
                       <motion.span
@@ -75,31 +95,41 @@ export default function VakaSecimPage() {
                         {playedStamp}
                       </motion.span>
                     )}
-                    <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
-                      Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
-                    </p>
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-paper-ink">
-                      {c.title}
-                    </h2>
-                    <p className="text-paper-ink/70 mt-2 text-sm sm:text-base">
-                      {c.tagline}
-                    </p>
-                    {inProgress ? (
-                      <div className="mt-3 flex items-center gap-3 flex-wrap">
-                        <span className="inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
-                          ▶ Kaldığın Yerden Devam Et
+                    <Link href={`/vaka/${c.id}`} className="block">
+                      <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
+                        Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
+                      </p>
+                      <h2 className="font-display text-2xl sm:text-3xl font-bold text-paper-ink">
+                        {c.title}
+                      </h2>
+                      <p className="text-paper-ink/70 mt-2 text-sm sm:text-base">
+                        {c.tagline}
+                      </p>
+                      {inProgress ? (
+                        <div className="mt-3 flex items-center gap-3 flex-wrap">
+                          <span className="inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
+                            ▶ Kaldığın Yerden Devam Et
+                          </span>
+                          <span className="font-mono-doc text-xs text-paper-ink/60">
+                            ⏱ {formatRemaining(remaining!)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="mt-3 inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
+                          Dosyayı Aç
+                          <span className="transition-transform group-hover:translate-x-1">→</span>
                         </span>
-                        <span className="font-mono-doc text-xs text-paper-ink/60">
-                          ⏱ {formatRemaining(remaining!)}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="mt-3 inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
-                        Dosyayı Aç
-                        <span className="transition-transform group-hover:translate-x-1">→</span>
-                      </span>
+                      )}
+                    </Link>
+                    {inProgress && (
+                      <button
+                        onClick={(e) => handleAbandon(e, c.id)}
+                        className="absolute top-2 right-2 sm:top-3 sm:right-3 rounded-sm border border-paper-ink/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-paper-ink/60 hover:text-accent-red hover:border-accent-red/50 transition-colors"
+                      >
+                        ✕ Vazgeç
+                      </button>
                     )}
-                  </Link>
+                  </div>
                 ) : (
                   <div className="relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl opacity-60 grayscale-[40%] cursor-not-allowed select-none">
                     <div className="pin" />
@@ -113,7 +143,7 @@ export default function VakaSecimPage() {
                       {c.tagline}
                     </p>
                     <span className="mt-3 inline-flex items-center gap-1.5 text-paper-ink/50 text-sm font-semibold uppercase tracking-wide">
-                      🔒 Yakında Açılacak
+                      {lockedByOther ? "🔒 Önce mevcut vakadan çık" : "🔒 Yakında Açılacak"}
                     </span>
                   </div>
                 )}

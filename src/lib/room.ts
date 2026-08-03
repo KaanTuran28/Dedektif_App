@@ -4,12 +4,14 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   runTransaction,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   arrayUnion,
   limit,
@@ -18,7 +20,14 @@ import {
 import { db } from "@/lib/firebase";
 import { getCaseById } from "@/data/cases";
 import { rankFor, type DetectiveRank } from "@/lib/rank";
+import { CASE_TIME_LIMIT_MS } from "@/lib/progress";
 import { setChatIdentity } from "@/lib/chat";
+
+/** Oda odalarının ne kadar süre sonra terk edilmiş sayılıp otomatik
+ * temizleneceği — Firestore'un ücretsiz TTL (time-to-live) özelliğiyle,
+ * Cloud Functions'a gerek kalmadan. Gerçek bir oyun 1 saati aşmayacağı
+ * için 24 saat cömert bir yedek pencere. */
+export const ROOM_TTL_MS = 24 * 60 * 60 * 1000;
 
 export type RoomPhase =
   | "voting-case"
@@ -26,7 +35,8 @@ export type RoomPhase =
   | "voting-killer"
   | "voting-motive"
   | "voting-method"
-  | "revealed";
+  | "revealed"
+  | "timed-out";
 
 export interface RoomResult {
   correct: boolean;
@@ -43,6 +53,13 @@ export interface RoomDoc {
   caseId: string | null;
   phase: RoomPhase;
   hostParticipantId: string;
+  /** Soruşturmanın senkron başladığı an (Date.now()) — vaka oylaması
+   * oybirliğiyle bitince otomatik set edilir, solo moddaki gibi client
+   * saatiyle tutuluyor (serverTimestamp() yerine — aynı 1 saatlik pencere
+   * için birkaç saniyelik sapma önemsiz, ve `tryResolvePhase` saf bir
+   * fonksiyon olduğu için serverTimestamp() sentinel'ını kullanmak
+   * zaten uygun değil). */
+  startedAt: number | null;
   hintsUsed: number;
   votes: Record<string, string>;
   viewedDocIds: string[];
@@ -149,6 +166,7 @@ export async function createRoom(hostName: string): Promise<string> {
       caseId: null,
       phase: "voting-case",
       hostParticipantId: participantId,
+      startedAt: null,
       hintsUsed: 0,
       votes: {},
       viewedDocIds: [],
@@ -159,6 +177,7 @@ export async function createRoom(hostName: string): Promise<string> {
       result: null,
       participantCount: 1,
       createdAt: serverTimestamp(),
+      expiresAt: Timestamp.fromMillis(Date.now() + ROOM_TTL_MS),
     });
     await setDoc(participantRef(code, participantId), {
       name: identity.name,
@@ -201,27 +220,53 @@ export async function joinRoom(roomCode: string, name: string): Promise<void> {
  * zaten oybirliğine ulaşmış olabilir (örn. 3 kişiden 2'si aynı şeyi oyladı,
  * anlaşmayan 3. kişi ayrıldı) — bu yüzden ayrılma sonrası da aynı çözümleme
  * mantığı (`tryResolvePhase`) çalıştırılır, yoksa tur birinin tekrar oy
- * vermesini bekleyerek gereksiz yere kilitli kalırdı. */
+ * vermesini bekleyerek gereksiz yere kilitli kalırdı.
+ *
+ * Odada kimse kalmazsa (participantCount 0'a düşerse) oda dokümanı ve
+ * onunla ilişkili pano/mesaj verileri hemen silinir — Firestore TTL
+ * politikası (bkz. `ROOM_TTL_MS`) sadece kimsenin düzgünce ayrılmadığı
+ * (sekmeyi kapatıp giden) terk edilmiş odalar için bir yedek. */
 export async function leaveRoom(roomCode: string): Promise<void> {
   const participantId = getOrCreateParticipantId();
   const ref = roomRef(roomCode);
   const pRef = participantRef(roomCode, participantId);
 
-  await runTransaction(db, async (tx) => {
+  const roomNowEmpty = await runTransaction(db, async (tx) => {
     const roomSnap = await tx.get(ref);
     if (!roomSnap.exists()) {
       tx.delete(pRef);
-      return;
+      return false;
     }
     const room = roomSnap.data() as RoomDoc;
     const nextVotes = { ...room.votes };
     delete nextVotes[participantId];
     const participantCount = Math.max(0, (room.participantCount ?? 1) - 1);
 
+    if (participantCount <= 0) {
+      tx.delete(ref);
+      tx.delete(pRef);
+      return true;
+    }
+
     const resolved = tryResolvePhase({ ...room, votes: nextVotes, participantCount }, room.phase);
     tx.update(ref, { participantCount, ...(resolved ?? { votes: nextVotes }) });
     tx.delete(pRef);
+    return false;
   });
+
+  if (roomNowEmpty) {
+    await cleanupRoomSubcollections(roomCode);
+  }
+}
+
+async function cleanupRoomSubcollections(roomCode: string): Promise<void> {
+  try {
+    const messagesSnap = await getDocs(collection(db, "caseRooms", roomCode, "messages"));
+    await Promise.all(messagesSnap.docs.map((d) => deleteDoc(d.ref)));
+    await deleteDoc(boardRef(roomCode));
+  } catch {
+    // Sessizce yut — oda dokümanı zaten silindi, kalan kırıntılar TTL ile temizlenir.
+  }
 }
 
 export function subscribeRoom(
@@ -375,7 +420,7 @@ function tryResolvePhase(
   // olur hem de soruşturma senkron şekilde başlamış olur — ayrı bir
   // "başlat" düğmesine gerek yok.
   if (phase === "voting-case") {
-    return { votes: {}, phase: "investigating", caseId: choice };
+    return { votes: {}, phase: "investigating", caseId: choice, startedAt: Date.now() };
   }
 
   if (phase !== "voting-killer" && phase !== "voting-motive" && phase !== "voting-method") return null;
@@ -427,6 +472,20 @@ function tryResolvePhase(
     methodCorrect,
     result: { correct: true, motiveCorrect, methodCorrect, coverage, rank },
   };
+}
+
+/** Paylaşımlı 1 saatlik süre dolunca herhangi bir katılımcının istemcisi
+ * bunu çağırır. Oda zaten sonuçlanmış (revealed) ya da zaten timed-out
+ * ise dokunmaz — bir client'ın gecikmiş sayacı, gerçek sonucu ezmesin. */
+export async function markRoomTimedOut(roomCode: string): Promise<void> {
+  const ref = roomRef(roomCode);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const room = snap.data() as RoomDoc;
+    if (room.phase === "revealed" || room.phase === "timed-out") return;
+    tx.update(ref, { phase: "timed-out" });
+  });
 }
 
 export async function castVote(roomCode: string, phase: RoomPhase, choice: string): Promise<void> {
