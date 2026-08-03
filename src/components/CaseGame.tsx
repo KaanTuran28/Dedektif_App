@@ -495,7 +495,7 @@ export function CaseGame({ data }: { data: CaseData }) {
   );
 }
 
-function IntroCinematic({
+export function IntroCinematic({
   title,
   order,
   skip,
