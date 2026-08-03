@@ -3,7 +3,11 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (Oda mimarisi vaka-sayfasından bağımsız
+**Son güncelleme:** 2026-08-03 (Vaka sayfasına mod seçimi geri geldi —
+"Tek Başına Oyna" / "Arkadaşlarınla Oyna", ikincisi case-agnostic oda
+akışına gidiyor, hangi vaka sayfasından girildiğinden bağımsız ortak
+oylamayla vaka seçiliyor. bkz. "Vaka Sayfasına Mod Seçimi Geri Getirildi".
+Önceki: Oda mimarisi vaka-sayfasından bağımsız
 /oda rotasına taşındı, ortak vaka seçimi oybirliğiyle + senkron başlama,
 sohbete düzenle/sil, geri butonları eklendi — bkz. "Oda Mimarisi Yeniden
 Yapılandırıldı". Önceki: TAM ORTAK OYUN ODASI özelliği TAMAMLANDI +
@@ -630,6 +634,34 @@ değişti:
   soruşturma başlıyor), katil oylamasından "Soruşturmaya Dön" çalışıyor,
   sohbette mesaj gönder/düzenle/sil her iki tarafta da senkron yansıyor,
   solo mod hiç bozulmadan uçtan uca çalışıyor. `npm run build` temiz.
+
+## Vaka Sayfasına Mod Seçimi Geri Getirildi (2026-08-03, yirmiikinci güncelleme)
+Kullanıcı bir önceki turda `/vaka/[caseId]`'nin artık direkt solo moda
+girdiğini fark edip şunu istedi: vaka sayfası açılınca yine "Tek Başına
+Oyna" / "Arkadaşlarınla Oyna" seçimi ilk başta gelsin, tekli de eskisi gibi
+devam etsin, ama çoklu seçilince vaka **ortak oylamayla** belirlenip
+açılsın (o sayfadaki vakayla sınırlı kalmadan) — yani `/oda`'daki akışın
+birebir aynısı, sadece giriş noktası da vaka sayfaları olsun.
+
+- **`CaseEntry.tsx` yeniden oluşturuldu** (bir önceki turda "artık gereksiz"
+  denilip silinmişti — kullanıcı bunun aslında hâlâ istenen bir giriş
+  noktası olduğunu netleştirdi). İçinde geri butonu var
+  ("← Vaka Seçimine Dön"). "Tek Başına Oyna" → `CaseGame` (skipIntro ile,
+  değişmedi). "Arkadaşlarınla Oyna" → **case-agnostic `RoomCaseGame`**
+  (aynı bileşen `/oda`'da kullanılan, data prop'u almıyor) — yani hangi
+  vakanın sayfasından girildiğinin hiçbir önemi yok, oda içinde ortak
+  oylamayla HANGİ vaka isteniyorsa o açılıyor.
+- **`CaseGame.tsx`**: `skipIntro` prop'u ve `IntroCinematic` export'u geri
+  eklendi (bir önceki turda "artık kullanılmıyor" denilip kaldırılmıştı).
+- **Test (kritik senaryo):** Bir katılımcı Yıldız Ekspresi'nin sayfasından,
+  diğeri Zümrüt Yalı'nın sayfasından "Arkadaşlarınla Oyna"ya bastı, aynı
+  oda koduyla buluştular, ortak oylamada **üçüncü bir vaka** olan "Son
+  Round"u seçtiler — ikisinde de doğru şekilde Son Round açıldı. Ayrıca
+  solo mod ve sayfa-yenileme-sonrası-devam-etme regresyonsuz doğrulandı.
+  `npm run build` temiz.
+- **Not:** `/oda` rotası da ayrıca duruyor (ana sayfadan "👥 Arkadaşlarınla
+  Oyna" ile) — iki farklı giriş noktası (ana sayfa/`​/oda` ve herhangi bir
+  vaka sayfası) aynı case-agnostic oda akışına çıkıyor, kod tekrarı yok.
 
 ## Sıradaki Adım
 1. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
