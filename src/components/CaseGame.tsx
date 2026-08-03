@@ -73,14 +73,14 @@ function zeroRank(data: CaseData): DetectiveRank {
   });
 }
 
-export function CaseGame({ data }: { data: CaseData }) {
+export function CaseGame({ data, skipIntro = false }: { data: CaseData; skipIntro?: boolean }) {
   const [step, setStep] = useState<Step>("giris");
   const [started, setStarted] = useState(false);
   const [ready, setReady] = useState(false);
   const [accusedId, setAccusedId] = useState<string | null>(null);
   const [motiveCorrect, setMotiveCorrect] = useState(false);
   const [final, setFinal] = useState<FinalResult | null>(null);
-  const [introDone, setIntroDone] = useState(false);
+  const [introDone, setIntroDone] = useState(skipIntro);
   const [soundOn, setSoundOn] = useState(true);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
   const [viewedSuspects, setViewedSuspects] = useState<Set<string>>(new Set());
@@ -495,7 +495,7 @@ export function CaseGame({ data }: { data: CaseData }) {
   );
 }
 
-function IntroCinematic({
+export function IntroCinematic({
   title,
   order,
   skip,
