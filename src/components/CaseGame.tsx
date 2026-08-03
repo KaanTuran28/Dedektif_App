@@ -8,6 +8,7 @@ import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SuspectCard } from "@/components/SuspectCard";
 import { Notebook } from "@/components/Notebook";
+import { CaseChat } from "@/components/CaseChat";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
 import { Timeline } from "@/components/Timeline";
 import { HintPanel } from "@/components/HintPanel";
@@ -418,7 +419,12 @@ export function CaseGame({ data }: { data: CaseData }) {
 
             {step === "pano" && <EvidenceBoard data={data} />}
 
-            {step === "notlar" && <Notebook caseId={data.id} />}
+            {step === "notlar" && (
+              <div className="grid gap-6 sm:grid-cols-2 items-start">
+                <Notebook caseId={data.id} />
+                <CaseChat caseId={data.id} />
+              </div>
+            )}
 
             {step === "suclama" && (
               <AccusationLineup

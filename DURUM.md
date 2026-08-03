@@ -3,7 +3,9 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-02 (Faz 1 MVP tamamlandı)
+**Son güncelleme:** 2026-08-03 (çok oyunculu sohbet özelliği TAMAMLANDI —
+Firebase/Firestore ile canlı sohbet Notlar sekmesinin yanına eklendi, bkz.
+"Sohbet Özelliği Tamamlandı")
 
 ## GitHub
 - Repo: https://github.com/KaanTuran28/Dedektif_App.git (public, kullanıcının kendi hesabı)
@@ -323,29 +325,108 @@ ziyarette açılmıyor, kilitli kartlara tıklama hiçbir şey yapmıyor, direkt
 link de kilitli, Vaka 01 sorunsuz oynanabiliyor — 0 hata. GitHub'a push
 edildi, Vercel otomatik deploy edecek.
 
+## Onbirinci–Onaltıncı Güncelleme Özeti (2026-08-02/03, sıkıştırılmış)
+Çok sayıda ardışık tur oldu, en önemli sonuçlar:
+
+- **Vaka oturum/süre sistemi:** `src/lib/progress.ts`'e `startCase`,
+  `getRemainingMs`, `endCaseManually`, `markTimedOut` eklendi. Her vakada
+  **1 saatlik süre sınırı** var, dolunca otomatik "Süre Doldu" sonucu.
+  İstediğin an "Vazgeç" ile de sonlandırılabiliyor. Ana sayfa artık devam
+  eden vakalarda "▶ Kaldığın Yerden Devam Et" + kalan süre gösteriyor,
+  tekrar "Başlat" butonu göstermiyor.
+- **Pano tamamen yeniden tasarlandı:** Artık kartlar başta küçük bir "tray"
+  kutusunda duruyor, dokunarak seçip panoda istediğin yere yerleştiriyorsun
+  (`↩` ile geri alınabiliyor). Performans sorunu (sürüklerken kasma) motion
+  value tabanlı pozisyon sistemine geçilerek çözüldü — React state artık
+  her drag frame'inde tetiklenmiyor.
+- **Zaman Çizelgesi bulmacası kaldırıldı:** Sürükle-bırak/eşleştirme
+  mekaniği sökülüp düz, salt-okunur kronolojik bir listeye çevrildi (mobilde
+  kaydırmayı engellediği için). "Çelişki Avcısı" rozeti bu yüzden kaldırıldı.
+- **İnteraktif tutorial:** Statik "Nasıl Oynanır" modalı kaldırıldı,
+  yerine gerçek bileşenleri (DocumentCard/SuspectCard/Timeline/EvidenceBoard)
+  kullanan küçük bir alıştırma vakası geldi (`TutorialFlow.tsx`,
+  `src/data/tutorialCase.ts`).
+- **Renk kodlama:** Kanıt türlerine (`src/lib/docColor.ts`) ve her
+  şüpheliye (`src/lib/suspectColor.ts`, id'den deterministik) sabit renkler
+  atandı; kartlar, pano ve suçlama ekranında tutarlı görünüyor.
+  Kanıtlar sekmesi artık türe göre kategorilere gruplanıyor
+  (`src/lib/docCategories.ts`): Resmi Belgeler / İletişim / Kişisel
+  Kayıtlar / Basın.
+- **Şüpheli ifadeleri yeniden yazıldı:** `Suspect.statement` (tek cümle)
+  yerine `statementIntro` (uzun anlatı) + `statementQA` (polisle soru-cevap
+  dizisi) geldi — gerçek bir sorgu tutanağı hissi için.
+- **İçerik zenginleştirildi ve TÜM VAKALAR AÇILDI:** Üç vakanın da sinopsisi
+  uzun/atmosferik hale getirildi, haber küpürleri eklendi. Yıldız Ekspresi
+  5→8, Son Round 5→8, Zümrüt Yalı 6→8 şüpheliye çıkarıldı, her birine yeni
+  kanıtlar eklendi. **`available: false` kalmadı, üçü de oynanabilir.**
+- **PWA altyapısı ilk kez kuruldu:** `public/manifest.json`, uygulama
+  ikonları (`public/icons/`, "Ş" damgası tasarımı), `public/sw.js` (offline
+  önbellek, sadece üretimde kayıt oluyor — `ServiceWorkerRegister.tsx`
+  `NODE_ENV==="production"` kontrolü yapıyor, dev'de karışmasın diye).
+- **StatsPanel "Dedektif Dosyası" listesi:** Ana sayfada her vaka için ayrı
+  satırda en iyi rütbe/puan ya da başarısız/henüz-çözülmedi durumu.
+- **Paylaşım kartı** artık `reason`'a göre (süre doldu/vazgeçildi/yanlış
+  şüpheli/çözüldü) ayrı renkli döner damga görseli üretiyor.
+- **Önemli standing-feedback:** Ambiyans/arka plan müziği DAHA ÖNCE
+  denenmiş ve rahatsız edici bulunup kaldırılmıştı; bu bilgi kod yorumunda
+  duruyordu, tekrar sorulup tekrar reddedildi. **Bir daha ambiyans müzik
+  önerilmeyecek/eklenmeyecek** — bkz. auto-memory
+  `feedback_no_ambient_audio.md`.
+
+## Sohbet Özelliği Tamamlandı (2026-08-03, onyedinci güncelleme)
+Kullanıcı `firebase login` yaptı ve Firebase Console'da `dedektif-84c7b`
+adlı projeyi zaten oluşturmuştu; MCP bağlantısı bu oturumda bağlandı ve
+kalan tüm adımlar uçtan uca tamamlandı:
+
+- **Firestore kuruldu ve deploy edildi:** `firebase_init` ile proje köküne
+  `firebase.json` + `firestore.rules` + `firestore.indexes.json` eklendi,
+  `firebase_deploy --only firestore` ile kurallar canlıya alındı.
+- **Veri modeli:** `rooms/{roomCode}/messages/{messageId}` — her mesaj
+  `name`, `text`, `colorHue`, `createdAt` (server timestamp) alanlarını
+  taşıyor. **Oda kavramı vaka id'sinden ayrı tutuldu:** `src/lib/chat.ts`
+  vaka id'sinden deterministik kısa bir varsayılan oda kodu türetiyor
+  (`defaultRoomCodeFor`) — aynı vakayı açan herkes otomatik aynı odaya
+  düşüyor, ama istenirse farklı bir kod girip özel bir odaya geçilebiliyor.
+- **Güvenlik kuralları (`firestore.rules`):** herkes okuyabilir/yazabilir
+  (hesap sistemi yok, kapsam dışı) ama `create` alanları doğrulanıyor —
+  isim ≤40 karakter, mesaj ≤500 karakter, `colorHue` sayı, `createdAt`
+  sunucu zaman damgasıyla eşleşmeli; `update`/`delete` tamamen kapalı
+  (mesajlar değişmez/kalıcı).
+- **`src/lib/firebase.ts`:** client SDK init (`initializeApp` + `getFirestore`),
+  config `NEXT_PUBLIC_FIREBASE_*` env değişkenlerinden okunuyor
+  (`.env.local`'da, gitignore'da zaten `.env*` vardı).
+- **`src/components/CaseChat.tsx`:** isim+oda kodu girme ekranı → katılınca
+  Firestore `onSnapshot` ile canlı akan mesaj listesi + gönderme kutusu.
+  Her katılımcının ismi `src/lib/chat.ts`'teki `hueForName` ile deterministik
+  bir HSL rengine boyanıyor (suspectColorFor deseniyle aynı mantık).
+  Kimlik (isim+renk) `localStorage`'da global, oda kodu vaka başına kalıcı.
+  `CaseGame.tsx`'te Notlar sekmesinde `Notebook` ile yan yana (masaüstünde
+  2 sütun, mobilde alt alta) gösteriliyor.
+- **Test:** İki ayrı Playwright browser context'i (iki farklı "kullanıcı")
+  aynı vakanın Notlar sekmesinde farklı isimlerle odaya katılıp gerçek
+  Firestore üzerinden karşılıklı mesajlaştı — her iki taraf da diğerinin
+  mesajını gördü. Mobil viewport'ta da sohbet kutusu görünür/kullanılabilir
+  durumda. `npm run build` başarılı.
+- **ÖNEMLİ — kullanıcının yapması gereken tek şey:** Vercel canlı ortamı
+  `.env.local`'ı OKUMUYOR (gitignore'da, commit'lenmedi — bilerek, API key
+  yine de public/client-side olduğu için gizli değil ama env değişkeni
+  olarak yönetmek daha temiz). **Vercel dashboard → proje → Settings →
+  Environment Variables** kısmına şu 6 değişkenin eklenmesi gerekiyor
+  (değerler `.env.local` dosyasında hazır):
+  `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`,
+  `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`,
+  `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`.
+  Eklenmezse canlıda sohbet kutusu Firebase'e bağlanamaz. Bu henüz
+  YAPILMADI.
+- Kapsam bilinçli olarak dar tutuldu: sadece yazılı sohbet, pano/kanıt gibi
+  tam ortak state paylaşımı yok — bu istenirse sonraki bir faz.
+
 ## Sıradaki Adım
-1. İkinci iyileştirme turu da bitti (2026-08-02) — sıradaki büyük karar hâlâ
-   kullanıcıda: **Vercel'e deploy** mi, **Vaka 04** mü, yoksa yeni önerilen
-   fikirlerden (aşağıya bkz.) biri mi? Kullanıcı "Vercel şimdilik kalsın"
-   demişti.
-2. Vaka 04 teması "ünlü/influencer cinayeti" kalan son klasik seçenek.
-   Yeni vaka eklemek kanıtlanmış şekilde kolay ve artık 10 belge türünden
-   (resmi_rapor, whatsapp, telefon_dokumu, bilet_kaydi, gunluk_log, ifade,
-   eposta, guvenlik_kamerasi, sosyal_medya, haber_kupuru, ses_kaydi)
-   dilediğini seçip zenginleştirebiliriz.
-3. Açık soru: "ChipChop" adlı referans kaynak bulunamadı, kullanıcıdan link istenecek
-4. Gerçek FİZİKSEL cihazda (özellikle iOS Safari) test hâlâ yapılmadı —
-   yalnızca Playwright'ın WebKit motoruyla test edildi.
-5. `PLAN.md` §7.1'deki bazı mekanik ilhamlar hâlâ uygulanmadı: tam sezonluk/
-   bağlı vaka evreni (şu an sadece hafif flavor-text göndermeler var, §9'da
-   bilinçli olarak seçildi), tam kademeli hedef sistemi (motiv/yöntem
-   sorularıyla kısmen karşılandı)
-6. Bu turda kullanıcıya sunulan yeni fikir listesi (henüz seçim yapılmadı):
-   panoya zaman-tabanlı alibi çakışma oyunu, çoklu son/kısmi başarı, vaka
-   içi "arama motoru" aracı (isim/anahtar kelime ile kanıt tarama), günlük/
-   haftalık mini vaka, sesli anlatıcı iç ses efekti, film grenli/vinyet
-   görsel filtre, gerçek cihaz test turu. Detaylar için kullanıcıyla yapılan
-   son konuşmaya bakılabilir.
+1. **Vercel env değişkenleri eklenmeli** (yukarıya bkz.) — sohbetin canlıda
+   çalışması için tek eksik adım.
+2. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
+   cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
+   Playwright WebKit emülasyonu var), Vaka 04 içeriği.
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).
