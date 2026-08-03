@@ -407,23 +407,19 @@ kalan tüm adımlar uçtan uca tamamlandı:
   Firestore üzerinden karşılıklı mesajlaştı — her iki taraf da diğerinin
   mesajını gördü. Mobil viewport'ta da sohbet kutusu görünür/kullanılabilir
   durumda. `npm run build` başarılı.
-- **ÖNEMLİ — kullanıcının yapması gereken tek şey:** Vercel canlı ortamı
-  `.env.local`'ı OKUMUYOR (gitignore'da, commit'lenmedi — bilerek, API key
-  yine de public/client-side olduğu için gizli değil ama env değişkeni
-  olarak yönetmek daha temiz). **Vercel dashboard → proje → Settings →
-  Environment Variables** kısmına şu 6 değişkenin eklenmesi gerekiyor
-  (değerler `.env.local` dosyasında hazır):
-  `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`,
-  `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`,
-  `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`.
-  Eklenmezse canlıda sohbet kutusu Firebase'e bağlanamaz. Bu henüz
-  YAPILMADI.
+- **Vercel env değişkenleri eklendi ve push edildi:** Kullanıcı 6
+  `NEXT_PUBLIC_FIREBASE_*` değişkenini Vercel dashboard'a (Production/
+  Preview/Development hepsine) ekledi, ardından commit GitHub'a push
+  edildi (`68ef194`) — Vercel otomatik yeniden deploy etti. Canlıda da
+  doğrulanmalı (bir sonraki oturumda kontrol edilebilir): sohbet kutusu
+  gerçek Firestore'a bağlanıyor mu, iki farklı cihaz/tarayıcıdan aynı
+  vakayı açıp mesajlaşabiliyor mu.
 - Kapsam bilinçli olarak dar tutuldu: sadece yazılı sohbet, pano/kanıt gibi
   tam ortak state paylaşımı yok — bu istenirse sonraki bir faz.
 
 ## Sıradaki Adım
-1. **Vercel env değişkenleri eklenmeli** (yukarıya bkz.) — sohbetin canlıda
-   çalışması için tek eksik adım.
+1. **Canlıda son doğrulama** (henüz yapılmadı): dedektif-app.vercel.app
+   üzerinde gerçekten sohbet kutusunun çalıştığını teyit et.
 2. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
    cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
    Playwright WebKit emülasyonu var), Vaka 04 içeriği.
