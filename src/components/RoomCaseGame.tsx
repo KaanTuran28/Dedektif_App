@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SuspectCard } from "@/components/SuspectCard";
-import { IntroCinematic } from "@/components/CaseGame";
+import { IntroCinematic, QuickClose } from "@/components/CaseGame";
 import { Notebook } from "@/components/Notebook";
 import { Timeline } from "@/components/Timeline";
 import { CaseChat } from "@/components/CaseChat";
@@ -16,7 +16,7 @@ import { suspectColorFor } from "@/lib/suspectColor";
 import { groupDocumentsByCategory } from "@/lib/docCategories";
 import { playStamp, playTick } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
-import { recordAccusation, getCaseProgress } from "@/lib/progress";
+import { recordAccusation, getCaseProgress, CASE_TIME_LIMIT_MS, formatRemaining } from "@/lib/progress";
 import { allCases, getCaseById } from "@/data/cases";
 import { getChatIdentity, colorForHue } from "@/lib/chat";
 import {
@@ -27,6 +27,7 @@ import {
   getStoredRoomCode,
   joinRoom,
   leaveRoom,
+  markRoomTimedOut,
   normalizeRoomCode,
   openAccusation,
   setStoredRoomCode,
@@ -434,14 +435,42 @@ function RoomGameShell({
   const identity = useMemo(() => getChatIdentity(), []);
   const docGroups = useMemo(() => groupDocumentsByCategory(data.documents), [data.documents]);
   const isInvestigating = room.phase === "investigating";
+  const gameOver = room.phase === "revealed" || room.phase === "timed-out";
+  const [remainingMs, setRemainingMs] = useState<number | null>(null);
+  const [leavingEarly, setLeavingEarly] = useState(false);
+  const router = useRouter();
   const coverage =
     (room.viewedDocIds.length / Math.max(data.documents.length, 1) +
       room.viewedSuspectIds.length / Math.max(data.suspects.length, 1)) /
     2;
 
+  // Paylaşımlı geri sayım — odadaki herkes aynı `startedAt`'ı görüyor, o
+  // yüzden herkesin sayacı senkron ilerliyor. Süre dolduğunda herhangi bir
+  // katılımcının istemcisi `markRoomTimedOut` çağırır; fonksiyon zaten oda
+  // sonuçlanmışsa (revealed) hiçbir şey yapmadığı için birden fazla
+  // client'ın aynı anda tetiklemesi zararsız.
+  useEffect(() => {
+    if (!room.startedAt || gameOver) {
+      setRemainingMs(null);
+      return;
+    }
+    function tick() {
+      const rem = CASE_TIME_LIMIT_MS - (Date.now() - room.startedAt!);
+      setRemainingMs(rem);
+      if (rem <= 0) markRoomTimedOut(roomCode);
+    }
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [room.startedAt, gameOver, roomCode]);
+
   function goStep(next: Step) {
     playTick();
     setStep(next);
+  }
+
+  function handleLeaveEarly() {
+    setLeavingEarly(true);
   }
 
   return (
@@ -455,6 +484,18 @@ function RoomGameShell({
             <h1 className="font-display text-xl sm:text-2xl font-bold mt-0.5">{data.title}</h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {isInvestigating && remainingMs !== null && (
+              <p
+                title="Oda için kalan süre"
+                className={`hidden sm:block text-[11px] font-mono-doc border rounded-sm px-2 py-1.5 ${
+                  remainingMs < 5 * 60 * 1000
+                    ? "border-accent-red-bright text-accent-red-bright"
+                    : "border-white/10 text-text-dim"
+                }`}
+              >
+                ⏱ {formatRemaining(remainingMs)}
+              </p>
+            )}
             {isInvestigating && (
               <p className="hidden sm:block text-[11px] font-mono-doc border border-white/10 rounded-sm px-2 py-1.5 text-text-dim">
                 🔍 %{Math.round(coverage * 100)} incelendi
@@ -463,9 +504,9 @@ function RoomGameShell({
             {isInvestigating && (
               <RoomHintPanel roomCode={roomCode} hintsUsed={room.hintsUsed} hints={data.hints} />
             )}
-            {room.phase !== "revealed" && (
+            {!gameOver && (
               <button
-                onClick={onLeave}
+                onClick={handleLeaveEarly}
                 className="hidden sm:block rounded-sm border border-white/15 px-3 py-2 text-xs uppercase tracking-wide text-text-dim hover:text-text hover:border-white/30 transition-colors"
               >
                 Odadan Ayrıl
@@ -628,9 +669,30 @@ function RoomGameShell({
             {room.phase === "revealed" && (
               <RoomResultReveal data={data} room={room} onLeave={onLeave} />
             )}
+
+            {room.phase === "timed-out" && (
+              <QuickClose
+                label="Süre Doldu"
+                onDone={() => {
+                  onLeave();
+                  router.push("/");
+                }}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {leavingEarly && (
+          <QuickClose
+            onDone={() => {
+              onLeave();
+              router.push("/");
+            }}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }

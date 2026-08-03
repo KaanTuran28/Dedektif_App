@@ -41,6 +41,7 @@ type Step =
   | "suclama"
   | "motiv-sorusu"
   | "yontem-sorusu"
+  | "kapaniyor"
   | "sonuc";
 
 const TABS: { id: Step; label: string }[] = [
@@ -52,25 +53,11 @@ const TABS: { id: Step; label: string }[] = [
   { id: "notlar", label: "Notlar" },
 ];
 
-type EndReason = "suclama" | "sure-doldu" | "vazgecildi";
-
 interface FinalResult {
   correct: boolean;
   motiveCorrect: boolean;
   methodCorrect: boolean;
   rank: DetectiveRank;
-  reason: EndReason;
-}
-
-function zeroRank(data: CaseData): DetectiveRank {
-  return rankFor({
-    correctSuspect: false,
-    motiveCorrect: false,
-    methodCorrect: false,
-    coverage: 0,
-    hintsUsed: 0,
-    difficulty: data.difficulty,
-  });
 }
 
 export function CaseGame({ data }: { data: CaseData }) {
@@ -87,6 +74,7 @@ export function CaseGame({ data }: { data: CaseData }) {
   const [remainingMs, setRemainingMs] = useState<number | null>(null);
   const [endConfirming, setEndConfirming] = useState(false);
   const reducedMotion = useReducedMotion();
+  const router = useRouter();
 
   useEffect(() => {
     setSoundOn(isSoundEnabled());
@@ -101,8 +89,7 @@ export function CaseGame({ data }: { data: CaseData }) {
         markTimedOut(data.id);
         setStarted(true);
         setIntroDone(true);
-        setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "sure-doldu" });
-        setStep("sonuc");
+        setStep("kapaniyor");
       } else {
         setStarted(true);
         setIntroDone(true);
@@ -128,8 +115,7 @@ export function CaseGame({ data }: { data: CaseData }) {
       setRemainingMs(rem);
       if (rem !== null && rem <= 0) {
         markTimedOut(data.id);
-        setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "sure-doldu" });
-        setStep("sonuc");
+        setStep("kapaniyor");
       }
     }
     tick();
@@ -163,8 +149,7 @@ export function CaseGame({ data }: { data: CaseData }) {
   function handleEndCase() {
     endCaseManually(data.id);
     setEndConfirming(false);
-    setFinal({ correct: false, motiveCorrect: false, methodCorrect: false, rank: zeroRank(data), reason: "vazgecildi" });
-    setStep("sonuc");
+    setStep("kapaniyor");
   }
 
   const coverage =
@@ -216,7 +201,7 @@ export function CaseGame({ data }: { data: CaseData }) {
       methodCorrect,
       solvedCasesCount,
     });
-    setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank, reason: "suclama" });
+    setFinal({ correct, motiveCorrect: motiveWasCorrect, methodCorrect, rank });
     setStep("sonuc");
   }
 
@@ -445,6 +430,8 @@ export function CaseGame({ data }: { data: CaseData }) {
               />
             )}
 
+            {step === "kapaniyor" && <QuickClose onDone={() => router.push("/vaka")} />}
+
             {step === "sonuc" && final && (
               <ResultReveal data={data} final={final} />
             )}
@@ -511,8 +498,12 @@ export function IntroCinematic({
       onDone();
       return;
     }
+    const stampSound = setTimeout(() => playStamp(), 1100);
     const t = setTimeout(onDone, 2600);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(stampSound);
+      clearTimeout(t);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skip]);
 
@@ -708,6 +699,41 @@ function FollowUpQuestionScreen({
   );
 }
 
+/** Bir suçlama yapılmadan biten oturumlar (Vazgeç, Süre Doldu) için —
+ * gerçek katili/çözümü göstermez, sadece dosyanın kapandığını belirten
+ * bir damga gösterip vaka seçimine döner. Spoiler sadece gerçek bir
+ * suçlama yapıldığında (doğru ya da yanlış) `ResultReveal` ile gösterilir. */
+/** Genel amaçlı kapanış damgası — jenerik tutulup export edilmesinin nedeni
+ * oda modunun da (RoomCaseGame.tsx) aynı "spoiler'sız kapanış" animasyonunu
+ * kullanması. */
+export function QuickClose({
+  onDone,
+  label = "Dosya Kapatıldı",
+}: {
+  onDone: () => void;
+  label?: string;
+}) {
+  useEffect(() => {
+    playStamp();
+    const t = setTimeout(onDone, 900);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+      <motion.p
+        initial={{ opacity: 0, scale: 0.8, rotate: -4 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 240, damping: 16 }}
+        className="stamp text-accent-red text-2xl sm:text-3xl"
+      >
+        {label}
+      </motion.p>
+    </div>
+  );
+}
+
 function ResultReveal({
   data,
   final,
@@ -715,7 +741,7 @@ function ResultReveal({
   data: CaseData;
   final: FinalResult;
 }) {
-  const { correct, rank, reason } = final;
+  const { correct, rank } = final;
   const [sharing, setSharing] = useState(false);
   const [closing, setClosing] = useState(false);
   const router = useRouter();
@@ -733,7 +759,7 @@ function ResultReveal({
         rankLabel: rank.label,
         points: rank.points,
         correct,
-        reason,
+        reason: "suclama",
       });
       if (!blob) return;
       const file = new File([blob], `supheli-${data.id}.png`, { type: "image/png" });
@@ -793,29 +819,15 @@ function ResultReveal({
             correct ? "text-accent-gold" : "text-accent-red-bright"
           }`}
         >
-          {correct
-            ? "Çözüldü"
-            : reason === "sure-doldu"
-              ? "Süre Doldu"
-              : reason === "vazgecildi"
-                ? "Vazgeçildi"
-                : "Yanlış Şüpheli"}
+          {correct ? "Çözüldü" : "Yanlış Şüpheli"}
         </motion.p>
       </div>
       <p className="text-text-dim">
         {correct
           ? "Doğru şüpheliyi işaret ettin."
-          : reason === "sure-doldu"
-            ? `1 saat içinde vakayı çözemedin. Gerçek katil: ${
-                data.suspects.find((s) => s.id === data.solution.killerId)?.name
-              }.`
-            : reason === "vazgecildi"
-              ? `Vakadan vazgeçtin. Gerçek katil: ${
-                  data.suspects.find((s) => s.id === data.solution.killerId)?.name
-                }.`
-              : `Suçladığın kişi katil değildi. Gerçek katil: ${
-                  data.suspects.find((s) => s.id === data.solution.killerId)?.name
-                }.`}
+          : `Suçladığın kişi katil değildi. Gerçek katil: ${
+              data.suspects.find((s) => s.id === data.solution.killerId)?.name
+            }.`}
       </p>
 
       <motion.div

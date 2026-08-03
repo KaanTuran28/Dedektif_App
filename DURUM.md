@@ -3,7 +3,12 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (Oda modunda vaka seçimi sonrası açılış
+**Son güncelleme:** 2026-08-03 (Spoiler'sız kapanışlar, oda modunda
+paylaşımlı süre, boş oda otomatik silme, /vaka'da vaka kilitleme —
+hepsi tamamlandı ve test edildi. **Kullanıcının yapması gereken tek şey:
+Firebase Console'da TTL politikasını etkinleştirmek** — aşağıda anlatılıyor.
+bkz. "Spoiler'sız Kapanışlar, Oda Süresi, Otomatik Temizlik". Önceki: Oda
+modunda vaka seçimi sonrası açılış
 sinematiği eklendi, mobil görünüm + genel hata taraması yapıldı — 0 hata.
 bkz. "Oda Sinematiği + Mobil/Hata Taraması". Önceki: Mod seçimi
 (Tek/Çoklu) artık en başta, ana
@@ -722,8 +727,61 @@ mobil uyum + genel hata taraması.
   test edildi, **0 konsol hatası**.
 - `npm run build` temiz.
 
+## Spoiler'sız Kapanışlar, Oda Süresi, Otomatik Temizlik (2026-08-03, yirmibeşinci güncelleme)
+Kullanıcı yoğun, çok maddeli bir istek gönderdi; kodlamadan önce anladıklarımı
+özetleyip 2 belirsiz noktayı (süre dolunca spoiler mı, /vaka'daki "kilitleme"
+tam ne anlama geliyor) sorup netleştirdim, sonra uygulamaya geçtim:
+
+- **Açılış sinematiği sesi düzeltildi:** `IntroCinematic` (`CaseGame.tsx`)
+  hiç ses çalmıyordu — "Dosya Açılıyor" damgasının belirdiği ana senkron
+  bir `playStamp()` eklendi. Bu bileşen oda modunda da kullanıldığı için
+  düzeltme otomatik olarak oraya da yansıdı.
+- **Solo modda "Vazgeç" ve "Süre Doldu" artık spoiler vermiyor:** Yeni bir
+  `QuickClose` bileşeni (sadece "Dosya Kapatıldı" damgası + ses, sonuç/rütbe/
+  çözüm YOK) eklendi, `/vaka`'ya yönlendiriyor. Gerçek bir suçlama
+  (doğru ya da yanlış fark etmez) hâlâ tam `ResultReveal`'ı (rütbe + çözüm
+  metni) gösteriyor — sadece "suçlama yapmadan biten" durumlar artık
+  gizleniyor. `EndReason`/`FinalResult.reason` kaldırıldı (artık gereksizdi).
+- **Oda modunda paylaşımlı 1 saatlik süre eklendi:** `RoomDoc.startedAt`
+  ortak vaka oylaması "investigating"e geçince otomatik set ediliyor
+  (solo'daki gibi `Date.now()`, `serverTimestamp()` değil — `tryResolvePhase`
+  saf bir fonksiyon). Herkesin sayacı senkron ilerliyor, dolunca herhangi
+  bir client `markRoomTimedOut` çağırıp fazı `"timed-out"` yapıyor (transaction
+  guard'lı — oda zaten `revealed` ise dokunmuyor). Bu faza geçince herkes
+  `QuickClose` ("Süre Doldu", sonuç yok) görüp odadan ayrılıp ana sayfaya
+  dönüyor.
+- **Oda modunda erken "Odadan Ayrıl" da artık `QuickClose` gösteriyor**
+  (spoiler yok) — önceden direkt çıkıyordu.
+- **Boş oda otomatik siliniyor:** `leaveRoom`, katılımcı sayısı 0'a inince
+  oda dokümanını + pano + tüm mesajları hemen siliyor (Firestore kuralları
+  buna izin verecek şekilde güncellendi: pano `delete` kuralı ayrıldı —
+  eskiden `request.resource` silme isteklerinde `null` olduğu için gizli
+  bir şekilde HER ZAMAN reddediyordu, fark edilmemiş bir hataydı; oda kök
+  dokümanı da artık `participantCount <= 1` iken silinebiliyor).
+- **Terk edilmiş odalar için Firestore TTL:** Her oda `expiresAt` (kuruluş
+  + 24 saat) alanıyla oluşturuluyor. **TTL politikasını açacak bir MCP
+  aracı yok, `gcloud` CLI de kurulu değil — kullanıcının Firebase Console'dan
+  BİR KEZ etkinleştirmesi gerekiyor:** Firebase Console → Firestore Database
+  → sol menüde "TTL" (ya da Data sekmesinde "Time-to-live") → yeni politika:
+  Collection group `caseRooms`, alan `expiresAt`. Bu yapılmadan odalar
+  kod tarafında (kimse kalmayınca) hâlâ siliniyor, sadece "terk edilmiş
+  ama katılımcı sayacı hiç 0'a inmemiş" odalar için yedek temizlik
+  çalışmıyor.
+- **`/vaka` ekranında vaka kilitleme + doğrudan bırakma:** Bir vaka
+  in-progress iken diğerleri "🔒 Önce mevcut vakadan çık" ile kilitleniyor.
+  In-progress kartın üzerinde "✕ Vazgeç" butonu var — vakaya hiç girmeden
+  direkt bırakıp ana sayfaya dönüyor.
+- **Test (Firebase MCP ile gerçek simülasyon dahil):** Solo Vazgeç/gerçek
+  suçlama regresyonu, `/vaka` kilitleme+bırakma, oda erken ayrılma, boş
+  oda silme (`firestore_get_document` ile silindiği doğrulandı), ve **süre
+  dolumu** — `firestore_update_document` ile bir odanın `startedAt`'ı 2 saat
+  geriye alındı, yeni bir katılımcı odaya girer girmez "Süre Doldu" görüp
+  otomatik ayrılıp ana sayfaya döndüğü doğrulandı. `npm run build` temiz.
+
 ## Sıradaki Adım
-1. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
+1. **Kullanıcı Firebase Console'dan TTL politikasını etkinleştirmeli**
+   (yukarıdaki adımlar) — kod tarafı zaten hazır, bu tek manuel adım kaldı.
+2. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
    doğrulamalı (bir kereliğine sert yenileme sonrası).
 2. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
    (yerelde Playwright ile kapsamlı doğrulandı ama gerçek ağ gecikmesiyle

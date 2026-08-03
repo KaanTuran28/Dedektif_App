@@ -4,26 +4,29 @@ service cloud.firestore {
     match /caseRooms/{roomCode} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll(
-          ['caseId', 'phase', 'hostParticipantId', 'hintsUsed', 'votes', 'viewedDocIds',
+          ['caseId', 'phase', 'hostParticipantId', 'startedAt', 'hintsUsed', 'votes', 'viewedDocIds',
            'viewedSuspectIds', 'accusedId', 'motiveCorrect', 'methodCorrect', 'result',
-           'participantCount', 'createdAt']
+           'participantCount', 'createdAt', 'expiresAt']
         )
         && request.resource.data.caseId == null
         && request.resource.data.phase == 'voting-case'
+        && request.resource.data.startedAt == null
         && request.resource.data.participantCount == 1
         && request.resource.data.votes == {}
         && request.resource.data.hintsUsed == 0
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt is timestamp;
       // Kimlik doğrulama yok (hesap sistemi kapsam dışı) — bu yüzden kurallar
       // sadece YAZILAN VERİNİN ŞEKLİNİ doğrulayabiliyor, "kim yazdığını" değil.
       // Oda kodunu bilen biri teorik olarak başka bir katılımcı adına oy/veri
       // yazabilir. Bu, zaten canlıdaki sohbet kuralıyla aynı güven modeli.
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
-                      .hasOnly(['caseId', 'phase', 'votes', 'hintsUsed', 'viewedDocIds', 'viewedSuspectIds',
+                      .hasOnly(['caseId', 'phase', 'startedAt', 'votes', 'hintsUsed', 'viewedDocIds', 'viewedSuspectIds',
                                 'accusedId', 'motiveCorrect', 'methodCorrect', 'result', 'participantCount'])
                     && (request.resource.data.caseId == null || (request.resource.data.caseId is string && request.resource.data.caseId.size() <= 60))
+                    && (request.resource.data.startedAt == null || request.resource.data.startedAt is int)
                     && request.resource.data.phase in
-                      ['voting-case', 'investigating', 'voting-killer', 'voting-motive', 'voting-method', 'revealed']
+                      ['voting-case', 'investigating', 'voting-killer', 'voting-motive', 'voting-method', 'revealed', 'timed-out']
                     && request.resource.data.hintsUsed is int
                     && request.resource.data.hintsUsed >= 0 && request.resource.data.hintsUsed <= 20
                     && request.resource.data.viewedDocIds.size() <= 200
@@ -31,7 +34,10 @@ service cloud.firestore {
                     && request.resource.data.votes.size() <= 32
                     && request.resource.data.participantCount is int
                     && request.resource.data.participantCount >= 0 && request.resource.data.participantCount <= 32;
-      allow delete: if false;
+      // Sadece oda zaten en fazla 1 kişiye düşmüşken silinebilir (odadan
+      // ayrılan son kişi tarafından) — canlı, kalabalık bir odanın
+      // yanlışlıkla/kötü niyetle silinmesine karşı ucuz bir güvence.
+      allow delete: if resource.data.participantCount <= 1;
     }
 
     match /caseRooms/{roomCode}/participants/{participantId} {
@@ -48,12 +54,16 @@ service cloud.firestore {
 
     match /caseRooms/{roomCode}/board/{boardDocId} {
       allow read: if true;
-      allow write: if boardDocId == 'state'
+      allow create, update: if boardDocId == 'state'
         && request.resource.data.keys().hasOnly(['positions', 'connections', 'notes'])
         && request.resource.data.connections is list
         && request.resource.data.connections.size() <= 60
         && request.resource.data.notes is map
         && request.resource.data.positions is map;
+      // delete kuralı ayrı: silme isteklerinde request.resource yok, yukarıdaki
+      // şekil kontrolüne dahil edilirse (request.resource.data okumaya çalışıp)
+      // hata verip reddederdi.
+      allow delete: if true;
     }
 
     match /caseRooms/{roomCode}/messages/{messageId} {
