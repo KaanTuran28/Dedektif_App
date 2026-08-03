@@ -3,17 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { allCases } from "@/data/cases";
-import { tiltFor } from "@/lib/tilt";
-import { StatsPanel } from "@/components/StatsPanel";
 import { TutorialFlow } from "@/components/TutorialFlow";
-import { formatRemaining, getCaseProgress, getRemainingMs, type CaseProgress } from "@/lib/progress";
 
 const GUIDE_SEEN_KEY = "supheli:rehber-gorundu";
 
+/** Giriş ekranı: önce ton/atmosfer, sonra tek karar — tek başına mı,
+ * arkadaşlarınla mı. Vaka seçimi (hangi dosyayı açacağın) bilinçli olarak
+ * burada değil, bu seçimden SONRA gelen ekranlarda (solo için /vaka,
+ * çoklu için /oda içindeki ortak oylama). */
 export default function HomePage() {
   const [guideOpen, setGuideOpen] = useState(false);
-  const [progressMap, setProgressMap] = useState<Record<string, CaseProgress>>({});
 
   useEffect(() => {
     const seen = window.localStorage.getItem(GUIDE_SEEN_KEY);
@@ -23,20 +22,9 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => {
-    function refresh() {
-      const map: Record<string, CaseProgress> = {};
-      for (const c of allCases) map[c.id] = getCaseProgress(c.id);
-      setProgressMap(map);
-    }
-    refresh();
-    const interval = setInterval(refresh, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <main className="flex-1 flex flex-col items-center px-3 sm:px-4 py-8 sm:py-12">
-      <div className="relative w-full max-w-3xl cork-texture rounded-md px-4 sm:px-10 py-12 sm:py-16 overflow-hidden">
+    <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-8 sm:py-12">
+      <div className="relative w-full max-w-lg cork-texture rounded-md px-4 sm:px-10 py-14 sm:py-20 overflow-hidden">
         <svg
           className="absolute left-1/2 top-[86px] sm:top-[104px] -translate-x-1/2 w-64 sm:w-80 h-16 opacity-70"
           viewBox="0 0 320 60"
@@ -55,7 +43,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative text-center mb-8 sm:mb-10"
+          className="relative text-center mb-10 sm:mb-12"
         >
           <p className="uppercase tracking-[0.35em] text-accent-gold text-xs sm:text-sm mb-3 font-mono-doc">
             Dijital Dedektiflik Oyunu
@@ -68,107 +56,32 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        <div className="relative flex justify-center gap-3 flex-wrap mb-8 sm:mb-10">
-          <button
-            onClick={() => setGuideOpen(true)}
-            className="rounded-sm border border-accent-gold/50 text-accent-gold px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors"
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="relative flex flex-col items-center gap-3"
+        >
+          <Link
+            href="/vaka"
+            className="w-full sm:w-80 text-center rounded-sm bg-accent-red-bright px-6 py-4 font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
           >
-            📖 Nasıl Oynanır?
-          </button>
+            Tek Başına Oyna
+          </Link>
           <Link
             href="/oda"
-            className="rounded-sm bg-accent-red-bright px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
+            className="w-full sm:w-80 text-center rounded-sm border border-accent-gold/50 text-accent-gold px-6 py-4 font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors"
           >
             👥 Arkadaşlarınla Oyna
           </Link>
-        </div>
-
-        <div className="relative w-full grid gap-6 sm:gap-8 sm:grid-cols-2">
-          {allCases.map((c, i) => {
-            const tilt = tiltFor(c.id);
-            const progress = progressMap[c.id];
-            const remaining = progress ? getRemainingMs(progress) : null;
-            const inProgress = !!progress?.inProgress && remaining !== null && remaining > 0;
-            const alreadyPlayed = !inProgress && !!progress && (progress.solved || !!progress.failed);
-            const playedStamp = alreadyPlayed ? (progress!.solved ? "Çözüldü" : "Başarısız") : null;
-
-            return (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, y: 18, rotate: 0 }}
-                animate={{ opacity: 1, y: 0, rotate: tilt }}
-                transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
-                whileHover={c.available ? { rotate: 0, y: -3 } : undefined}
-                className="relative"
-              >
-                {c.available ? (
-                  <Link
-                    href={`/vaka/${c.id}`}
-                    className="group relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl"
-                  >
-                    <div className="pin" />
-                    {playedStamp && (
-                      <motion.span
-                        aria-hidden
-                        initial={{ scale: 2.4, opacity: 0, rotate: -25 }}
-                        animate={{ scale: 1, opacity: 1, rotate: 10 }}
-                        transition={{ type: "spring", stiffness: 260, damping: 15, delay: 0.3 + i * 0.08 }}
-                        className={`stamp absolute -top-2 -right-2 sm:top-1 sm:right-1 text-[10px] sm:text-xs pointer-events-none ${
-                          playedStamp === "Çözüldü" ? "text-accent-gold" : "text-accent-red-bright"
-                        }`}
-                      >
-                        {playedStamp}
-                      </motion.span>
-                    )}
-                    <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
-                      Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
-                    </p>
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-paper-ink">
-                      {c.title}
-                    </h2>
-                    <p className="text-paper-ink/70 mt-2 text-sm sm:text-base">
-                      {c.tagline}
-                    </p>
-                    {inProgress ? (
-                      <div className="mt-3 flex items-center gap-3 flex-wrap">
-                        <span className="inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
-                          ▶ Kaldığın Yerden Devam Et
-                        </span>
-                        <span className="font-mono-doc text-xs text-paper-ink/60">
-                          ⏱ {formatRemaining(remaining!)}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="mt-3 inline-flex items-center gap-1 text-accent-red text-sm font-semibold uppercase tracking-wide">
-                        Dosyayı Aç
-                        <span className="transition-transform group-hover:translate-x-1">→</span>
-                      </span>
-                    )}
-                  </Link>
-                ) : (
-                  <div className="relative block paper-card rounded-sm p-5 sm:p-6 shadow-xl opacity-60 grayscale-[40%] cursor-not-allowed select-none">
-                    <div className="pin" />
-                    <p className="text-[11px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
-                      Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
-                    </p>
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-paper-ink">
-                      {c.title}
-                    </h2>
-                    <p className="text-paper-ink/70 mt-2 text-sm sm:text-base">
-                      {c.tagline}
-                    </p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 text-paper-ink/50 text-sm font-semibold uppercase tracking-wide">
-                      🔒 Yakında Açılacak
-                    </span>
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+          <button
+            onClick={() => setGuideOpen(true)}
+            className="mt-2 rounded-sm border border-white/15 text-text-dim px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:text-text hover:border-white/30 transition-colors"
+          >
+            📖 Nasıl Oynanır?
+          </button>
+        </motion.div>
       </div>
-
-      <StatsPanel cases={allCases.filter((c) => c.available)} />
 
       <TutorialFlow open={guideOpen} onClose={() => setGuideOpen(false)} />
     </main>

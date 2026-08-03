@@ -73,14 +73,14 @@ function zeroRank(data: CaseData): DetectiveRank {
   });
 }
 
-export function CaseGame({ data, skipIntro = false }: { data: CaseData; skipIntro?: boolean }) {
+export function CaseGame({ data }: { data: CaseData }) {
   const [step, setStep] = useState<Step>("giris");
   const [started, setStarted] = useState(false);
   const [ready, setReady] = useState(false);
   const [accusedId, setAccusedId] = useState<string | null>(null);
   const [motiveCorrect, setMotiveCorrect] = useState(false);
   const [final, setFinal] = useState<FinalResult | null>(null);
-  const [introDone, setIntroDone] = useState(skipIntro);
+  const [introDone, setIntroDone] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
   const [viewedSuspects, setViewedSuspects] = useState<Set<string>>(new Set());
@@ -238,7 +238,7 @@ export function CaseGame({ data, skipIntro = false }: { data: CaseData; skipIntr
       <header className="border-b border-white/10 bg-panel/70 sticky top-0 z-10 backdrop-blur">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <div>
-            <Link href="/" className="text-accent-gold text-xs uppercase tracking-widest hover:underline font-mono-doc">
+            <Link href="/vaka" className="text-accent-gold text-xs uppercase tracking-widest hover:underline font-mono-doc">
               ← Vaka Seçimi
             </Link>
             <h1 className="font-display text-xl sm:text-2xl font-bold mt-0.5">
@@ -495,7 +495,7 @@ export function CaseGame({ data, skipIntro = false }: { data: CaseData; skipIntr
   );
 }
 
-export function IntroCinematic({
+function IntroCinematic({
   title,
   order,
   skip,
@@ -759,7 +759,7 @@ function ResultReveal({
   function handleClose() {
     playStamp();
     setClosing(true);
-    setTimeout(() => router.push("/"), 650);
+    setTimeout(() => router.push("/vaka"), 650);
   }
 
   return (
