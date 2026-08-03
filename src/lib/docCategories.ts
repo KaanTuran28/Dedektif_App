@@ -6,6 +6,7 @@ interface DocCategory {
 }
 
 const CATEGORIES: DocCategory[] = [
+  { label: "🔐 Kilitli Kayıtlar", types: ["sifreli_kayit", "kilitli_kasa"] },
   { label: "Resmi Belgeler", types: ["resmi_rapor", "guvenlik_kamerasi", "bilet_kaydi"] },
   { label: "İletişim ve Yazışmalar", types: ["whatsapp", "telefon_dokumu", "eposta"] },
   { label: "Kişisel Kayıtlar", types: ["gunluk_log", "ifade", "ses_kaydi"] },

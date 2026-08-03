@@ -592,6 +592,7 @@ function RoomGameShell({
                         <DocumentCard
                           key={doc.id}
                           doc={doc}
+                          caseId={data.id}
                           onOpen={(id) => markDocViewedShared(roomCode, id)}
                         />
                       ))}

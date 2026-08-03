@@ -9,7 +9,9 @@ export type DocumentType =
   | "guvenlik_kamerasi"
   | "sosyal_medya"
   | "haber_kupuru"
-  | "ses_kaydi";
+  | "ses_kaydi"
+  | "sifreli_kayit"
+  | "kilitli_kasa";
 
 export interface ChatMessage {
   sender: string;
@@ -67,6 +69,22 @@ export interface CaseDocument {
   cameraTimestamp?: string;
   /** ses_kaydi tipi için süre göstergesi */
   audioDuration?: string;
+  /** sifreli_kayit tipi için oyuncuya gösterilen şifreli ham metin */
+  cipherEncoded?: string;
+  /** sifreli_kayit tipi için beklenen çözüm (karşılaştırma normalize edilerek yapılır) */
+  cipherAnswer?: string;
+  /** sifreli_kayit tipi için çözülünce açığa çıkan asıl içerik */
+  cipherReveal?: string;
+  /** sifreli_kayit tipi için sırayla açılan, bu bulmacaya özel ipucu zinciri (genel hints[]'ten ayrı, rütbeyi etkilemez) */
+  cipherHints?: string[];
+  /** kilitli_kasa tipi için kombinasyon kilidinin hane sayısı (genelde 3) */
+  lockDigits?: number;
+  /** kilitli_kasa tipi için beklenen kod (rakamlar, karşılaştırma rakam-dışı karakterleri yok sayar) */
+  lockAnswer?: string;
+  /** kilitli_kasa tipi için doğru kod girilince açığa çıkan içerik */
+  lockReveal?: string;
+  /** kilitli_kasa tipi için sırayla açılan ipucu zinciri */
+  lockHints?: string[];
 }
 
 export interface StatementExchange {

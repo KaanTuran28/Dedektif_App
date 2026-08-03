@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { CaseDocument } from "@/types/case";
 import { tiltFor } from "@/lib/tilt";
 import { docColorFor } from "@/lib/docColor";
-import { playPaper } from "@/lib/sound";
+import { playPaper, playMatch, playMismatch, playTick } from "@/lib/sound";
+import { answersMatch, digitsMatch } from "@/lib/cipher";
+import {
+  getCipherHintsUsed,
+  isCipherSolved,
+  markCipherSolved,
+  useNextCipherHint,
+} from "@/lib/cipherPuzzle";
 
 const TYPE_LABELS: Record<CaseDocument["type"], string> = {
   resmi_rapor: "Resmi Rapor",
@@ -19,6 +26,8 @@ const TYPE_LABELS: Record<CaseDocument["type"], string> = {
   sosyal_medya: "Sosyal Medya",
   haber_kupuru: "Haber Küpürü",
   ses_kaydi: "Ses Kaydı",
+  sifreli_kayit: "Şifreli Kayıt",
+  kilitli_kasa: "Kilitli Kasa",
 };
 
 function signatureFromMeta(meta?: string) {
@@ -48,14 +57,17 @@ function waveformBars(seed: string, count: number) {
 
 export function DocumentCard({
   doc,
+  caseId,
   onOpen,
 }: {
   doc: CaseDocument;
+  caseId?: string;
   onOpen?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const tilt = tiltFor(doc.id);
   const color = docColorFor(doc.type);
+  const isCipher = doc.type === "sifreli_kayit" || doc.type === "kilitli_kasa";
 
   return (
     <motion.div
@@ -73,7 +85,9 @@ export function DocumentCard({
         onClick={() => {
           const next = !open;
           setOpen(next);
-          if (next) onOpen?.(doc.id);
+          // Şifreli kayıtlar için "incelendi" sayılmak çözülmeyi gerektirir —
+          // sadece açmak yeterli değil (bkz. SifreliKayitBody'nin kendi onOpen çağrısı).
+          if (next && !isCipher) onOpen?.(doc.id);
           playPaper();
         }}
         className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left"
@@ -109,7 +123,7 @@ export function DocumentCard({
             style={{ overflow: "hidden" }}
             className="border-t border-white/10"
           >
-            <DocumentBody doc={doc} />
+            <DocumentBody doc={doc} caseId={caseId} onOpen={onOpen} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -117,7 +131,23 @@ export function DocumentCard({
   );
 }
 
-function DocumentBody({ doc }: { doc: CaseDocument }) {
+function DocumentBody({
+  doc,
+  caseId,
+  onOpen,
+}: {
+  doc: CaseDocument;
+  caseId?: string;
+  onOpen?: (id: string) => void;
+}) {
+  if (doc.type === "sifreli_kayit") {
+    return <SifreliKayitBody doc={doc} caseId={caseId} onOpen={onOpen} />;
+  }
+
+  if (doc.type === "kilitli_kasa") {
+    return <KilitliKasaBody doc={doc} caseId={caseId} onOpen={onOpen} />;
+  }
+
   if (doc.type === "whatsapp") {
     return (
       <div className="paper-card paper-card--plain relative px-4 sm:px-6 py-5">
@@ -367,6 +397,303 @@ function DocumentBody({ doc }: { doc: CaseDocument }) {
         <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base font-mono-doc pr-16">
           {doc.body}
         </p>
+      )}
+    </div>
+  );
+}
+
+/** "Şifreli Kayıt" bulmacası: oyuncu şifreli metni kendi başına çözüp cevabı
+ * bir input'a yazar — uygulama hiçbir zaman kendisi çözmez/göstermez. Doğru
+ * cevap girilince asıl içerik (`cipherReveal`) açığa çıkar ve bu doküman
+ * ancak o zaman "incelendi" sayılır (kapsam/rütbe hesabına öyle girer). */
+function SifreliKayitBody({
+  doc,
+  caseId,
+  onOpen,
+}: {
+  doc: CaseDocument;
+  caseId?: string;
+  onOpen?: (id: string) => void;
+}) {
+  const [solved, setSolved] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [input, setInput] = useState("");
+  const [wrongPulse, setWrongPulse] = useState(0);
+  const [hintOpen, setHintOpen] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
+
+  useEffect(() => {
+    if (!caseId) {
+      setChecked(true);
+      return;
+    }
+    const alreadySolved = isCipherSolved(caseId, doc.id);
+    setSolved(alreadySolved);
+    setHintsUsed(getCipherHintsUsed(caseId, doc.id));
+    setChecked(true);
+    if (alreadySolved) onOpen?.(doc.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caseId, doc.id]);
+
+  function handleSubmit() {
+    if (!doc.cipherAnswer || !input.trim()) return;
+    if (answersMatch(input, doc.cipherAnswer)) {
+      setSolved(true);
+      if (caseId) markCipherSolved(caseId, doc.id);
+      onOpen?.(doc.id);
+      playMatch();
+    } else {
+      setWrongPulse((n) => n + 1);
+      playMismatch();
+    }
+  }
+
+  function revealHint() {
+    const hints = doc.cipherHints ?? [];
+    if (hintsUsed >= hints.length) return;
+    const next = caseId ? useNextCipherHint(caseId, doc.id, hints.length) : hintsUsed + 1;
+    setHintsUsed(next);
+    playTick();
+  }
+
+  if (!checked) return null;
+
+  if (solved) {
+    return (
+      <div className="px-4 sm:px-6 py-5 space-y-3">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest font-mono-doc text-[#8af0b8]">
+          <span>🔓 Çözüldü</span>
+        </div>
+        <div className="rounded-sm border border-[#3ddc84]/30 bg-[#3ddc84]/[0.06] px-4 py-3.5 font-mono-doc">
+          <p className="whitespace-pre-wrap leading-relaxed text-sm">
+            {doc.cipherReveal ?? doc.body}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const hints = doc.cipherHints ?? [];
+
+  return (
+    <div className="px-4 sm:px-6 py-5 space-y-4">
+      {doc.body && (
+        <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{doc.body}</p>
+      )}
+
+      <div className="rounded-sm border border-white/15 bg-black/50 px-4 py-3.5">
+        <p className="text-[10px] uppercase tracking-widest text-[#8af0b8]/70 font-mono-doc mb-2">
+          🔒 Kilitli İçerik
+        </p>
+        <p className="font-mono-doc text-xs sm:text-sm leading-relaxed break-all text-[#8af0b8]/90">
+          {doc.cipherEncoded}
+        </p>
+      </div>
+
+      <motion.div
+        animate={wrongPulse > 0 ? { x: [0, -8, 8, -6, 6, 0] } : {}}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row gap-2"
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSubmit();
+          }}
+          placeholder="Çözdüğün metni buraya yaz..."
+          aria-label={`${doc.title} için çözüm girişi`}
+          className="flex-1 rounded-sm border border-white/15 bg-background px-3 py-2 text-sm text-text outline-none focus:ring-2 focus:ring-accent-gold/60"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={!input.trim()}
+          className="shrink-0 rounded-sm bg-accent-gold text-black px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Çöz
+        </button>
+      </motion.div>
+
+      {hints.length > 0 && (
+        <div className="pt-1">
+          <button
+            onClick={() => setHintOpen((v) => !v)}
+            className="text-[11px] uppercase tracking-widest text-text-dim hover:text-text font-mono-doc"
+          >
+            💡 İpucu ({hintsUsed}/{hints.length})
+          </button>
+          <AnimatePresence>
+            {hintOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 space-y-2 overflow-hidden"
+              >
+                {hints.slice(0, hintsUsed).map((h, i) => (
+                  <p key={i} className="text-sm leading-relaxed border-l-2 border-accent-gold/50 pl-3">
+                    {h}
+                  </p>
+                ))}
+                {hintsUsed === 0 && (
+                  <p className="text-text-dim text-sm italic">Henüz ipucu almadın.</p>
+                )}
+                <button
+                  onClick={revealHint}
+                  disabled={hintsUsed >= hints.length}
+                  className="rounded-sm border border-accent-gold/40 text-accent-gold px-3 py-1.5 text-xs font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  {hintsUsed >= hints.length ? "Tüm ipuçları açıldı" : "Sonraki İpucu"}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** "Kilitli Kasa" bulmacası: kombinasyon kilidinin haneleri vaka içindeki
+ * başka belgelere dağılmış küçük ayrıntılarda saklı. Oyuncu bunları bulup
+ * (genelde küçükten büyüğe sıralayarak) kodu kendi başına girer. */
+function KilitliKasaBody({
+  doc,
+  caseId,
+  onOpen,
+}: {
+  doc: CaseDocument;
+  caseId?: string;
+  onOpen?: (id: string) => void;
+}) {
+  const [solved, setSolved] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [input, setInput] = useState("");
+  const [wrongPulse, setWrongPulse] = useState(0);
+  const [hintOpen, setHintOpen] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
+
+  useEffect(() => {
+    if (!caseId) {
+      setChecked(true);
+      return;
+    }
+    const alreadySolved = isCipherSolved(caseId, doc.id);
+    setSolved(alreadySolved);
+    setHintsUsed(getCipherHintsUsed(caseId, doc.id));
+    setChecked(true);
+    if (alreadySolved) onOpen?.(doc.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caseId, doc.id]);
+
+  function handleSubmit() {
+    if (!doc.lockAnswer || !input.trim()) return;
+    if (digitsMatch(input, doc.lockAnswer)) {
+      setSolved(true);
+      if (caseId) markCipherSolved(caseId, doc.id);
+      onOpen?.(doc.id);
+      playMatch();
+    } else {
+      setWrongPulse((n) => n + 1);
+      playMismatch();
+    }
+  }
+
+  function revealHint() {
+    const hints = doc.lockHints ?? [];
+    if (hintsUsed >= hints.length) return;
+    const next = caseId ? useNextCipherHint(caseId, doc.id, hints.length) : hintsUsed + 1;
+    setHintsUsed(next);
+    playTick();
+  }
+
+  if (!checked) return null;
+
+  if (solved) {
+    return (
+      <div className="px-4 sm:px-6 py-5 space-y-3">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest font-mono-doc text-[#e8ac6e]">
+          <span>🔓 Açıldı</span>
+        </div>
+        <div className="rounded-sm border border-[#c9863a]/30 bg-[#c9863a]/[0.06] px-4 py-3.5 font-mono-doc">
+          <p className="whitespace-pre-wrap leading-relaxed text-sm">
+            {doc.lockReveal ?? doc.body}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const hints = doc.lockHints ?? [];
+  const digits = doc.lockDigits ?? 3;
+
+  return (
+    <div className="px-4 sm:px-6 py-5 space-y-4">
+      {doc.body && (
+        <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{doc.body}</p>
+      )}
+
+      <motion.div
+        animate={wrongPulse > 0 ? { x: [0, -8, 8, -6, 6, 0] } : {}}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row gap-2"
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value.replace(/[^\d]/g, "").slice(0, digits))}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSubmit();
+          }}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder={"•".repeat(digits)}
+          aria-label={`${doc.title} için ${digits} haneli kombinasyon`}
+          className="w-32 shrink-0 rounded-sm border border-white/15 bg-background px-3 py-2 text-center text-lg tracking-[0.4em] font-mono-doc text-text outline-none focus:ring-2 focus:ring-accent-gold/60"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={!input.trim()}
+          className="shrink-0 rounded-sm bg-accent-gold text-black px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Aç
+        </button>
+      </motion.div>
+
+      {hints.length > 0 && (
+        <div className="pt-1">
+          <button
+            onClick={() => setHintOpen((v) => !v)}
+            className="text-[11px] uppercase tracking-widest text-text-dim hover:text-text font-mono-doc"
+          >
+            💡 İpucu ({hintsUsed}/{hints.length})
+          </button>
+          <AnimatePresence>
+            {hintOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 space-y-2 overflow-hidden"
+              >
+                {hints.slice(0, hintsUsed).map((h, i) => (
+                  <p key={i} className="text-sm leading-relaxed border-l-2 border-accent-gold/50 pl-3">
+                    {h}
+                  </p>
+                ))}
+                {hintsUsed === 0 && (
+                  <p className="text-text-dim text-sm italic">Henüz ipucu almadın.</p>
+                )}
+                <button
+                  onClick={revealHint}
+                  disabled={hintsUsed >= hints.length}
+                  className="rounded-sm border border-accent-gold/40 text-accent-gold px-3 py-1.5 text-xs font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  {hintsUsed >= hints.length ? "Tüm ipuçları açıldı" : "Sonraki İpucu"}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       )}
     </div>
   );

@@ -164,9 +164,11 @@ export const vaka01: CaseData = {
       meta: "T.C. Devlet Demiryolları · Tutanak No: 2026/YE-014 · Komiser Yrd. Hakan Ört",
       body: `Kompartıman kapısı iç sürgüsü kapalı halde bulunmuştur. Pencere kışlık yalıtım nedeniyle dıştan buzlanmış, açılamayacak durumdadır. Kurbanın koleksiyonuna ait, kabzası sedef kakmalı bir Osmanlı hançeri, göğüs bölgesinde tek darbe halinde saplı bulunmuştur. Mücadele izine rastlanmamıştır — kurbanın saldırganı tanıdığı ve yakınına kadar sokulmasına izin verdiği değerlendirilmektedir.
 
-Kompartıman kapısının hemen dışında, koridor zemininde, üzerinde "E.S." harfleri kazınmış küçük bir gümüş kol düğmesi bulunmuş, delil poşetine alınmıştır. Sahibi henüz tespit edilememiştir.
+Kompartıman kapısının hemen dışında, koridor zemininde, üzerine bir çift baş harf kazınmış küçük bir gümüş kol düğmesi bulunmuş, delil poşetine alınmıştır. Kazıma yüzeysel ve eskimiş olduğundan harflerden yalnızca ikincisi ("...S.") net okunabilmektedir; ilk harf aşınmadan dolayı belirsizdir. Sahibi henüz tespit edilememiştir.
 
-Not (teknik detay): Kompartıman kapı sürgüsü, trenin eski model vagonlarında görülen türden olup, koridor tarafından ince bir alet sokularak dışarıdan da manipüle edilebilecek bir mekanizmaya sahiptir. Bu, "içeriden kilitli" görünümünün tek başına saldırganı dışlamayacağı anlamına gelir.`,
+Not (teknik detay): Kompartıman kapı sürgüsü, trenin eski model vagonlarında görülen türden olup, koridor tarafından ince bir alet sokularak dışarıdan da manipüle edilebilecek bir mekanizmaya sahiptir. Bu, "içeriden kilitli" görünümünün tek başına saldırganı dışlamayacağı anlamına gelir.
+
+Kurbanın yelek cebinde, üzerine tek bir rakam kazınmış küçük bir bakır madalyon bulunmuştur: "4". Anlamı şu an için çözülememiştir.`,
     },
     {
       id: "otopsi-raporu",
@@ -202,6 +204,8 @@ Sonuç: Saldırgan muhtemelen kısa boylu, kurbanın güvendiği/yakınına serb
         { sender: "Aylin Ergen", time: "21:53", text: "Umarım. Bu iş açığa çıkarsa sadece kovulmakla kalmazsın, biliyorsun. Kemal Bey şikayetçi de olur." },
         { sender: "Emre Solak", time: "21:58", text: "Trende konuşacağız onunla zaten. Bir yolunu bulurum.", self: true },
         { sender: "Emre Solak", time: "22:01", text: "Lütfen bu konuşmayı kimseye söyleme Aylin.", self: true },
+        { sender: "Aylin Ergen", time: "22:03", text: "Söylemem ama telefonuna güvenme, notlarını hâlâ o tuhaf ters yazı huyunla mı kilitliyorsun? Onu da kırmak zor değil aslında." },
+        { sender: "Emre Solak", time: "22:05", text: "Kimse çözemiyor, kafamda tutması kolay oluyor. Neyse, konu kapansın.", self: true },
       ],
     },
     {
@@ -234,7 +238,9 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
 03:50 — Koridorda Nihal Hanım'ı gördüm, tuvalete gidiyordu, iyi görünüyordu.
 04:05 — 7 no'lu kompartımanın kapısı aralık buldum, seslendim, cevap gelmeyince içeri girdim. Kemal Bey'i o halde buldum. Derhal makinist kabinini aradım.
 
-(Not: 03:25–03:45 arası defterde herhangi bir kayıt yoktur — Bora bu saatlerde lokomotif ekibiyle telsiz görüşmesi yaptığını, koridordan uzak kaldığını ifade etmiştir.)`,
+(Not: 03:25–03:45 arası defterde herhangi bir kayıt yoktur — Bora bu saatlerde lokomotif ekibiyle telsiz görüşmesi yaptığını, koridordan uzak kaldığını ifade etmiştir.)
+
+(Ek not: Kemal Bey'in kompartımanında, masada kağıt ağırlığı olarak kullanılan eski bir zar gördüm, üste gelen yüzünde tek bir nokta vardı — tuhaf bir ayrıntı, ne olur ne olmaz diye not düşüyorum.)`,
     },
     {
       id: "gorgu-tanigi",
@@ -312,7 +318,39 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
       title: "Kemal'in Sesli Notu",
       meta: "Telefonunda bulundu, olay gecesi kaydedilmiş",
       audioDuration: "0:47",
-      body: `"Kendime not: Yusuf diye biri kompartımana geldi, tanımadım, tanımak da istemiyorum, güvenliğe söyleyeceğim... O gazeteci kadın bir şey biliyormuş gibi davranıyor, avukatları arayacağım sabah... Deniz'e bir kuruş daha vermem, o tablo zaten şaibeliydi... Emre'yle de konuşmam lazım, o defter meselesini kapatmalıyım."`,
+      body: `"Kendime not: Yusuf diye biri kompartımana geldi, tanımadım, tanımak da istemiyorum, güvenliğe söyleyeceğim... O gazeteci kadın bir şey biliyormuş gibi davranıyor, avukatları arayacağım sabah... Deniz'e bir kuruş daha vermem, o tablo zaten şaibeliydi... Emre'yle de konuşmam lazım, o defter meselesini kapatmalıyım... Ha bir de, kasadaki eski kilidi unutma, hep aynı üç rakamı kullanırım, biri yedi, biliyorsun."`,
+    },
+    {
+      id: "kemal-kilitli-kutu",
+      type: "kilitli_kasa",
+      title: "Kemal'in Kilitli Kutusu",
+      meta: "Bagajında, deri bir çanta cebinde bulundu",
+      body: `Kemal'in bagajında, küçük pirinç bir kutu bulundu. Üç haneli bir çevirmeli kilidi var, anahtarı yok. Kemal'in yakınlarından biri, onun önemli şeyleri hep aynı üç rakamla kilitlediğini söylüyor — belki bu rakamlar, çevresindeki küçük ayrıntılarda saklı.`,
+      lockDigits: 3,
+      lockAnswer: "147",
+      lockReveal: `[Kutunun içinden çıkanlar]
+
+Eski, katlanmış bir belge: Selçuklu tasının kökenine dair el yazısıyla notlar... "Bu parça izinsiz bir kazıdan geliyor, resmi belgeler sahte." Kemal bunu biliyordu ve saklıyordu — Selim'in aylardır öne sürdüğü iddianın haklı çıktığını gösteriyor.`,
+      lockHints: [
+        "Kemal'in önemli şeyleri hep aynı üç rakamla kilitlediği söyleniyor. Bu rakamları belgelerin arasında bulup küçükten büyüğe doğru dene.",
+        "Bir zar, bir madalyon, bir ses kaydı... Kemal'in çevresindeki küçük ayrıntılara tekrar bak.",
+      ],
+    },
+    {
+      id: "emre-kilitli-not",
+      type: "sifreli_kayit",
+      title: "Telefonda Kilitli Not",
+      meta: "Emre Solak'ın telefonundan, adli bilişim ekibince kurtarıldı",
+      body: `Emre'nin telefonundaki Notlar uygulamasında, başlıksız, kilitli tek bir kayıt bulunmuştur. İçeriği alışıldık bir metin gibi görünmüyor — harf ve rakamların rastgele bir karmaşası. Adli bilişim ekibi, bunun karmaşık bir şifreleme değil, basit ama alışılmadık bir şekilde gizlenmiş bir not olabileceğini düşünüyor.`,
+      cipherEncoded: "=4yavlHIfWMvD7mtDTGIpJXZnByaxSMdyFGIskGZuVmcfSstDDSsEvmchZGI5VmQgwWYtV2S",
+      cipherAnswer: "Kemal Bey farkı öğrendi, artık geri dönüş yok.",
+      cipherReveal: `[Kurtarılan not — Emre Solak'ın telefonundan]
+
+"Kemal Bey farkı öğrendi, artık geri dönüş yok. Belki hâlâ bir açıklama bulabilirim ama sesindeki o ton... Beni sadece kovmakla kalmayacak, şikayetçi de olacak sanırım. Trende bir şey yapmalıyım, bir çözüm bulmalıyım."`,
+      cipherHints: [
+        "Bu tuhaf karakter dizisi bir kodlama olabilir — alfabesi tanıdık geliyor mu?",
+        "Belki bir şeyi ters çevirmen gerekiyor. Emre'nin bu notları nasıl 'kilitlediğinden' bahseden birini hatırlıyor musun?",
+      ],
     },
   ],
   timeline: [
@@ -354,6 +392,6 @@ Ek not (görevli el yazısı): Yolcunun kimliği kontrol edildiğinde, gerçek a
   solution: {
     killerId: "emre",
     explanation:
-      "Katil, asistan Emre Solak. Vagon restoranından sıvışıp yedek anahtarla kompartımana girdi, Kemal'i kendi hançeriyle öldürdü ve eski model sürgü mekanizmasını dışarıdan manipüle ederek kapıyı 'içeriden kilitli' gösterdi. Otopsi raporu saldırganın kısa boylu olduğunu gösteriyor (1.62–1.69 m) — bu aralığa Nihal ve Emre giriyordu. Olay yeri raporundaki 'E.S.' kazılı kol düğmesi ile görgü tanığının 'bilek hizasında parlayan bir şey' tanıklığı (erkek gömleğine ait bir kol düğmesi, kadın değil) ipucu zincirini Emre'ye bağlıyor. Motivi de en acil olandı: zimmet ortaya çıkmıştı, kovulma ve hapis tehdidi kapıdaydı. Diğer şüphelilerin hepsinin gerçek bir sırrı vardı ama hiçbiri cinayete karışmamıştı: Nihal tuvalete gitmişti, Selim erkenden uyuyakalmıştı, Ferit sadece şartlı tahliye ihlali yapmamak için kimliğini gizliyordu, Bora anahtarını hiç kullanmamıştı, Yusuf babasının kapısına kadar gidip geri dönmüştü, Sibel sadece haberi için gözlem yapıyordu, Deniz ise tartışıp öfkeyle ayrılmış ama parasını bile alamamıştı.",
+      "Katil, asistan Emre Solak. Vagon restoranından sıvışıp yedek anahtarla kompartımana girdi, Kemal'i kendi hançeriyle öldürdü ve eski model sürgü mekanizmasını dışarıdan manipüle ederek kapıyı 'içeriden kilitli' gösterdi. Otopsi raporu saldırganın kısa boylu olduğunu gösteriyor (1.62–1.69 m) — bu aralığa Nihal ve Emre giriyordu. Olay yeri raporundaki kısmen okunaklı '...S.' kazılı kol düğmesi ile görgü tanığının 'bilek hizasında parlayan bir şey' tanıklığı (erkek gömleğine ait bir kol düğmesi, kadın değil — Nihal'i eleyen ayrıntı) ipucu zincirini daraltıyor; asistanın kol düğmesinin eksik olduğunu kendi de fark etmemiş olması ('belki kaybetmişimdir, bilmiyorum') ve soyadının kazımayla örtüşmesi zinciri Emre'ye bağlıyor. Motivi de en acil olandı: zimmet ortaya çıkmıştı, kovulma ve hapis tehdidi kapıdaydı. Diğer şüphelilerin hepsinin gerçek bir sırrı vardı ama hiçbiri cinayete karışmamıştı: Nihal tuvalete gitmişti, Selim erkenden uyuyakalmıştı, Ferit sadece şartlı tahliye ihlali yapmamak için kimliğini gizliyordu, Bora anahtarını hiç kullanmamıştı, Yusuf babasının kapısına kadar gidip geri dönmüştü, Sibel sadece haberi için gözlem yapıyordu, Deniz ise tartışıp öfkeyle ayrılmış ama parasını bile alamamıştı.",
   },
 };

@@ -20,6 +20,8 @@ export const DOC_COLORS: Record<DocumentType, DocColor> = {
   sosyal_medya: { border: "#d1568f", text: "#e88fb7", bg: "rgba(209,86,143,0.10)" },
   haber_kupuru: { border: "#5a63c4", text: "#8f96e3", bg: "rgba(90,99,196,0.10)" },
   ses_kaydi: { border: "#dcc24a", text: "#efdd8a", bg: "rgba(220,194,74,0.10)" },
+  sifreli_kayit: { border: "#3ddc84", text: "#8af0b8", bg: "rgba(61,220,132,0.10)" },
+  kilitli_kasa: { border: "#c9863a", text: "#e8ac6e", bg: "rgba(201,134,58,0.10)" },
 };
 
 export function docColorFor(type: DocumentType): DocColor {

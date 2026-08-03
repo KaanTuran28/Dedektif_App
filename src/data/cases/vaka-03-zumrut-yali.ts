@@ -175,7 +175,9 @@ Not: Digoksin serbestçe satılmaz, kontrollü ilaç dolaplarında bulunur.`,
       meta: "Erendil Ailesi Avukatı · Henüz imzalanmamış taslak",
       body: `Necdet Erendil'in avukatıyla üzerinde çalıştığı taslağa göre: Erendil Holding CEO'luğu Aslan Erendil'den alınıp Defne Erendil-Kara'ya devredilecek. Yıldız Erendil'in miras payı, sürmekte olan bir "güven kaybı" gerekçesiyle önemli ölçüde azaltılacak. Kaan Erendil'e doğrudan bir pay öngörülmemiş, babası Aslan üzerinden dolaylı pay alacak. Sadi Yalman'a, kırk yıllık hizmeti karşılığında sembolik bir emeklilik ikramiyesi bırakılmış.
 
-Taslak henüz imzalanmamıştı.`,
+Taslak henüz imzalanmamıştı.
+
+(Taslağın kenarına, avukatın el yazısıyla küçük bir rakam not düşülmüş: 2 — muhtemelen bir revizyon numarası.)`,
     },
     {
       id: "kaan-mesaj",
@@ -224,7 +226,7 @@ Kutlama günü — kayıt yok, ancak dolabın son kontrolünde bir digoksin kutu
       meta: "Sadi Yalman'ın eşyaları arasında bulunmuş, otuz yıllık, el yazısı",
       body: `"Sadi kardeşim, eğer bunu okuyorsan artık burada değilim demektir. Necdet Bey'le kurduğumuz şirketi elimden aldı, imzaladığım kağıtların hileli olduğunu çok geç anladım. Her şeyimi kaybettim, borç içindeyim, sana yük olmak istemiyorum. Beni affet. Bunu kimseye anlatma, Necdet Bey güçlü biri, başına iş açma."
 
-(Not: Bu mektup, Sadi Yalman'ın yakın zamanda ailesinin eski eşyalarını düzenlerken bulduğu belirtiliyor — kırk yıl boyunca kardeşinin gerçek ölüm nedenini bilmediğini iddia ediyor.)`,
+(Not: Bu mektup, Sadi Yalman'ın yakın zamanda ailesinin eski eşyalarını düzenlerken bulduğu belirtiliyor — kırk yıl boyunca kardeşinin gerçek ölüm nedenini bilmediğini iddia ediyor. Mektubun kenarında, çocukluktan kalma bir "gizli yazı" oyununun izi olan küçük bir çiziktirme var: harfleri ters sırayla yazıp sonra ayna karşısında okuma. Altında soluk bir el yazısıyla "S.Y & Y.Y — sonsuza dek gizli" yazıyor.)`,
     },
     {
       id: "hizmetci-ifadesi",
@@ -253,14 +255,50 @@ Ne yazık ki dava sonuçlandıktan kısa süre sonra Yusuf Yalman'ın ani vefat 
       type: "resmi_rapor",
       title: "Şirket Kredi Kartı İnceleme Notu",
       meta: "Erendil Holding İç Denetim · Gizli",
-      body: `İç denetim ekibi tarafından yapılan rutin inceleme sırasında, Melis Erendil'e (Aslan Erendil'in eşi) tahsis edilen şirket kredi kartıyla son altı ayda yapılan harcamaların büyük kısmının kişisel nitelikte olduğu tespit edilmiştir. Necdet Erendil, bulguları görür görmez konuyu bizzat takip etmek istediğini belirtmiş, "ailevi bir mesele olarak" ele alınmasını istemiştir.`,
+      body: `İç denetim ekibi tarafından yapılan rutin inceleme sırasında, Melis Erendil'e (Aslan Erendil'in eşi) tahsis edilen şirket kredi kartıyla son altı ayda yapılan harcamaların büyük kısmının kişisel nitelikte olduğu tespit edilmiştir. Necdet Erendil, bulguları görür görmez konuyu bizzat takip etmek istediğini belirtmiş, "ailevi bir mesele olarak" ele alınmasını istemiştir.
+
+(Raporun üstündeki dosya numarasının son hanesi: 5.)`,
     },
     {
       id: "hisse-devri-inceleme",
       type: "resmi_rapor",
       title: "Hisse Devri Belgesi İncelemesi",
       meta: "Erendil Holding Hukuk Servisi · Acil İnceleme Talebi",
-      body: `Necdet Erendil'in talimatıyla incelenen 2019 tarihli hisse devri belgesinde, holding avukatı Emin Doğaner adına devredilen %4'lük payın imza sürecinde usulsüzlük şüphesi bulunmaktadır. Necdet Erendil, belgeyi "yakın zamanda fark ettiğini" ve "derhal iptal sürecini başlatacağını" belirten yazılı bir talimat vermiştir. Belgenin savcılığa intikal ettirilip ettirilmeyeceği netlik kazanmamıştır.`,
+      body: `Necdet Erendil'in talimatıyla incelenen 2019 tarihli hisse devri belgesinde, holding avukatı Emin Doğaner adına devredilen %4'lük payın imza sürecinde usulsüzlük şüphesi bulunmaktadır. Necdet Erendil, belgeyi "yakın zamanda fark ettiğini" ve "derhal iptal sürecini başlatacağını" belirten yazılı bir talimat vermiştir. Belgenin savcılığa intikal ettirilip ettirilmeyeceği netlik kazanmamıştır.
+
+(İncelemenin ekindeki eski bir zarfın üstünde tek bir rakam yazılı: 9.)`,
+    },
+    {
+      id: "sadi-gizli-not",
+      type: "sifreli_kayit",
+      title: "Sadi'nin Odasında Bulunan Sayfa",
+      meta: "Hizmetçi odasında, eski bir defterin arasına sıkıştırılmış",
+      body: `Sadi'nin hizmetçi odasında, eski bir defterin arasına sıkıştırılmış tek bir sayfa bulundu. Üzerindeki yazı tanıdık bir alfabeyle ama anlamsız bir karmaşa halinde — harfler karışmış görünüyor. Defterin geri kalan sayfaları boş.`,
+      cipherEncoded: "u0Wdy9WepxWaiBSaul2nEnGd0VmdoFWbg0WarBSauV2Ug4Sb1J3b5FLxs5WYgkGZtl2nFDCLtl2nFXGZyF2agYWdzVXW",
+      cipherAnswer: "Yusuf kardeşim, şimdi anlıyorum. Seni kim mahvettiğini biliyorum.",
+      cipherReveal: `[Kurtarılan sayfa — Sadi Yalman'ın el yazısı, olaydan birkaç gün önce]
+
+"Yusuf kardeşim, şimdi anlıyorum. Seni kim mahvettiğini biliyorum. Kırk yıl ona hizmet ettim, kadehini bin kere elimle hazırladım. Bunu nasıl taşıyacağımı bilmiyorum ama artık biliyorum işte — artık geri dönemem."`,
+      cipherHints: [
+        "Bu harfler tanıdık bir alfabeden geliyor ama bir şey ters gidiyor.",
+        "Sadi ile kardeşinin çocukken oynadığı bir oyunu hatırla — ayna yazısı. Belki bu sayfa da öyle okunuyor.",
+      ],
+    },
+    {
+      id: "necdet-kilitli-cekmece",
+      type: "kilitli_kasa",
+      title: "Necdet'in Kilitli Çekmecesi",
+      meta: "Kütüphanede, özel çalışma masasında bulundu",
+      body: `Necdet'in kütüphanedeki çalışma masasının alt çekmecesi kilitli. Üç haneli eski bir kombinasyon kilidi var. Aile, Necdet'in yıllar içinde topladığı belgelerin kenarına dalgın dalgın rakamlar karaladığını, bunların hep aynı üç rakam olduğunu hatırlıyor — belki dosyaların arasında hâlâ duruyorlardır.`,
+      lockDigits: 3,
+      lockAnswer: "259",
+      lockReveal: `[Çekmecenin içinden çıkanlar]
+
+Eski, sararmış bir zarf: içinde Necdet'in kendi el yazısıyla, hiç gönderilmemiş kısa bir mektup taslağı var. "Sadi, Yusuf'un başına geleni biliyorum, hep bildim. Yıllardır sana bunu nasıl söyleyeceğimi bilemedim. Belki bir gün..." Mektup burada yarım kalmış.`,
+      lockHints: [
+        "Necdet'in çekmecesi rastgele değil — yıllar içinde topladığı belgelerin kenarına bırakılmış üç rakam olduğu söyleniyor. Bulunca küçükten büyüğe dene.",
+        "Bir vasiyet taslağı, bir mali not, bir hisse devri incelemesi... üçünün de kenarında unutulmuş birer rakam var.",
+      ],
     },
   ],
   timeline: [

@@ -26,6 +26,8 @@ const TYPE_ICON: Record<string, string> = {
   sosyal_medya: "📱",
   haber_kupuru: "📰",
   ses_kaydi: "🎙️",
+  sifreli_kayit: "🔐",
+  kilitli_kasa: "🗝️",
 };
 
 const CANVAS_W = 1040;
@@ -281,6 +283,21 @@ export function RoomEvidenceBoard({ data, roomCode }: { data: CaseData; roomCode
             outlineOffset: "-4px",
           }}
         >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.35) 100%)",
+            }}
+          />
+          <p
+            aria-hidden
+            className="pointer-events-none absolute bottom-3 right-4 font-display text-6xl sm:text-8xl font-black text-white/[0.03] select-none"
+          >
+            DOSYA {String(data.order).padStart(2, "0")}
+          </p>
+
           <svg className="absolute inset-0 pointer-events-none" width={CANVAS_W} height={CANVAS_H}>
             <defs>
               <marker

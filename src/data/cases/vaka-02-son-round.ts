@@ -195,7 +195,7 @@ Odada, yatırım turu sözleşmesinin bir nüshası üzerinde el yazısıyla yap
 22:45  O.KIRCA    GİRİŞ   28. Kat, CEO Ofisi
 23:15  O.KIRCA    ÇIKIŞ   28. Kat
 
-Silme işlemi, sistem yöneticisi (admin) yetkisiyle, 23:22'de gerçekleştirilmiş olup, bu yetkiye şirket içinde yalnızca CTO erişebilmektedir. Silme işleminin kaynağı olan cihaz, Ozan Kırca'nın şirket dizüstü bilgisayarıyla eşleşmektedir.`,
+Silme işlemi, sistem yöneticisi (admin) yetkisiyle, 23:22'de gerçekleştirilmiş olup, bu yetkiye şirket içinde yalnızca CTO erişebilmektedir. Silme işleminin kaynağı olan cihazın envanter sicil numarası (NV-LT-014), IT zimmet kayıtlarında CTO'ya tahsisli dizüstü bilgisayar olarak görünmektedir.`,
     },
     {
       id: "eposta-deniz-ozan",
@@ -262,7 +262,9 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       type: "ifade",
       title: "Yağmur Diker İfadesi",
       meta: "Kişisel Asistan, 26 · Kurbanın son gördüğü kişilerden",
-      body: `"Deniz'i son kez 22:25'te gördüm, ofisine çekiliyordu, biraz gergindi. Ben resepsiyonda kaldım, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım'la birlikteydim, ikisi de doğrular. 23:30'da toplantı bitti, herkes onu bekliyordu, ben çağırmaya gittim... O halde buldum."`,
+      body: `"Deniz'i son kez 22:25'te gördüm, ofisine çekiliyordu, biraz gergindi. Ben resepsiyonda kaldım, gece nöbetçisi Kadir ve temizlikçi Fatma Hanım'la birlikteydim, ikisi de doğrular. 23:30'da toplantı bitti, herkes onu bekliyordu, ben çağırmaya gittim... O halde buldum."
+
+(Sorgu sırasında kendiliğinden eklemiş: "Deniz'in tuhaf bir huyu vardı, önemli şeyleri hep tersten yazardı, üniversiteden kalma bir alışkanlıkmış diyordu, hep gülerdik buna.")`,
     },
     {
       id: "nova-haber",
@@ -274,7 +276,9 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
         byline: "Ekonomi Servisi",
         date: "Olaydan 2 gün önce",
       },
-      body: `Yapay zeka alanında hızla büyüyen Nova Teknoloji'nin, şirket değerini kat kat artıracak yeni bir yatırım turuna hazırlandığı öğrenildi. Sektör kaynakları, imza töreninin bu hafta içinde gerçekleşeceğini belirtirken, şirket içi kaynaklar bazı ortaklık paylarının yeniden yapılandırılacağına dair "gerilimli" görüşmelerin sürdüğünü aktardı. Nova Teknoloji'den konuya ilişkin resmi bir açıklama gelmedi.`,
+      body: `Yapay zeka alanında hızla büyüyen Nova Teknoloji'nin, şirket değerini kat kat artıracak yeni bir yatırım turuna hazırlandığı öğrenildi. Sektör kaynakları, imza töreninin bu hafta içinde gerçekleşeceğini belirtirken, şirket içi kaynaklar bazı ortaklık paylarının yeniden yapılandırılacağına dair "gerilimli" görüşmelerin sürdüğünü aktardı. Nova Teknoloji'den konuya ilişkin resmi bir açıklama gelmedi.
+
+(Kupürün kenarına elle bir rakam karalanmış: 9.)`,
     },
     {
       id: "board-eposta",
@@ -289,7 +293,7 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       },
       body: `Değerli kurul üyeleri, yatırım turu görüşmeleri sırasında hukuk müşavirimiz Cem Baydar'ın, yatırımcı fonlarımızdan birinde önceden beyan edilmemiş bir hissesi olduğunu öğrendim. Bu açık bir çıkar çatışması ve sözleşme sürecinin bütünlüğünü riske atıyor. Toplantıdan hemen sonra bu konuyu resmi olarak gündeme getireceğim.
 
-(Not: E-posta gönderilmemiş, taslak olarak kalmış.)`,
+(Not: E-posta gönderilmemiş, taslak olarak kalmış. Taslağın otomatik kaydedilen sürüm geçmişinde bir versiyon numarası dikkat çekiyor: v.6.)`,
     },
     {
       id: "muhendis-transfer-mesaj",
@@ -308,7 +312,41 @@ Not: Olay gecesi saat 21:52'de bina girişinde "misafir kartı" kullanıldığı
       type: "resmi_rapor",
       title: "Eski Ortaklık Sözleşmesi Özeti",
       meta: "Ticaret Sicili kayıtları · Nova Teknoloji kuruluş belgeleri",
-      body: `Nova Teknoloji, sekiz yıl önce Deniz Aral, Ozan Kırca ve Kerem Arslan tarafından eşit ortaklıkla (%33,3) kurulmuştur. İzleyen yıllarda yapılan art arda hisse ihraçları ve yeniden yapılandırmalarla Kerem Arslan'ın payı kademeli olarak %2,1'e kadar düşürülmüştür. İncelenen taslak yatırım turu sözleşmesinde, Kerem Arslan'a ait payın "seyreltme koruması" maddesinden hariç tutulduğu, bu turun tamamlanmasıyla payının sembolik bir düzeyin de altına ineceği görülmektedir.`,
+      body: `Nova Teknoloji, sekiz yıl önce Deniz Aral, Ozan Kırca ve Kerem Arslan tarafından eşit ortaklıkla (%33,3) kurulmuştur. İzleyen yıllarda yapılan art arda hisse ihraçları ve yeniden yapılandırmalarla Kerem Arslan'ın payı kademeli olarak %2,1'e kadar düşürülmüştür. İncelenen taslak yatırım turu sözleşmesinde, Kerem Arslan'a ait payın "seyreltme koruması" maddesinden hariç tutulduğu, bu turun tamamlanmasıyla payının sembolik bir düzeyin de altına ineceği görülmektedir.
+
+(Belgenin fotokopisine iliştirilmiş küçük bir post-it notunda tek bir rakam yazıyor: 3.)`,
+    },
+    {
+      id: "kilitli-usb",
+      type: "sifreli_kayit",
+      title: "Kilitli USB Bellek",
+      meta: "Deniz Aral'ın masa çekmecesinde bulundu, adli bilişim incelemesinde",
+      body: `Deniz'in masasının en alt çekmecesinde, üzerinde etiket olmayan küçük bir USB bellek bulundu. İçinde tek bir metin dosyası var ama açıldığında ekranda anlamsız bir karakter dizisi beliriyor — dosya bozuk değil, bilerek böyle bırakılmış gibi görünüyor.`,
+      cipherEncoded: "=4Sbp9JxlNWZ5VWbyVmdg4Wa6lGIhx2chBSYuVnYgwicvlXsE/ZxxSMbhd6wgEWeh1GbhBSYuFLxkFGIpRmbltGIpRnblRXYwBibhp3T",
+      cipherAnswer: "Ozan patenti kendi adına almaya çalışıyor, buna asla izin vermeyeceğim.",
+      cipherReveal: `[Kurtarılan dosya — Deniz Aral'ın kişisel notu]
+
+"Ozan patenti kendi adına almaya çalışıyor, buna asla izin vermeyeceğim. Yarın imza gecesi bu konuyu açık açık konuşacağım, ne kadar sinirlenirse sinirlensin — bu onun emeği, biliyorum, ama şirketin de hakkı var. Bir orta yol bulmalıyız yoksa bu iş büyür."`,
+      cipherHints: [
+        "Bu karakterler bilindik bir kodlamaya benziyor ama düz çözülmüyor.",
+        "Deniz'in eski bir alışkanlığını hatırla — önemli şeyleri hep tersten yazarmış.",
+      ],
+    },
+    {
+      id: "deniz-ani-kutusu",
+      type: "kilitli_kasa",
+      title: "Deniz'in Kilitli Anı Kutusu",
+      meta: "Evinde, çalışma odasındaki rafta bulundu",
+      body: `Deniz'in evinde, çalışma odasındaki bir rafta küçük, ahşap bir kutu bulundu. Üç haneli bir kombinasyon kilidi var. Asistanı Yağmur, Deniz'in önemli anılarını hep aynı üç rakamla kilitlediğini, ama rakamları hiç bilmediğini söylüyor — belki de dosyaların kenarında unutulmuş küçük ayrıntılarda saklıdır.`,
+      lockDigits: 3,
+      lockAnswer: "369",
+      lockReveal: `[Kutunun içinden çıkanlar]
+
+Eski bir fotoğraf: genç Deniz, Ozan ve Kerem, ilk ofislerinin önünde, üçü de gülüyor. Arkasında Deniz'in el yazısıyla: "Bir gün bunun ne kadar büyüyeceğini kimse bilemez. İyi ki sizi tanıdım." Fotoğrafın tarihi, şirketin kuruluşundan sadece birkaç ay öncesine ait.`,
+      lockHints: [
+        "Deniz'in bu kutuyu nasıl kilitlediğini bilen yok ama üç ayrı yerde bıraktığı üç rakam varmış gibi görünüyor — bulduğunda küçükten büyüğe sırala.",
+        "Bir haber küpürü, eski bir ortaklık belgesi, bir e-posta taslağı... üçünde de köşede unutulmuş birer rakam var.",
+      ],
     },
   ],
   timeline: [
