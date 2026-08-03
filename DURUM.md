@@ -3,10 +3,15 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (İkinci bulmaca türü eklendi: Kombinasyon
+**Son güncelleme:** 2026-08-04 (Dördüncü vaka "Perde Arkası" (tiyatro
+teması) eklendi, ikisi de baştan planlanmış iki bulmaca içeriyor, Pelin
+Ergüven easter egg'i ilk kez kullanıldı. **Kullanıcı isteğiyle bu turda
+tarayıcı testi YAPILMADI, sadece `npm run build`.** bkz. "Vaka 04 —
+'Perde Arkası' Eklendi" — bir sonraki oturumda öncelik bunun test
+edilmesi. Öncesinde 2026-08-03: İkinci bulmaca türü eklendi: Kombinasyon
 Kilidi — 3 vakanın hepsine birer tane, Şifreli Kayıt ile aynı kalıcılık/
-başarım altyapısını paylaşıyor. bkz. "Kombinasyon Kilidi Bulmacası
-Eklendi". Öncesinde aynı gün: Şifreli Kayıt bulmaca mekaniği — her vakaya
+başarım altyapısını paylaşıyor (bu ikisi zaten push edildi). bkz.
+"Kombinasyon Kilidi Bulmacası Eklendi". Öncesinde aynı gün: Şifreli Kayıt bulmaca mekaniği — her vakaya
 birer tane (Vaka 02'de kullanıcının istediği kilitli USB bellek dahil) — ve
 Pano'ya "Ana Şüpheli" çapası + bağlantı etiketleme + teori bonusu eklendi,
 Vaka 01/02'nin en belirgin ipuçları yumuşatıldı, Playwright ile test edildi
@@ -906,7 +911,58 @@ bulmacayı istedi.
   gerçekten işlediği doğrulandı), doğru kodun açtığı — **0 konsol hatası**.
   `npm run build` temiz.
 
+## Vaka 04 — "Perde Arkası" Eklendi (2026-08-04, yirmisekizinci güncelleme)
+Bir önceki turdaki iki bulmaca mekaniği (şifreli kayıt + kombinasyon
+kilidi) commit'lenip push edildikten sonra, kullanıcı kısa bir web
+araştırması istedi (casual dedektif/escape-room bulmaca tasarımı
+üzerine — bkz. bu turun başındaki arama sonuçları) ve ardından **dördüncü
+bir vaka** yazılmasını istedi, üç seçenek arasından **"Perde Arkası"**
+(tiyatro teması) seçildi. **Kullanıcı bu turda "test etmeden geliştirme
+yapalım" dedi** — bu yüzden Playwright ile uçtan uca doğrulama YAPILMADI,
+sadece `npm run build` ile derleme/tip kontrolü yapıldı.
+
+- **Tema:** Bir tiyatronun prömiyer gecesi, usta yönetmen Orhan Tez sahne
+  arkasında, ışık kumanda panosunun önünde elektrik çarpması süsü verilmiş
+  bir cinayetle öldürülüyor. Önceki üç vakadan (tren/kapalı mekan,
+  teknoloji ofisi/dijital log, villa/zehir) hem ortam hem yöntem olarak
+  bilinçli şekilde farklı.
+- **Katil: Derin Aksoy** (başrol oyuncusu, 12 yıldır Orhan'ın güvendiği
+  isim). Twist: resmi biyografisinde hiç yer almayan, unutulmuş bir
+  detay — oyunculuktan önce üç yıl ışık teknisyenliği yapmış, bu da
+  panoyu sabote edebilecek teknik bilgiye nasıl sahip olduğunu açıklıyor.
+  Motiv: Orhan'ın onu hiç haber vermeden ulusal turne kadrosundan çıkarıp
+  yerine genç Mina'yı koyması. 6 red herring şüpheli (yapımcı, sahne
+  amiri, elektrikçi, eski asistan/intihal iddiası, genç oyuncu, eş) —
+  hepsinin gerçek motivi var ama hepsinin sağlam bir alibisi de var.
+- **Ortak evren easter egg'i ilk kez kullanıldı:** `PLAN.md` §9'da aylar
+  önce not edilen ama hiç kullanılmayan gazeteci karakteri **Pelin
+  Ergüven**, Meridyen Gazetesi imzalı bir söyleşi küpüründe ilk kez
+  sahneye çıktı (aynı zamanda kombinasyon kilidinin rakamlarından birini
+  taşıyor).
+- **İki bulmaca da baştan planlanarak yazıldı** (retrofit değil):
+  `orhan-sandigi` (kilitli_kasa, kod 258 — loca fişi=2, devre no=5,
+  "sekizinci prömiyeri"=8'den toplanıyor, içinden Derin'in unutulmuş
+  teknisyenlik geçmişine dair eski bir fotoğraf çıkıyor — çözüme dair
+  ipucu ama zorunlu değil) ve `derin-gunluk` (sifreli_kayit, aynı
+  ters-çevrilmiş-base64 şeması, Derin'in kendi itirafı niteliğinde bir
+  günlük sayfası). "Ters çevirme" ipucu bu kez Mina'nın ifadesinde,
+  Derin'in repliklerini "aynadan okur gibi" ezberleme alışkanlığı olarak
+  saklandı — önceki iki vakadaki "tersten yazma huyu" varyasyonlarından
+  farklı, oyunculuğa özgü bir gerekçe.
+- **Kayıt:** `src/data/cases/vaka-04-perde-arkasi.ts` yeni dosya,
+  `src/data/cases/index.ts`'e eklendi. Bir isim çakışması riski fark edilip
+  düzeltildi (Vaka 02'deki "Barış Ete" ile karışmasın diye arka plan
+  karakteri "Barış Konak" → "Kerim Sav" yapıldı).
+- **Doğrulama:** SADECE `npm run build` (temiz, tip hatası yok, 4 vaka da
+  statik olarak üretiliyor). Kilit kodunun (258) ve şifre çözümünün
+  (reverse-base64 round-trip) doğruluğu Node ile elle hesaplanıp
+  doğrulandı ama **tarayıcıda hiç açılıp oynanmadı** — bir sonraki turda
+  gerçek bir Playwright/manuel oynanış testi yapılmalı.
+
 ## Sıradaki Adım
+0. **ÖNCELİK: Vaka 04 hiç tarayıcıda test edilmedi** — bir sonraki
+   oturumda önce bu yapılmalı (uçtan uca oynanış, iki bulmaca, suçlama
+   akışı, mobil görünüm).
 1. **Bu oturumun değişiklikleri henüz GitHub'a push edilmedi** — kullanıcı
    onaylarsa commit atılıp push edilebilir (yerelde tamamen çalışır durumda,
    `npm run build` temiz).
