@@ -1,7 +1,61 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /rooms/{roomCode}/messages/{messageId} {
+    match /caseRooms/{roomCode} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(
+          ['caseId', 'phase', 'hostParticipantId', 'hintsUsed', 'votes', 'viewedDocIds',
+           'viewedSuspectIds', 'accusedId', 'motiveCorrect', 'methodCorrect', 'result',
+           'participantCount', 'createdAt']
+        )
+        && request.resource.data.caseId is string && request.resource.data.caseId.size() <= 60
+        && request.resource.data.phase == 'lobby'
+        && request.resource.data.participantCount == 1
+        && request.resource.data.votes == {}
+        && request.resource.data.hintsUsed == 0
+        && request.resource.data.createdAt == request.time;
+      // Kimlik doğrulama yok (hesap sistemi kapsam dışı) — bu yüzden kurallar
+      // sadece YAZILAN VERİNİN ŞEKLİNİ doğrulayabiliyor, "kim yazdığını" değil.
+      // Oda kodunu bilen biri teorik olarak başka bir katılımcı adına oy/veri
+      // yazabilir. Bu, zaten canlıdaki sohbet kuralıyla aynı güven modeli.
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                      .hasOnly(['phase', 'votes', 'hintsUsed', 'viewedDocIds', 'viewedSuspectIds',
+                                'accusedId', 'motiveCorrect', 'methodCorrect', 'result', 'participantCount'])
+                    && request.resource.data.phase in
+                      ['lobby', 'investigating', 'voting-killer', 'voting-motive', 'voting-method', 'revealed']
+                    && request.resource.data.hintsUsed is int
+                    && request.resource.data.hintsUsed >= 0 && request.resource.data.hintsUsed <= 20
+                    && request.resource.data.viewedDocIds.size() <= 200
+                    && request.resource.data.viewedSuspectIds.size() <= 200
+                    && request.resource.data.votes.size() <= 32
+                    && request.resource.data.participantCount is int
+                    && request.resource.data.participantCount >= 0 && request.resource.data.participantCount <= 32;
+      allow delete: if false;
+    }
+
+    match /caseRooms/{roomCode}/participants/{participantId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['name', 'colorHue', 'joinedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.colorHue is number
+        && request.resource.data.joinedAt == request.time;
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    match /caseRooms/{roomCode}/board/{boardDocId} {
+      allow read: if true;
+      allow write: if boardDocId == 'state'
+        && request.resource.data.keys().hasOnly(['positions', 'connections', 'notes'])
+        && request.resource.data.connections is list
+        && request.resource.data.connections.size() <= 60
+        && request.resource.data.notes is map
+        && request.resource.data.positions is map;
+    }
+
+    match /caseRooms/{roomCode}/messages/{messageId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll(['name', 'text', 'colorHue', 'createdAt'])
         && request.resource.data.name is string

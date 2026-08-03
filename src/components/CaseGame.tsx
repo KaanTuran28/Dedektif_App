@@ -8,7 +8,6 @@ import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SuspectCard } from "@/components/SuspectCard";
 import { Notebook } from "@/components/Notebook";
-import { CaseChat } from "@/components/CaseChat";
 import { EvidenceBoard } from "@/components/EvidenceBoard";
 import { Timeline } from "@/components/Timeline";
 import { HintPanel } from "@/components/HintPanel";
@@ -74,14 +73,14 @@ function zeroRank(data: CaseData): DetectiveRank {
   });
 }
 
-export function CaseGame({ data }: { data: CaseData }) {
+export function CaseGame({ data, skipIntro = false }: { data: CaseData; skipIntro?: boolean }) {
   const [step, setStep] = useState<Step>("giris");
   const [started, setStarted] = useState(false);
   const [ready, setReady] = useState(false);
   const [accusedId, setAccusedId] = useState<string | null>(null);
   const [motiveCorrect, setMotiveCorrect] = useState(false);
   const [final, setFinal] = useState<FinalResult | null>(null);
-  const [introDone, setIntroDone] = useState(false);
+  const [introDone, setIntroDone] = useState(skipIntro);
   const [soundOn, setSoundOn] = useState(true);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
   const [viewedSuspects, setViewedSuspects] = useState<Set<string>>(new Set());
@@ -419,12 +418,7 @@ export function CaseGame({ data }: { data: CaseData }) {
 
             {step === "pano" && <EvidenceBoard data={data} />}
 
-            {step === "notlar" && (
-              <div className="grid gap-6 sm:grid-cols-2 items-start">
-                <Notebook caseId={data.id} />
-                <CaseChat caseId={data.id} />
-              </div>
-            )}
+            {step === "notlar" && <Notebook caseId={data.id} />}
 
             {step === "suclama" && (
               <AccusationLineup
@@ -501,7 +495,7 @@ export function CaseGame({ data }: { data: CaseData }) {
   );
 }
 
-function IntroCinematic({
+export function IntroCinematic({
   title,
   order,
   skip,
