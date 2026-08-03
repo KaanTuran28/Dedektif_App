@@ -39,27 +39,3 @@ export function setChatIdentity(name: string): ChatIdentity {
   if (isBrowser()) window.localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity));
   return identity;
 }
-
-const ROOM_KEY_PREFIX = "supheli:chat:oda:";
-
-/** Aynı vakayı açan herkes varsayılan olarak aynı odada buluşsun diye vaka
- * id'sinden kısa, deterministik bir oda kodu türetilir — kod vaka id'sinin
- * kendisi DEĞİL, ayrı bir kavram, çünkü kullanıcı isterse farklı bir kod
- * girip aynı vakayı oynayan başka bir arkadaş grubuyla karışmayan özel bir
- * odaya geçebilmeli. */
-export function defaultRoomCodeFor(caseId: string): string {
-  return hash(caseId).toString(36).slice(0, 5).toUpperCase();
-}
-
-export function getStoredRoomCode(caseId: string): string {
-  if (!isBrowser()) return defaultRoomCodeFor(caseId);
-  return window.localStorage.getItem(ROOM_KEY_PREFIX + caseId) ?? defaultRoomCodeFor(caseId);
-}
-
-export function setStoredRoomCode(caseId: string, roomCode: string) {
-  if (isBrowser()) window.localStorage.setItem(ROOM_KEY_PREFIX + caseId, roomCode);
-}
-
-export function normalizeRoomCode(input: string): string {
-  return input.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
-}

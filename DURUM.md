@@ -3,9 +3,9 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (çok oyunculu sohbet özelliği TAMAMLANDI —
-Firebase/Firestore ile canlı sohbet Notlar sekmesinin yanına eklendi, bkz.
-"Sohbet Özelliği Tamamlandı")
+**Son güncelleme:** 2026-08-03 (TAM ORTAK OYUN ODASI özelliği TAMAMLANDI —
+oda kur/katıl, paylaşımlı pano, oybirliğiyle katil/motiv/yöntem oylaması,
+sohbet hepsi tek sistemde birleşti, bkz. "Ortak Oyun Odası Tamamlandı")
 
 ## GitHub
 - Repo: https://github.com/KaanTuran28/Dedektif_App.git (public, kullanıcının kendi hesabı)
@@ -417,12 +417,98 @@ kalan tüm adımlar uçtan uca tamamlandı:
 - Kapsam bilinçli olarak dar tutuldu: sadece yazılı sohbet, pano/kanıt gibi
   tam ortak state paylaşımı yok — bu istenirse sonraki bir faz.
 
+## Ortak Oyun Odası Tamamlandı (2026-08-03, onsekizinci güncelleme)
+Kullanıcı önceki turda eklenen basit sohbet kutusunu yeterli bulmadı,
+**gerçek eş zamanlı ortak oyun** istedi: oda kur, kod arkadaşa gitsin,
+katılsın, pano/kanıt görülme durumu herkese yansısın, suçlamada katılımcı
+sayısı kadar oy gerekli olsun. Plan modunda tasarlanıp (bir Plan sub-agent'ı
+ile doğrulanıp) kullanıcıyla netleştirilen kararlar:
+- Oybirliği şart (çoğunluk değil) — hem katil hem motiv hem yöntem
+  turlarında.
+- Oybirliği sağlanamazsa oylar otomatik sıfırlanıp tur yeniden başlıyor
+  (manuel "yeniden oyla" butonu yok, sürtünmesiz).
+- Kanıt/şüpheli "incelendi" durumu oda genelinde paylaşımlı (kişiye özel
+  değil).
+- Bir önceki turda eklenen basit/otomatik-kodlu sohbet kutusu bu sisteme
+  TAMAMEN taşındı — artık tek bir "oda" kavramı var, ayrı bir sohbet kodu
+  kalmadı.
+
+**Mimari:**
+- **Firestore veri modeli:** `caseRooms/{kod}` (faz, paylaşımlı `votes` map'i
+  — katil/motiv/yöntem turlarının üçü de aynı jenerik alanı kullanıyor ve
+  tur bitince temizleniyor —, `viewedDocIds`/`viewedSuspectIds`,
+  `hintsUsed`, `participantCount`, `result`), alt koleksiyonlar
+  `participants/{katılımcıId}` ve `messages/{mesajId}` (sohbet, eski
+  `rooms/{kod}` koleksiyonunun yerini aldı), ayrıca `board/state` (pano —
+  pozisyon/bağlantı/not) ayrı bir doküman (sık yazılan pano, seyrek yazılan
+  oda durumunu gereksiz yere tetiklemesin diye).
+- **`src/lib/room.ts`:** tüm Firestore CRUD/subscribe fonksiyonları +
+  `castVote` — oybirliği çözümü tek bir `runTransaction` içinde yapılıyor
+  (oku-kontrol-yaz, Firestore'un optimistic concurrency'siyle yarış
+  durumuna karşı güvenli; SDK çakışan transaction'ları otomatik retry
+  ediyor). Yanlış katil seçilirse motiv/yöntem turlarına hiç girilmeden
+  direkt "Vaka Kapandı" sonucuna gidiyor (solo moddaki mantıkla birebir
+  aynı, `rankFor()` fonksiyonu solo ile birebir paylaşılıyor).
+- **`src/components/RoomEvidenceBoard.tsx`:** `EvidenceBoard.tsx`'in
+  Firestore senkronlu hali — kendi sürüklediğin kart, gelen bir uzak
+  güncellemeyle çakışmasın diye `draggingIdRef` ile korunuyor, sürükleme
+  bitince (drag-end) commit ediliyor (her frame'de değil, yazma trafiği
+  düşük kalsın diye).
+- **`src/components/RoomCaseGame.tsx`:** oda kur/katıl formu, bekleme odası
+  (katılımcı listesi + "Soruşturmayı Başlat"), yatırım sekmesi kabuğu
+  (solo ile aynı Vaka/Kanıtlar/Şüpheliler/Zaman/Pano/Notlar sekmeleri),
+  paylaşımlı ipucu paneli (kullanımı TÜM takımın puanını düşürüyor), canlı
+  oy sayaçlı katil/motiv/yöntem oylama ekranları, paylaşımlı sonuç ekranı
+  — sonuç geldiğinde her katılımcının kendi cihazı `recordAccusation`/
+  `checkAchievements` çağırıyor ki ana sayfadaki istatistikler/rozetler
+  solo modla aynı şekilde güncellensin.
+- **`src/components/CaseEntry.tsx`** (yeni giriş noktası): açılış
+  sinematiğini bir kez gösterip "Tek Başına Oyna" (değişmeyen `CaseGame`)
+  / "👥 Arkadaşlarınla Oyna" (`RoomCaseGame`) seçimi sunuyor. `page.tsx`
+  artık `CaseGame` yerine `CaseEntry` render ediyor.
+- **`CaseChat.tsx`** kendi katılma formunu kaybetti, artık dumb bir bileşen
+  (`{roomCode, name, colorHue}` prop'u alıyor), `caseRooms/{kod}/messages`
+  koleksiyonuna bağlanıyor. **Solo modda artık hiç sohbet kutusu yok.**
+- **`firestore.rules`** güncellendi ve deploy edildi: `caseRooms` +
+  `participants` + `board` + `messages` kural ağacı eklendi, eski
+  `rooms/{kod}/messages` bloğu kaldırıldı. Kimlik doğrulama olmadığı için
+  kurallar sadece yazılan verinin ŞEKLİNİ doğrulayabiliyor ("kim yazdığını"
+  değil) — bu, zaten var olan sohbet güven modeliyle aynı, bilinçli kabul
+  edilen bir sınır.
+- **Bilinçli kapsam dışı bırakılanlar:** oda modunda 1 saatlik süre sınırı
+  yok; "Odadan Ayrıl" dışında bağlantı kopma/presence takibi yok (biri
+  sekmeyi kapatıp ayrılmazsa gerekli oy sayısı kilitlenebilir — bilinen
+  risk, kabul edildi); pano üzerinde aynı anda aynı kartı iki kişi
+  sürüklerse son yazan kazanır (son derece düşük ihtimal, çözülmedi).
+
+**Test:** İki bağımsız Playwright browser context'i ile gerçek Firestore'a
+karşı uçtan uca doğrulandı — oda kurma, kod ile katılma, katılımcı listesi
+senkronu, paylaşımlı pano (biri kart yerleştirince diğeri anında görüyor),
+oybirliği olmayan oylamanın otomatik sıfırlanması (0/2'ye dönüyor),
+oybirliğiyle katil→motiv→yöntem zincirinin ilerlemesi, paylaşımlı sonuç
+ekranı (takım rütbesi dahil) — hepsi iki tarafta da senkron. Test
+sırasında görülen "HTTP 400 FAILED_PRECONDITION" hataları, eşzamanlı oy
+transaction'larında Firestore'un beklenen optimistic-concurrency
+çakışması — SDK otomatik retry ediyor, gerçek bir hata değil (her
+kontrolün sonucu hep doğru çıktı). `npm run build` temiz geçti.
+
+**Not:** `npm run lint` bazı "Cannot access refs during render" / "Avoid
+calling setState() directly within an effect" hataları veriyor ama bunlar
+bu oturumdan ÖNCE de vardı (EvidenceBoard.tsx, CaseGame.tsx, page.tsx,
+StatsPanel.tsx — hiçbiri değişmedi), yeni dosyalar (RoomEvidenceBoard.tsx,
+RoomCaseGame.tsx) aynı deseni birebir taklit ettiği için aynı uyarıyı
+veriyor. Regresyon değil, ayrı bir gündem maddesi olarak bekliyor.
+
 ## Sıradaki Adım
-1. **Canlıda son doğrulama** (henüz yapılmadı): dedektif-app.vercel.app
-   üzerinde gerçekten sohbet kutusunun çalıştığını teyit et.
-2. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
+1. **Henüz push edilmedi** — kullanıcıdan onay bekleniyor (büyük bir
+   özellik, Firestore güvenlik kuralları dahil).
+2. Push sonrası: canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama
+   iyi olur (yerelde zaten Playwright ile doğrulandı ama gerçek ağ
+   gecikmesiyle bir kez daha denemek faydalı).
+3. Diğer açık öneriler (henüz seçilmedi, öncelik değil): gerçek fiziksel
    cihaz testi (özellikle iOS Safari — hâlâ hiç yapılmadı, sadece
-   Playwright WebKit emülasyonu var), Vaka 04 içeriği.
+   Playwright WebKit emülasyonu var), Vaka 04 içeriği, oda modunda süre
+   sınırı / presence-kopma takibi eklemek istenirse.
 
 ## Kararlar Günlüğü
 - **2026-08-02:** Platform olarak Web App/PWA seçildi (native app'e karşı).
