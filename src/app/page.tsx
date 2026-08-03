@@ -68,13 +68,19 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        <div className="relative flex justify-center mb-8 sm:mb-10">
+        <div className="relative flex justify-center gap-3 flex-wrap mb-8 sm:mb-10">
           <button
             onClick={() => setGuideOpen(true)}
             className="rounded-sm border border-accent-gold/50 text-accent-gold px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-accent-gold/10 transition-colors"
           >
             📖 Nasıl Oynanır?
           </button>
+          <Link
+            href="/oda"
+            className="rounded-sm bg-accent-red-bright px-5 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
+          >
+            👥 Arkadaşlarınla Oyna
+          </Link>
         </div>
 
         <div className="relative w-full grid gap-6 sm:gap-8 sm:grid-cols-2">

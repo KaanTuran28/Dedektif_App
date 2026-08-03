@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import type { CaseData, FollowUpQuestion } from "@/types/case";
@@ -15,9 +16,10 @@ import { groupDocumentsByCategory } from "@/lib/docCategories";
 import { playStamp, playTick } from "@/lib/sound";
 import { checkAchievements } from "@/lib/achievements";
 import { recordAccusation, getCaseProgress } from "@/lib/progress";
-import { allCases } from "@/data/cases";
+import { allCases, getCaseById } from "@/data/cases";
 import { getChatIdentity, colorForHue } from "@/lib/chat";
 import {
+  backToInvestigating,
   castVote,
   createRoom,
   getOrCreateParticipantId,
@@ -27,7 +29,6 @@ import {
   normalizeRoomCode,
   openAccusation,
   setStoredRoomCode,
-  startInvestigation,
   subscribeParticipants,
   subscribeRoom,
   markDocViewedShared,
@@ -51,10 +52,13 @@ const TABS: { id: Step; label: string }[] = [
   { id: "notlar", label: "Notlar" },
 ];
 
-/** CaseGame.tsx'in çok oyunculu karşılığı — oyunun "beyni" artık localStorage
- * değil paylaşılan bir Firestore oda dokümanı. Solo mod bu dosyaya hiç
- * dokunmadan aynen çalışmaya devam ediyor. */
-export function RoomCaseGame({ data }: { data: CaseData }) {
+/** /oda sayfasının içeriği — hiçbir vakaya bağlı değil. Oda kurulunca hangi
+ * vakanın oynanacağı henüz belli değildir; katılımcılar "voting-case"
+ * fazında ortak oy birliğiyle karar verir, karar verilir verilmez soruşturma
+ * herkes için aynı anda (senkron) başlar. Solo mod (CaseGame.tsx,
+ * progress.ts, board.ts) bu dosyaya hiç dokunmadan aynen çalışmaya devam
+ * ediyor. */
+export function RoomCaseGame() {
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [checkedStorage, setCheckedStorage] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
@@ -63,9 +67,9 @@ export function RoomCaseGame({ data }: { data: CaseData }) {
   const participantId = useMemo(() => getOrCreateParticipantId(), []);
 
   useEffect(() => {
-    setRoomCode(getStoredRoomCode(data.id));
+    setRoomCode(getStoredRoomCode());
     setCheckedStorage(true);
-  }, [data.id]);
+  }, []);
 
   useEffect(() => {
     if (!roomCode) {
@@ -83,13 +87,15 @@ export function RoomCaseGame({ data }: { data: CaseData }) {
     return subscribeParticipants(roomCode, setParticipants);
   }, [roomCode]);
 
+  const data = useMemo(() => (room?.caseId ? getCaseById(room.caseId) ?? null : null), [room?.caseId]);
+
   function handleJoined(code: string) {
     setRoomCode(code);
   }
 
   function handleLeave() {
     if (roomCode) leaveRoom(roomCode);
-    setStoredRoomCode(data.id, null);
+    setStoredRoomCode(null);
     setRoomCode(null);
     setRoom(null);
     setStep("giris");
@@ -98,7 +104,7 @@ export function RoomCaseGame({ data }: { data: CaseData }) {
   if (!checkedStorage) return null;
 
   if (!roomCode) {
-    return <RoomJoinForm caseId={data.id} onJoined={handleJoined} />;
+    return <RoomJoinForm onJoined={handleJoined} />;
   }
 
   if (!room) {
@@ -112,15 +118,26 @@ export function RoomCaseGame({ data }: { data: CaseData }) {
     );
   }
 
-  if (room.phase === "lobby") {
+  if (room.phase === "voting-case") {
     return (
-      <RoomWaitingRoom
-        data={data}
+      <RoomCaseVoting
         roomCode={roomCode}
+        participantId={participantId}
+        room={room}
         participants={participants}
-        onStart={() => startInvestigation(roomCode)}
         onLeave={handleLeave}
       />
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-4 text-center py-24">
+        <p className="text-text-dim">Vaka verisi yüklenemedi.</p>
+        <button onClick={handleLeave} className="mt-4 text-xs text-text-dim underline">
+          Odadan Ayrıl
+        </button>
+      </div>
     );
   }
 
@@ -138,7 +155,7 @@ export function RoomCaseGame({ data }: { data: CaseData }) {
   );
 }
 
-function RoomJoinForm({ caseId, onJoined }: { caseId: string; onJoined: (code: string) => void }) {
+function RoomJoinForm({ onJoined }: { onJoined: (code: string) => void }) {
   const [mode, setMode] = useState<"choose" | "create" | "join">("choose");
   const [name, setName] = useState(() => getChatIdentity()?.name ?? "");
   const [codeInput, setCodeInput] = useState("");
@@ -152,7 +169,7 @@ function RoomJoinForm({ caseId, onJoined }: { caseId: string; onJoined: (code: s
     setBusy(true);
     setError(null);
     try {
-      const code = await createRoom(caseId, trimmed);
+      const code = await createRoom(trimmed);
       onJoined(code);
     } catch {
       setError("Oda kurulamadı, tekrar dene.");
@@ -169,7 +186,7 @@ function RoomJoinForm({ caseId, onJoined }: { caseId: string; onJoined: (code: s
     setBusy(true);
     setError(null);
     try {
-      await joinRoom(caseId, code, trimmed);
+      await joinRoom(code, trimmed);
       onJoined(code);
     } catch {
       setError("Bu kodla bir oda bulunamadı.");
@@ -181,6 +198,12 @@ function RoomJoinForm({ caseId, onJoined }: { caseId: string; onJoined: (code: s
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm rounded-lg border border-white/10 bg-panel p-6">
+        <Link
+          href="/"
+          className="inline-block text-accent-gold text-xs uppercase tracking-widest hover:underline font-mono-doc mb-4"
+        >
+          ← Ana Sayfaya Dön
+        </Link>
         <p className="text-xs uppercase tracking-widest text-accent-gold mb-4">Arkadaşlarınla Oyna</p>
         {mode === "choose" && (
           <div className="space-y-3">
@@ -251,20 +274,22 @@ function RoomJoinForm({ caseId, onJoined }: { caseId: string; onJoined: (code: s
   );
 }
 
-function RoomWaitingRoom({
-  data,
+function RoomCaseVoting({
   roomCode,
+  participantId,
+  room,
   participants,
-  onStart,
   onLeave,
 }: {
-  data: CaseData;
   roomCode: string;
+  participantId: string;
+  room: Room;
   participants: Participant[];
-  onStart: () => void;
   onLeave: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const myVote = room.votes[participantId];
+  const playable = allCases.filter((c) => c.available);
 
   function handleCopy() {
     navigator.clipboard?.writeText(roomCode).then(() => {
@@ -273,13 +298,15 @@ function RoomWaitingRoom({
     });
   }
 
+  function vote(caseId: string) {
+    castVote(roomCode, "voting-case", caseId);
+    playTick();
+  }
+
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-sm rounded-lg border border-accent-gold/40 bg-panel p-6 text-center space-y-5">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-accent-gold mb-1">{data.title}</p>
-          <p className="text-text-dim text-xs">Bu kodu arkadaşınla paylaş, katılsın</p>
-        </div>
+    <div className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-10 space-y-6">
+      <div className="text-center space-y-3">
+        <p className="text-text-dim text-sm">Bu kodu arkadaşlarınla paylaş, katılsınlar</p>
         <button
           onClick={handleCopy}
           aria-label={`Oda kodu ${roomCode}, kopyalamak için tıkla`}
@@ -288,33 +315,72 @@ function RoomWaitingRoom({
           {roomCode}
         </button>
         {copied && <p className="text-accent-gold text-xs">Kopyalandı!</p>}
-        <div className="text-left">
-          <p className="text-[11px] uppercase tracking-widest text-text-dim mb-2">
-            Odadakiler ({participants.length})
-          </p>
-          <div className="space-y-1.5">
-            {participants.map((p) => (
-              <p key={p.id} className="text-sm flex items-center gap-2">
-                <span
-                  className="h-2 w-2 rounded-full shrink-0"
-                  style={{ backgroundColor: colorForHue(p.colorHue) }}
-                />
-                {p.name}
-              </p>
-            ))}
-          </div>
+      </div>
+
+      <div>
+        <p className="text-[11px] uppercase tracking-widest text-text-dim mb-2">
+          Odadakiler ({participants.length})
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {participants.map((p) => (
+            <span key={p.id} className="text-sm flex items-center gap-1.5 rounded-full border border-white/10 px-2.5 py-1">
+              <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: colorForHue(p.colorHue) }} />
+              {p.name}
+            </span>
+          ))}
         </div>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={onStart}
-            className="w-full rounded-sm bg-accent-red-bright px-4 py-3 text-sm font-semibold uppercase tracking-wide hover:bg-accent-red transition-colors"
-          >
-            Soruşturmayı Başlat
-          </button>
-          <button onClick={onLeave} className="text-xs text-text-dim hover:text-text underline">
-            Odadan Ayrıl
-          </button>
+      </div>
+
+      <div>
+        <p className="text-[11px] uppercase tracking-widest text-accent-gold mb-2">
+          Hangi vakayı oynayalım? · {Object.keys(room.votes).length}/{participants.length} oy verdi
+        </p>
+        <p className="text-text-dim text-xs mb-3">
+          Herkes aynı vakayı seçmeden soruşturma başlamaz — oy verdikten sonra fikrini değiştirebilirsin.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {playable.map((c) => {
+            const voters = participants.filter((p) => room.votes[p.id] === c.id);
+            const selected = myVote === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => vote(c.id)}
+                aria-pressed={selected}
+                className={`text-left rounded-sm border p-4 transition-colors ${
+                  selected
+                    ? "border-accent-red-bright bg-accent-red-bright/10"
+                    : "border-white/10 bg-panel hover:border-white/25"
+                }`}
+              >
+                <p className="text-[10px] uppercase tracking-widest text-accent-red font-mono-doc mb-1">
+                  Vaka {String(c.order).padStart(2, "0")} · {c.difficulty}
+                </p>
+                <p className="font-display text-lg font-bold">{c.title}</p>
+                <p className="text-text-dim text-xs mt-1">{c.tagline}</p>
+                {voters.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {voters.map((v) => (
+                      <span
+                        key={v.id}
+                        className="text-[9px] px-1.5 py-0.5 rounded-full"
+                        style={{ backgroundColor: `${colorForHue(v.colorHue)}30`, color: colorForHue(v.colorHue) }}
+                      >
+                        {v.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
+      </div>
+
+      <div className="text-center">
+        <button onClick={onLeave} className="text-xs text-text-dim hover:text-text underline">
+          Odadan Ayrıl
+        </button>
       </div>
     </div>
   );
@@ -488,7 +554,14 @@ function RoomGameShell({
             {isInvestigating && step === "notlar" && (
               <div className="grid gap-6 sm:grid-cols-2 items-start">
                 <Notebook caseId={data.id} />
-                {identity && <CaseChat roomCode={roomCode} name={identity.name} colorHue={identity.colorHue} />}
+                {identity && (
+                  <CaseChat
+                    roomCode={roomCode}
+                    participantId={participantId}
+                    name={identity.name}
+                    colorHue={identity.colorHue}
+                  />
+                )}
               </div>
             )}
 
@@ -622,10 +695,18 @@ function RoomAccusationVoting({
 
   return (
     <div className="space-y-5">
-      <p className="text-text-dim">
-        Herkes aynı şüpheliyi seçmeden suçlama sonuçlanmaz. Oy verdikten sonra
-        fikrini değiştirebilirsin.
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-text-dim">
+          Herkes aynı şüpheliyi seçmeden suçlama sonuçlanmaz. Oy verdikten sonra
+          fikrini değiştirebilirsin.
+        </p>
+        <button
+          onClick={() => backToInvestigating(roomCode)}
+          className="shrink-0 text-xs text-text-dim hover:text-text underline whitespace-nowrap"
+        >
+          ← Soruşturmaya Dön
+        </button>
+      </div>
       <p className="text-xs font-mono-doc text-accent-gold">
         {Object.keys(room.votes).length}/{participants.length} oy verdi
       </p>

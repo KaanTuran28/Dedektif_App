@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -20,7 +21,7 @@ import { rankFor, type DetectiveRank } from "@/lib/rank";
 import { setChatIdentity } from "@/lib/chat";
 
 export type RoomPhase =
-  | "lobby"
+  | "voting-case"
   | "investigating"
   | "voting-killer"
   | "voting-motive"
@@ -36,7 +37,10 @@ export interface RoomResult {
 }
 
 export interface RoomDoc {
-  caseId: string;
+  /** Oda kurulduğunda henüz belli değil — "voting-case" turu oybirliğiyle
+   * sonuçlanınca atanır. Kimse belirli bir vakanın sayfasından oda kurmuyor,
+   * herkes /oda'da buluşup hangi vakayı oynayacaklarına birlikte karar veriyor. */
+  caseId: string | null;
   phase: RoomPhase;
   hostParticipantId: string;
   hintsUsed: number;
@@ -68,9 +72,11 @@ export interface BoardDoc {
 
 export interface RoomChatMessage {
   id: string;
+  authorId: string;
   name: string;
   text: string;
   colorHue: number;
+  editedAt: boolean;
 }
 
 function isBrowser() {
@@ -78,7 +84,7 @@ function isBrowser() {
 }
 
 const PARTICIPANT_ID_KEY = "supheli:oda:katilimci-id";
-const ROOM_CODE_PREFIX = "supheli:oda:kod:";
+const ROOM_CODE_KEY = "supheli:oda:aktif-kod";
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // O/0, I/1 karışmasın diye çıkarıldı
 
 export function getOrCreateParticipantId(): string {
@@ -91,15 +97,15 @@ export function getOrCreateParticipantId(): string {
   return id;
 }
 
-export function getStoredRoomCode(caseId: string): string | null {
+export function getStoredRoomCode(): string | null {
   if (!isBrowser()) return null;
-  return window.localStorage.getItem(ROOM_CODE_PREFIX + caseId);
+  return window.localStorage.getItem(ROOM_CODE_KEY);
 }
 
-export function setStoredRoomCode(caseId: string, code: string | null) {
+export function setStoredRoomCode(code: string | null) {
   if (!isBrowser()) return;
-  if (code) window.localStorage.setItem(ROOM_CODE_PREFIX + caseId, code);
-  else window.localStorage.removeItem(ROOM_CODE_PREFIX + caseId);
+  if (code) window.localStorage.setItem(ROOM_CODE_KEY, code);
+  else window.localStorage.removeItem(ROOM_CODE_KEY);
 }
 
 export function generateRoomCode(): string {
@@ -126,9 +132,10 @@ function boardRef(roomCode: string) {
   return doc(db, "caseRooms", roomCode, "board", "state");
 }
 
-/** Yeni oda kurar: benzersiz bir kod üretmeye çalışır (çakışma ihtimali çok
+/** Yeni oda kurar — henüz hiçbir vaka seçilmemiştir, faz "voting-case"
+ * olarak başlar. Benzersiz bir kod üretmeye çalışır (çakışma ihtimali çok
  * düşük ama yine de kontrol edilir), oda + kurucunun katılımcı kaydını yazar. */
-export async function createRoom(caseId: string, hostName: string): Promise<string> {
+export async function createRoom(hostName: string): Promise<string> {
   const participantId = getOrCreateParticipantId();
   const identity = setChatIdentity(hostName);
 
@@ -139,8 +146,8 @@ export async function createRoom(caseId: string, hostName: string): Promise<stri
     if (existing.exists()) continue;
 
     await setDoc(ref, {
-      caseId,
-      phase: "lobby",
+      caseId: null,
+      phase: "voting-case",
       hostParticipantId: participantId,
       hintsUsed: 0,
       votes: {},
@@ -158,7 +165,7 @@ export async function createRoom(caseId: string, hostName: string): Promise<stri
       colorHue: identity.colorHue,
       joinedAt: serverTimestamp(),
     });
-    setStoredRoomCode(caseId, code);
+    setStoredRoomCode(code);
     return code;
   }
   throw new Error("Oda kodu üretilemedi, tekrar dene.");
@@ -166,7 +173,7 @@ export async function createRoom(caseId: string, hostName: string): Promise<stri
 
 /** Var olan bir odaya katılır. Aynı participantId zaten katılmışsa (sayfa
  * yenilendiyse) katılımcı sayısını tekrar artırmadan sessizce devam eder. */
-export async function joinRoom(caseId: string, roomCode: string, name: string): Promise<void> {
+export async function joinRoom(roomCode: string, name: string): Promise<void> {
   const participantId = getOrCreateParticipantId();
   const identity = setChatIdentity(name);
   const ref = roomRef(roomCode);
@@ -186,7 +193,7 @@ export async function joinRoom(caseId: string, roomCode: string, name: string): 
     tx.update(ref, { participantCount: (room.participantCount ?? 0) + 1 });
   });
 
-  setStoredRoomCode(caseId, roomCode);
+  setStoredRoomCode(roomCode);
 }
 
 /** Odadan ayrılır: katılımcı kaydını siler, sayacı düşürür, varsa aktif
@@ -263,7 +270,14 @@ export function subscribeMessages(
     cb(
       snap.docs.map((d) => {
         const data = d.data();
-        return { id: d.id, name: data.name, text: data.text, colorHue: data.colorHue };
+        return {
+          id: d.id,
+          authorId: data.authorId ?? "",
+          name: data.name,
+          text: data.text,
+          colorHue: data.colorHue,
+          editedAt: !!data.editedAt,
+        };
       })
     );
   });
@@ -271,11 +285,13 @@ export function subscribeMessages(
 
 export async function sendRoomMessage(
   roomCode: string,
+  authorId: string,
   name: string,
   text: string,
   colorHue: number
 ): Promise<void> {
   await addDoc(collection(db, "caseRooms", roomCode, "messages"), {
+    authorId,
     name,
     text,
     colorHue,
@@ -283,14 +299,28 @@ export async function sendRoomMessage(
   });
 }
 
-export async function startInvestigation(roomCode: string): Promise<void> {
-  await updateDoc(roomRef(roomCode), { phase: "investigating" });
+export async function editRoomMessage(roomCode: string, messageId: string, text: string): Promise<void> {
+  await updateDoc(doc(db, "caseRooms", roomCode, "messages", messageId), {
+    text,
+    editedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteRoomMessage(roomCode: string, messageId: string): Promise<void> {
+  await deleteDoc(doc(db, "caseRooms", roomCode, "messages", messageId));
 }
 
 /** Herhangi bir katılımcı "Katili Suçla"ya basınca herkesi katil oylama
  * ekranına geçirir — bu adımın kendisi bir oy değil, sadece ekran geçişidir. */
 export async function openAccusation(roomCode: string): Promise<void> {
   await updateDoc(roomRef(roomCode), { phase: "voting-killer" });
+}
+
+/** Katil oylama ekranından "hayır, kanıtlara bakalım" diyip soruşturmaya
+ * dönmek için — oylar da sıfırlanır ki eski turdan kalan oylar yeni
+ * suçlamayı yanlışlıkla hemen sonuçlandırmasın. */
+export async function backToInvestigating(roomCode: string): Promise<void> {
+  await updateDoc(roomRef(roomCode), { phase: "investigating", votes: {} });
 }
 
 export async function markDocViewedShared(roomCode: string, docId: string): Promise<void> {
@@ -320,10 +350,10 @@ function coverageFor(room: RoomDoc, docCount: number, suspectCount: number): num
   );
 }
 
-/** Katil/motiv/yöntem oylamasının üçü de aynı jenerik mekanizmayı paylaşır:
- * herkes oy verene kadar bekle, oybirliği varsa bir sonraki tura geç, herkes
- * oy verdi ama anlaşamadıysa turu sıfırla. Saf bir fonksiyon olarak
- * yazılmasının nedeni hem `castVote` hem `leaveRoom` transaction'larından
+/** Vaka seçimi, katil/motiv/yöntem oylamasının hepsi aynı jenerik mekanizmayı
+ * paylaşır: herkes oy verene kadar bekle, oybirliği varsa bir sonraki tura
+ * geç, herkes oy verdi ama anlaşamadıysa turu sıfırla. Saf bir fonksiyon
+ * olarak yazılmasının nedeni hem `castVote` hem `leaveRoom` transaction'larından
  * çağrılabilmesi — biri odadan ayrıldığında da (oy sayısı/katılımcı sayısı
  * değiştiği için) aynı çözümlemenin tekrar denenmesi gerekiyor, yoksa kalan
  * oylar zaten oybirliğine ulaşmış olsa bile tur gereksiz yere kilitli kalır. */
@@ -331,7 +361,6 @@ function tryResolvePhase(
   room: RoomDoc,
   phase: RoomPhase
 ): Partial<RoomDoc> | null {
-  if (phase !== "voting-killer" && phase !== "voting-motive" && phase !== "voting-method") return null;
   if (room.phase !== phase) return null;
 
   const values = Object.values(room.votes);
@@ -340,10 +369,19 @@ function tryResolvePhase(
 
   const allSame = values.every((v) => v === values[0]);
   if (!allSame) return { votes: {} };
-
-  const caseData = getCaseById(room.caseId);
-  if (!caseData) return null;
   const choice = values[0];
+
+  // Vaka seçimi: oybirliği sağlanınca hem hangi vakanın oynanacağı belli
+  // olur hem de soruşturma senkron şekilde başlamış olur — ayrı bir
+  // "başlat" düğmesine gerek yok.
+  if (phase === "voting-case") {
+    return { votes: {}, phase: "investigating", caseId: choice };
+  }
+
+  if (phase !== "voting-killer" && phase !== "voting-motive" && phase !== "voting-method") return null;
+
+  const caseData = room.caseId ? getCaseById(room.caseId) : undefined;
+  if (!caseData) return null;
   const coverage = coverageFor(room, caseData.documents.length, caseData.suspects.length);
 
   if (phase === "voting-killer") {

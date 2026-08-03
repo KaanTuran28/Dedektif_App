@@ -3,7 +3,10 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (TAM ORTAK OYUN ODASI özelliği TAMAMLANDI +
+**Son güncelleme:** 2026-08-03 (Oda mimarisi vaka-sayfasından bağımsız
+/oda rotasına taşındı, ortak vaka seçimi oybirliğiyle + senkron başlama,
+sohbete düzenle/sil, geri butonları eklendi — bkz. "Oda Mimarisi Yeniden
+Yapılandırıldı". Önceki: TAM ORTAK OYUN ODASI özelliği TAMAMLANDI +
 **kritik service worker önbellek hatası düzeltildi** — kullanıcı "GitHub'a
 gidiyor ama Vercel'de yüklenmiyor" dedi, bkz. "Service Worker Önbellek
 Hatası Bulundu ve Düzeltildi")
@@ -579,9 +582,58 @@ ve ciddi bir hata** bulundu:
   — yüksek güvenle doğru teşhis ama kullanıcının deploy sonrası gerçekten
   düzeldiğini teyit etmesi gerekiyor.
 
+## Oda Mimarisi Yeniden Yapılandırıldı (2026-08-03, yirmibirinci güncelleme)
+Kullanıcı 4 şey istedi: geri butonları, vaka başlatmanın "kafamıza göre değil"
+ortak/oylanmış olması (katil/motiv/yöntem oylaması gibi), oyunun senkron
+başlaması, sohbete mesaj düzenleme/silme. Bunun için oda mimarisi kökten
+değişti:
+
+- **Oda artık bir vaka sayfasına bağlı değil.** Önceki tasarımda oda, o an
+  hangi vakanın sayfasındaysan o vakaya kilitleniyordu (biri vaka-01'den oda
+  kurup arkadaşı yanlışlıkla vaka-02'nin sayfasından katılırsa içerik
+  uyuşmazlığı olabilirdi — gerçek bir gizli hataydı). Şimdi ana sayfada yeni
+  bir **"👥 Arkadaşlarınla Oyna"** girişi var → yeni `/oda` rotası (vakadan
+  bağımsız) → oda kur/katıl → **"voting-case" fazı**: herkes hangi vakayı
+  oynayacağına birlikte karar verir. Bu, katil/motiv/yöntem oylamasıyla
+  AYNI jenerik oybirliği mekanizmasını kullanıyor (`tryResolvePhase`'e
+  4. bir dal eklendi) — anlaşmazlıkta oylar sıfırlanır, oybirliği olunca
+  hem hangi vaka oynanacağı belli olur HEM DE soruşturma herkes için aynı
+  anda başlar. **Ayrı bir "Soruşturmayı Başlat" butonu tamamen kaldırıldı**
+  — vaka seçimi zaten "başlat" demek.
+- **`RoomDoc.caseId` artık `string | null`** — oda kurulurken null, oy
+  birliğiyle atanıyor. `createRoom`/`joinRoom` artık caseId parametresi
+  almıyor (tek bir global "aktif oda kodu" localStorage anahtarı yeterli,
+  `supheli:oda:kod:{caseId}` yerine `supheli:oda:aktif-kod`).
+  `getCaseById(room.caseId)` ile vaka verisi `RoomCaseGame` içinde
+  dinamik çözülüyor.
+- **`CaseEntry.tsx` tamamen kaldırıldı** — artık gerek yok, çünkü çoklu
+  oyunculu vaka sayfasından değil `/oda`'dan başlıyor.
+  `src/app/vaka/[caseId]/page.tsx` eskisi gibi doğrudan `<CaseGame>`
+  render ediyor (solo mod sıfırdan hiç değişmedi, sadece dolaylı olarak
+  CaseEntry'nin kaldırılmasıyla eski basit haline döndü).
+- **Geri butonları eklendi:** oda kur/katıl formunda "← Ana Sayfaya Dön",
+  katil oylama ekranında "← Soruşturmaya Dön" (yeni `backToInvestigating`
+  — oyları temizleyip herkesi tekrar kanıt incelemeye döndürür, tur
+  yanlışlıkla açıldıysa ya da grup fikrini değiştirdiyse diye).
+- **Sohbete düzenleme/silme eklendi:** mesajlara `authorId` (katılımcı id)
+  alanı eklendi, kendi mesajının üzerine gelince ✎/✕ ikonları çıkıyor.
+  Firestore kuralları mesaj `update`'ini sadece `text`+`editedAt` alanlarına
+  izin verecek şekilde daraltıldı, `delete: true` yapıldı (aynı "kimlik
+  doğrulama yok" güven modeliyle — sadece kendi client'ın hangi mesajları
+  düzenleyebileceğini UI seviyesinde gösteriyoruz, kural seviyesinde
+  "sahiplik" zorlanamıyor, önceki turlarda da kabul edilen bir sınır).
+- **Firestore kuralları güncellenip deploy edildi:** `voting-case` fazı ve
+  nullable `caseId` için create/update kuralları güncellendi.
+- **Test:** İki-üç context ile tam akış doğrulandı — ana sayfadan `/oda`ya
+  geçiş, oda kur/katıl, ortak vaka oylamasında anlaşmazlık (senkron
+  başlamıyor) → oybirliği (her iki tarafta da AYNI ANDA doğru vakayla
+  soruşturma başlıyor), katil oylamasından "Soruşturmaya Dön" çalışıyor,
+  sohbette mesaj gönder/düzenle/sil her iki tarafta da senkron yansıyor,
+  solo mod hiç bozulmadan uçtan uca çalışıyor. `npm run build` temiz.
+
 ## Sıradaki Adım
-1. **Kullanıcı bu düzeltmenin canlıda işe yaradığını doğrulamalı** (bir
-   kereliğine sert yenileme sonrası).
+1. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
+   doğrulamalı (bir kereliğine sert yenileme sonrası).
 2. Canlıda gerçek iki cihaz/tarayıcıyla son bir doğrulama iyi olur
    (yerelde Playwright ile kapsamlı doğrulandı ama gerçek ağ gecikmesiyle
    bir kez daha denemek faydalı).
