@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { CaseData, FollowUpQuestion } from "@/types/case";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SuspectCard } from "@/components/SuspectCard";
+import { IntroCinematic } from "@/components/CaseGame";
 import { Notebook } from "@/components/Notebook";
 import { Timeline } from "@/components/Timeline";
 import { CaseChat } from "@/components/CaseChat";
@@ -64,7 +65,10 @@ export function RoomCaseGame() {
   const [room, setRoom] = useState<Room | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [step, setStep] = useState<Step>("giris");
+  const [introShown, setIntroShown] = useState(false);
+  const initialPhaseRef = useRef<RoomPhase | null>(null);
   const participantId = useMemo(() => getOrCreateParticipantId(), []);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     setRoomCode(getStoredRoomCode());
@@ -88,6 +92,17 @@ export function RoomCaseGame() {
   }, [roomCode]);
 
   const data = useMemo(() => (room?.caseId ? getCaseById(room.caseId) ?? null : null), [room?.caseId]);
+
+  // Odaya YENİ katılan biri (ya da vaka oylaması yeni bitmiş biri) için
+  // solo moddaki gibi bir "Dosya Açılıyor" sinematiği oynatılır — ama
+  // sayfa yenilenip devam eden bir soruşturmaya dönülüyorsa (ilk görülen
+  // faz zaten "voting-case"in ötesindeyse) sinematik tekrar oynatılmaz,
+  // tıpkı solo modun devam eden vakada intro'yu atlaması gibi.
+  useEffect(() => {
+    if (!room || initialPhaseRef.current !== null) return;
+    initialPhaseRef.current = room.phase;
+    if (room.phase !== "voting-case") setIntroShown(true);
+  }, [room]);
 
   function handleJoined(code: string) {
     setRoomCode(code);
@@ -138,6 +153,17 @@ export function RoomCaseGame() {
           Odadan Ayrıl
         </button>
       </div>
+    );
+  }
+
+  if (!introShown) {
+    return (
+      <IntroCinematic
+        title={data.title}
+        order={data.order}
+        skip={!!reducedMotion}
+        onDone={() => setIntroShown(true)}
+      />
     );
   }
 

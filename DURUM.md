@@ -3,7 +3,10 @@
 > Bu dosya, oturumlar arasında "kaldığımız yerden devam etmek" için var.
 > Her çalışma seansının sonunda burayı güncelle.
 
-**Son güncelleme:** 2026-08-03 (Mod seçimi (Tek/Çoklu) artık en başta, ana
+**Son güncelleme:** 2026-08-03 (Oda modunda vaka seçimi sonrası açılış
+sinematiği eklendi, mobil görünüm + genel hata taraması yapıldı — 0 hata.
+bkz. "Oda Sinematiği + Mobil/Hata Taraması". Önceki: Mod seçimi
+(Tek/Çoklu) artık en başta, ana
 sayfada — vaka seçimi ondan SONRA geliyor. bkz. "Giriş Akışı Yeniden
 Düzenlendi: Mod Önce, Vaka Sonra". Önceki: Vaka sayfasına mod seçimi geri geldi —
 "Tek Başına Oyna" / "Arkadaşlarınla Oyna", ikincisi case-agnostic oda
@@ -690,6 +693,34 @@ vaka. Yapılan değişiklik:
   Oyna" → `/vaka` → kart tıklanınca hiç ara ekran olmadan direkt oyuna
   giriyor; "Arkadaşlarınla Oyna" → `/oda` → ortak vaka oylaması hâlâ
   sorunsuz çalışıyor (regresyon yok). `npm run build` temiz.
+
+## Oda Sinematiği + Mobil/Hata Taraması (2026-08-03, yirmidördüncü güncelleme)
+Kullanıcı 3 şey istedi: oda modunda vaka seçimi sonrası açılış sinematiği,
+kapanış animasyonunun (odadan çıkarken/sonuçta) var olduğunu doğrulama,
+mobil uyum + genel hata taraması.
+
+- **Açılış sinematiği eklendi:** `CaseGame.tsx`'teki `IntroCinematic`
+  tekrar export edildi, `RoomCaseGame.tsx` artık ortak vaka oylaması
+  "investigating"e geçince solo moddaki AYNI "Dosya No: XX... Dosya
+  Açılıyor" sinematiğini oynatıyor. **Devam eden bir oyuna dönenler
+  (sayfa yenileme) sinematiği TEKRAR görmüyor** — ilk gözlemlenen faz
+  zaten "voting-case"in ötesindeyse (yani zaten oynanıyorsa) atlanıyor,
+  tıpkı solo modun devam eden vakada intro'yu atlaması gibi.
+- **Kapanış animasyonu zaten vardı:** `RoomResultReveal`'daki "Dosya
+  Kapatıldı" damgası önceki turda solo'dan birebir kopyalanmıştı,
+  değişiklik gerekmedi — doğrulandı, çalışıyor.
+- **Mobil test (iPhone 13 viewport, iki gerçek katılımcı context'i):**
+  ana sayfa, /oda formu, ortak vaka oylama ekranı, açılış sinematiği,
+  header+sekmeler, pano, notlar+sohbet, katil/motiv oylama, sonuç
+  ekranı — hepsi ekran görüntüsüyle incelendi, **yatay taşma yok**,
+  düzen bozulmuyor. Bu büyük ölçüde oda bileşenlerinin zaten mobilde
+  kanıtlanmış solo bileşenlerini (EvidenceBoard, kart grid'leri)
+  yeniden kullanmasından kaynaklanıyor.
+- **Genel hata taraması:** 3 solo vakanın tüm sekmeleri + oda akışının
+  tamamı (oybirliği olmadan başlamama, oybirliğiyle sinematik+senkron
+  başlama, farklı bir vaka için — Son Round/Ozan — tam suçlama akışı)
+  test edildi, **0 konsol hatası**.
+- `npm run build` temiz.
 
 ## Sıradaki Adım
 1. Kullanıcı önceki service worker düzeltmesinin canlıda işe yaradığını
