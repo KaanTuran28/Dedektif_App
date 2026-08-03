@@ -190,7 +190,11 @@ export async function joinRoom(caseId: string, roomCode: string, name: string): 
 }
 
 /** Odadan ayrılır: katılımcı kaydını siler, sayacı düşürür, varsa aktif
- * oylamadaki oyunu da temizler ki tur kilitlenmesin. */
+ * oylamadaki oyunu da temizler. Kalan katılımcıların oyu bu ayrılışla birlikte
+ * zaten oybirliğine ulaşmış olabilir (örn. 3 kişiden 2'si aynı şeyi oyladı,
+ * anlaşmayan 3. kişi ayrıldı) — bu yüzden ayrılma sonrası da aynı çözümleme
+ * mantığı (`tryResolvePhase`) çalıştırılır, yoksa tur birinin tekrar oy
+ * vermesini bekleyerek gereksiz yere kilitli kalırdı. */
 export async function leaveRoom(roomCode: string): Promise<void> {
   const participantId = getOrCreateParticipantId();
   const ref = roomRef(roomCode);
@@ -198,14 +202,17 @@ export async function leaveRoom(roomCode: string): Promise<void> {
 
   await runTransaction(db, async (tx) => {
     const roomSnap = await tx.get(ref);
-    if (!roomSnap.exists()) return;
+    if (!roomSnap.exists()) {
+      tx.delete(pRef);
+      return;
+    }
     const room = roomSnap.data() as RoomDoc;
     const nextVotes = { ...room.votes };
     delete nextVotes[participantId];
-    tx.update(ref, {
-      participantCount: Math.max(0, (room.participantCount ?? 1) - 1),
-      votes: nextVotes,
-    });
+    const participantCount = Math.max(0, (room.participantCount ?? 1) - 1);
+
+    const resolved = tryResolvePhase({ ...room, votes: nextVotes, participantCount }, room.phase);
+    tx.update(ref, { participantCount, ...(resolved ?? { votes: nextVotes }) });
     tx.delete(pRef);
   });
 }
@@ -314,10 +321,76 @@ function coverageFor(room: RoomDoc, docCount: number, suspectCount: number): num
 }
 
 /** Katil/motiv/yöntem oylamasının üçü de aynı jenerik mekanizmayı paylaşır:
- * herkes oy verene kadar bekle, oybirliği varsa bir sonraki tura geç,
- * herkes oy verdi ama anlaşamadıysa turu sıfırla. Yarış durumuna karşı
- * (iki katılımcının aynı anda "son oy"u vermesi) tek bir transaction
- * içinde okuma-kontrol-yazma yapılır. */
+ * herkes oy verene kadar bekle, oybirliği varsa bir sonraki tura geç, herkes
+ * oy verdi ama anlaşamadıysa turu sıfırla. Saf bir fonksiyon olarak
+ * yazılmasının nedeni hem `castVote` hem `leaveRoom` transaction'larından
+ * çağrılabilmesi — biri odadan ayrıldığında da (oy sayısı/katılımcı sayısı
+ * değiştiği için) aynı çözümlemenin tekrar denenmesi gerekiyor, yoksa kalan
+ * oylar zaten oybirliğine ulaşmış olsa bile tur gereksiz yere kilitli kalır. */
+function tryResolvePhase(
+  room: RoomDoc,
+  phase: RoomPhase
+): Partial<RoomDoc> | null {
+  if (phase !== "voting-killer" && phase !== "voting-motive" && phase !== "voting-method") return null;
+  if (room.phase !== phase) return null;
+
+  const values = Object.values(room.votes);
+  const voteCount = values.length;
+  if (voteCount === 0 || voteCount < room.participantCount) return null;
+
+  const allSame = values.every((v) => v === values[0]);
+  if (!allSame) return { votes: {} };
+
+  const caseData = getCaseById(room.caseId);
+  if (!caseData) return null;
+  const choice = values[0];
+  const coverage = coverageFor(room, caseData.documents.length, caseData.suspects.length);
+
+  if (phase === "voting-killer") {
+    const correct = choice === caseData.solution.killerId;
+    if (!correct) {
+      const rank = rankFor({
+        correctSuspect: false,
+        motiveCorrect: false,
+        methodCorrect: false,
+        coverage,
+        hintsUsed: room.hintsUsed,
+        difficulty: caseData.difficulty,
+      });
+      return {
+        votes: {},
+        phase: "revealed",
+        accusedId: choice,
+        result: { correct: false, motiveCorrect: false, methodCorrect: false, coverage, rank },
+      };
+    }
+    return { votes: {}, phase: "voting-motive", accusedId: choice };
+  }
+
+  if (phase === "voting-motive") {
+    const motiveCorrect = caseData.motiveQuestion.options.find((o) => o.id === choice)?.correct ?? false;
+    return { votes: {}, phase: "voting-method", motiveCorrect };
+  }
+
+  // phase === "voting-method"
+  const methodCorrect = caseData.methodQuestion.options.find((o) => o.id === choice)?.correct ?? false;
+  const motiveCorrect = room.motiveCorrect ?? false;
+  const rank = rankFor({
+    correctSuspect: true,
+    motiveCorrect,
+    methodCorrect,
+    coverage,
+    hintsUsed: room.hintsUsed,
+    difficulty: caseData.difficulty,
+  });
+  return {
+    votes: {},
+    phase: "revealed",
+    methodCorrect,
+    result: { correct: true, motiveCorrect, methodCorrect, coverage, rank },
+  };
+}
+
 export async function castVote(roomCode: string, phase: RoomPhase, choice: string): Promise<void> {
   const participantId = getOrCreateParticipantId();
   const ref = roomRef(roomCode);
@@ -329,71 +402,7 @@ export async function castVote(roomCode: string, phase: RoomPhase, choice: strin
     if (room.phase !== phase) return; // ekran zaten değişmiş, bayat tıklama
 
     const nextVotes = { ...room.votes, [participantId]: choice };
-    const values = Object.values(nextVotes);
-    const voteCount = values.length;
-    const allSame = values.every((v) => v === values[0]);
-
-    if (voteCount < room.participantCount) {
-      tx.update(ref, { votes: nextVotes });
-      return;
-    }
-    if (!allSame) {
-      tx.update(ref, { votes: {} });
-      return;
-    }
-
-    const caseData = getCaseById(room.caseId);
-    if (!caseData) {
-      tx.update(ref, { votes: nextVotes });
-      return;
-    }
-    const coverage = coverageFor(room, caseData.documents.length, caseData.suspects.length);
-
-    if (phase === "voting-killer") {
-      const correct = choice === caseData.solution.killerId;
-      if (!correct) {
-        const rank = rankFor({
-          correctSuspect: false,
-          motiveCorrect: false,
-          methodCorrect: false,
-          coverage,
-          hintsUsed: room.hintsUsed,
-          difficulty: caseData.difficulty,
-        });
-        tx.update(ref, {
-          votes: {},
-          phase: "revealed",
-          accusedId: choice,
-          result: { correct: false, motiveCorrect: false, methodCorrect: false, coverage, rank },
-        });
-        return;
-      }
-      tx.update(ref, { votes: {}, phase: "voting-motive", accusedId: choice });
-      return;
-    }
-
-    if (phase === "voting-motive") {
-      const motiveCorrect = caseData.motiveQuestion.options.find((o) => o.id === choice)?.correct ?? false;
-      tx.update(ref, { votes: {}, phase: "voting-method", motiveCorrect });
-      return;
-    }
-
-    // phase === "voting-method"
-    const methodCorrect = caseData.methodQuestion.options.find((o) => o.id === choice)?.correct ?? false;
-    const motiveCorrect = room.motiveCorrect ?? false;
-    const rank = rankFor({
-      correctSuspect: true,
-      motiveCorrect,
-      methodCorrect,
-      coverage,
-      hintsUsed: room.hintsUsed,
-      difficulty: caseData.difficulty,
-    });
-    tx.update(ref, {
-      votes: {},
-      phase: "revealed",
-      methodCorrect,
-      result: { correct: true, motiveCorrect, methodCorrect, coverage, rank },
-    });
+    const resolved = tryResolvePhase({ ...room, votes: nextVotes }, phase);
+    tx.update(ref, resolved ?? { votes: nextVotes });
   });
 }

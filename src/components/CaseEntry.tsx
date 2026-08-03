@@ -1,20 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import type { CaseData } from "@/types/case";
 import { CaseGame, IntroCinematic } from "@/components/CaseGame";
 import { RoomCaseGame } from "@/components/RoomCaseGame";
+import { getCaseProgress } from "@/lib/progress";
+import { getStoredRoomCode } from "@/lib/room";
 
 type Mode = "choice" | "solo" | "room";
 
 /** Vaka sayfasının giriş noktası: açılış sinematiğini bir kez gösterir,
  * ardından "Tek Başına Oyna" (mevcut CaseGame, hiç değişmedi) ile
- * "Arkadaşlarınla Oyna" (yeni RoomCaseGame) arasında seçim sunar. */
+ * "Arkadaşlarınla Oyna" (yeni RoomCaseGame) arasında seçim sunar.
+ *
+ * Sayfa yenilenince bu bileşenin state'i sıfırlanır — devam eden bir solo
+ * oyun ya da katılınmış bir oda varsa kullanıcıyı tekrar seçim ekranına
+ * (ve sinematiğe) düşürmemek için mount olurken localStorage'a bakıp hangi
+ * modda kaldığını tespit eder. */
 export function CaseEntry({ data }: { data: CaseData }) {
+  const [ready, setReady] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const [mode, setMode] = useState<Mode>("choice");
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (getStoredRoomCode(data.id)) {
+      setMode("room");
+      setIntroDone(true);
+    } else if (getCaseProgress(data.id).inProgress) {
+      setMode("solo");
+      setIntroDone(true);
+    }
+    setReady(true);
+  }, [data.id]);
+
+  if (!ready) return null;
 
   if (!introDone) {
     return (
